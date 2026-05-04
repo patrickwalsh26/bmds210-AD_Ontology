@@ -1,0 +1,994 @@
+Prefix(:=<http://protege.stanford.edu/ontologies/groceries/>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(foaf:=<http://xmlns.com/foaf/0.1/>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+Prefix(skos:=<http://www.w3.org/2004/02/skos/core#>)
+Prefix(schema:=<http://schema.org/>)
+Prefix(dcterms:=<http://purl.org/dc/terms/>)
+
+
+Ontology(<http://protege.stanford.edu/ontologies/groceries>
+
+Declaration(Class(:Almond))
+Declaration(Class(:AmaranthFlour))
+Declaration(Class(:AmmoniumBicarbonate))
+Declaration(Class(:Apple))
+Declaration(Class(:BackToNatureFudgeMintCookiesItem))
+Declaration(Class(:BananaPuree))
+Declaration(Class(:Barley))
+Declaration(Class(:BiscoffCookie))
+Declaration(Class(:BreakfastCereal))
+Declaration(Class(:BrownFlour))
+Declaration(Class(:BrownRiceFlour))
+Declaration(Class(:BrownSugar))
+Declaration(Class(:Buckwheat))
+Declaration(Class(:Butter))
+Declaration(Class(:ButterProduct))
+Declaration(Class(:CaneJuice))
+Declaration(Class(:CaneJuiceProduct))
+Declaration(Class(:CaneSyrup))
+Declaration(Class(:CanolaOil))
+Declaration(Class(:Cashew))
+Declaration(Class(:CerealBar))
+Declaration(Class(:CerealGrain))
+Declaration(Class(:CerealProduct))
+Declaration(Class(:ChiaFlour))
+Declaration(Class(:ChiaSeed))
+Declaration(Class(:ChickenEgg))
+Declaration(Class(:Chocolate))
+Declaration(Class(:ChocolateLiquor))
+Declaration(Class(:ChocolateProduct))
+Declaration(Class(:Cinnamon))
+Declaration(Class(:CocoaButter))
+Declaration(Class(:CocoaProduct))
+Declaration(Class(:Coconut))
+Declaration(Class(:ConfectioneryCoating))
+Declaration(Class(:Cookie))
+Declaration(Class(:CornSyrup))
+Declaration(Class(:Cornstarch))
+Declaration(Class(:CottonSeedOil))
+Declaration(Class(:CreamOfTartar))
+Declaration(Class(:DairyProduct))
+Declaration(Class(:DehydratedCaneJuice))
+Declaration(Class(:DriedCaneSyrup))
+Declaration(Class(:DutchedCocoa))
+Declaration(Class(:Egg))
+Declaration(Class(:EnrichedWheatFlour))
+Declaration(Class(:EssentialOil))
+Declaration(Class(:EvaporatedCaneJuice))
+Declaration(Class(:EvaporatedSalt))
+Declaration(Class(:Extract))
+Declaration(Class(:FlakeProduct))
+Declaration(Class(:Flour))
+Declaration(Class(:FolicAcid))
+Declaration(Class(:FoodStuff))
+Declaration(Class(:FoodSyrup))
+Declaration(Class(:Fructan))
+Declaration(Class(:FruitFlake))
+Declaration(Class(:FruitProduct))
+Declaration(Class(:FudgeCoating))
+Declaration(Class(:FudgeMintCookie))
+Declaration(Class(:Gelatin))
+Declaration(Class(:Ginger))
+Declaration(Class(:Gluten))
+Declaration(Class(:GoldenFlaxFlour))
+Declaration(Class(:GrainStarch))
+Declaration(Class(:GroceryItem))
+Declaration(Class(:GroceryItemThatContainsSoy))
+Declaration(Class(:HardRedWheat))
+Declaration(Class(:Hazelnut))
+Declaration(Class(:HighFructoseCornSyrup))
+Declaration(Class(:Honey))
+Declaration(Class(:HydrogenatedSoyBeanOil))
+Declaration(Class(:InvertCaneSugar))
+Declaration(Class(:InvertCaneSyrup))
+Declaration(Class(:KashiCrunchChocolateChipBar))
+Declaration(Class(:KashiCrunchChocolateChipBarItem))
+Declaration(Class(:Lactose))
+Declaration(Class(:LotusBiscoffCookiesItem))
+Declaration(Class(:Macadamia))
+Declaration(Class(:MallomarsCookie))
+Declaration(Class(:MallomarsCookiesPureChocolateItem))
+Declaration(Class(:Milk))
+Declaration(Class(:MilkPowder))
+Declaration(Class(:Millet))
+Declaration(Class(:MilletFlake))
+Declaration(Class(:MilletFlour))
+Declaration(Class(:ModifiedCornstarch))
+Declaration(Class(:Molasses))
+Declaration(Class(:NaturalCocoa))
+Declaration(Class(:Niacin))
+Declaration(Class(:Nut))
+Declaration(Class(:NutProduct))
+Declaration(Class(:NutritionalInformation))
+Declaration(Class(:Oat))
+Declaration(Class(:OatFlake))
+Declaration(Class(:OatFlour))
+Declaration(Class(:OrganicEvaporatedCaneJuice))
+Declaration(Class(:OrganicEvaporatedCaneJuiceInvertSyrup))
+Declaration(Class(:PalmKernelOil))
+Declaration(Class(:PalmOil))
+Declaration(Class(:Pecan))
+Declaration(Class(:PepperidgeFarmTahoeWhiteChocolateMacadamiaCookiesItem))
+Declaration(Class(:PeppermintOil))
+Declaration(Class(:PlantOil))
+Declaration(Class(:Quinoa))
+Declaration(Class(:QuinoaFlour))
+Declaration(Class(:Raisin))
+Declaration(Class(:RaisinJuice))
+Declaration(Class(:RaisinJuiceConcentrate))
+Declaration(Class(:ReducedIron))
+Declaration(Class(:Riboflavin))
+Declaration(Class(:Rice))
+Declaration(Class(:RiceFlour))
+Declaration(Class(:Rye))
+Declaration(Class(:Salt))
+Declaration(Class(:SeaSalt))
+Declaration(Class(:SemiSweetChocolateChips))
+Declaration(Class(:Semolina))
+Declaration(Class(:Shortbread))
+Declaration(Class(:SkimMilkPowder))
+Declaration(Class(:SodiumBicarbonate))
+Declaration(Class(:Soy))
+Declaration(Class(:SoyBeanOil))
+Declaration(Class(:SoyFlour))
+Declaration(Class(:SoyLecithin))
+Declaration(Class(:Spice))
+Declaration(Class(:SugarProduct))
+Declaration(Class(:SunflowerOil))
+Declaration(Class(:SweetChocolateCoating))
+Declaration(Class(:ThiaminMononitrate))
+Declaration(Class(:TreeNutMeal))
+Declaration(Class(:TripotassiumPhosphate))
+Declaration(Class(:Triticale))
+Declaration(Class(:UnmodifiedCornstarch))
+Declaration(Class(:VanillaBean))
+Declaration(Class(:VanillaExtract))
+Declaration(Class(:VegetableOil))
+Declaration(Class(:Vitamin))
+Declaration(Class(:VitaminB))
+Declaration(Class(:VitaminB1))
+Declaration(Class(:VitaminB2))
+Declaration(Class(:VitaminB3))
+Declaration(Class(:VitaminB9))
+Declaration(Class(:WalkersShortbread))
+Declaration(Class(:WalkersShortbreadFingersBox))
+Declaration(Class(:WalkersShortbreadItem))
+Declaration(Class(:WalkersShortbreadRoundsBox))
+Declaration(Class(:Walnut))
+Declaration(Class(:Wheat))
+Declaration(Class(:WheatFlake))
+Declaration(Class(:WheatFlour))
+Declaration(Class(:WheatStarch))
+Declaration(Class(:Whey))
+Declaration(Class(:WhiteChocolate))
+Declaration(Class(:WhiteChocolateMacadamiaCookie))
+Declaration(Class(:WhiteFlour))
+Declaration(Class(:WhiteSugar))
+Declaration(Class(:WholeGrainBrownRiceFlour))
+Declaration(Class(:WholeGrainOat))
+Declaration(Class(:WholeMilkPowder))
+Declaration(Class(:WholeOatFlour))
+Declaration(Class(:WholeSorghumFlour))
+Declaration(Class(:WholemealFlour))
+Declaration(ObjectProperty(:contains))
+Declaration(ObjectProperty(:containsFoodStuff))
+Declaration(ObjectProperty(:hasIngredient))
+Declaration(AnnotationProperty(dcterms:creator))
+Declaration(AnnotationProperty(schema:gtin12))
+Declaration(AnnotationProperty(skos:altLabel))
+Declaration(AnnotationProperty(skos:definition))
+Declaration(AnnotationProperty(foaf:depiction))
+
+############################
+#   Object Properties
+############################
+
+# Object Property: :contains (:contains)
+
+TransitiveObjectProperty(:contains)
+
+# Object Property: :containsFoodStuff (:containsFoodStuff)
+
+SubObjectPropertyOf(:containsFoodStuff :contains)
+
+# Object Property: :hasIngredient (:hasIngredient)
+
+SubObjectPropertyOf(:hasIngredient :contains)
+
+
+
+############################
+#   Classes
+############################
+
+# Class: :Almond (:Almond)
+
+SubClassOf(:Almond :Nut)
+
+# Class: :AmaranthFlour (:AmaranthFlour)
+
+SubClassOf(:AmaranthFlour :Flour)
+
+# Class: :AmmoniumBicarbonate (:AmmoniumBicarbonate)
+
+SubClassOf(:AmmoniumBicarbonate :FoodStuff)
+
+# Class: :Apple (:Apple)
+
+SubClassOf(:Apple :FruitProduct)
+
+# Class: :BackToNatureFudgeMintCookiesItem (:BackToNatureFudgeMintCookiesItem)
+
+AnnotationAssertion(foaf:depiction :BackToNatureFudgeMintCookiesItem <http://i.imgur.com/q782EtN.jpg>)
+SubClassOf(:BackToNatureFudgeMintCookiesItem :GroceryItem)
+SubClassOf(:BackToNatureFudgeMintCookiesItem ObjectSomeValuesFrom(:containsFoodStuff :FudgeMintCookie))
+
+# Class: :BananaPuree (:BananaPuree)
+
+SubClassOf(:BananaPuree :FruitProduct)
+
+# Class: :Barley (:Barley)
+
+SubClassOf(:Barley :CerealGrain)
+
+# Class: :BiscoffCookie (:BiscoffCookie)
+
+SubClassOf(:BiscoffCookie :Cookie)
+SubClassOf(:BiscoffCookie ObjectSomeValuesFrom(:hasIngredient :BrownSugar))
+SubClassOf(:BiscoffCookie ObjectSomeValuesFrom(:hasIngredient :Cinnamon))
+SubClassOf(:BiscoffCookie ObjectSomeValuesFrom(:hasIngredient :Salt))
+SubClassOf(:BiscoffCookie ObjectSomeValuesFrom(:hasIngredient :SodiumBicarbonate))
+SubClassOf(:BiscoffCookie ObjectSomeValuesFrom(:hasIngredient :SoyFlour))
+SubClassOf(:BiscoffCookie ObjectSomeValuesFrom(:hasIngredient :WheatFlour))
+SubClassOf(:BiscoffCookie ObjectSomeValuesFrom(:hasIngredient ObjectUnionOf(:CanolaOil :PalmOil :SoyBeanOil :SunflowerOil)))
+
+# Class: :BreakfastCereal (:BreakfastCereal)
+
+SubClassOf(:BreakfastCereal :CerealProduct)
+DisjointClasses(:BreakfastCereal :CerealBar)
+
+# Class: :BrownFlour (:BrownFlour)
+
+SubClassOf(:BrownFlour :WheatFlour)
+
+# Class: :BrownRiceFlour (:BrownRiceFlour)
+
+SubClassOf(:BrownRiceFlour :RiceFlour)
+DisjointClasses(:BrownRiceFlour :WholeGrainBrownRiceFlour)
+
+# Class: :BrownSugar (:BrownSugar)
+
+SubClassOf(:BrownSugar :SugarProduct)
+
+# Class: :Buckwheat (:Buckwheat)
+
+SubClassOf(:Buckwheat :Wheat)
+DisjointClasses(:Buckwheat :HardRedWheat)
+
+# Class: :Butter (:Butter)
+
+SubClassOf(:Butter :ButterProduct)
+
+# Class: :ButterProduct (:ButterProduct)
+
+SubClassOf(:ButterProduct :DairyProduct)
+
+# Class: :CaneJuice (:CaneJuice)
+
+SubClassOf(:CaneJuice :CaneJuiceProduct)
+
+# Class: :CaneJuiceProduct (:CaneJuiceProduct)
+
+SubClassOf(:CaneJuiceProduct :SugarProduct)
+
+# Class: :CaneSyrup (:CaneSyrup)
+
+SubClassOf(:CaneSyrup :FoodSyrup)
+
+# Class: :CanolaOil (:CanolaOil)
+
+SubClassOf(:CanolaOil :VegetableOil)
+
+# Class: :Cashew (:Cashew)
+
+SubClassOf(:Cashew :Nut)
+
+# Class: :CerealBar (:CerealBar)
+
+SubClassOf(:CerealBar :CerealProduct)
+
+# Class: :CerealGrain (:CerealGrain)
+
+SubClassOf(:CerealGrain :FoodStuff)
+
+# Class: :CerealProduct (:CerealProduct)
+
+SubClassOf(:CerealProduct :FoodStuff)
+
+# Class: :ChiaFlour (:ChiaFlour)
+
+SubClassOf(:ChiaFlour :Flour)
+
+# Class: :ChiaSeed (:ChiaSeed)
+
+SubClassOf(:ChiaSeed :FoodStuff)
+
+# Class: :ChickenEgg (:ChickenEgg)
+
+SubClassOf(:ChickenEgg :Egg)
+
+# Class: :Chocolate (:Chocolate)
+
+SubClassOf(:Chocolate :ChocolateProduct)
+
+# Class: :ChocolateLiquor (:ChocolateLiquor)
+
+SubClassOf(:ChocolateLiquor :CocoaProduct)
+
+# Class: :ChocolateProduct (:ChocolateProduct)
+
+SubClassOf(:ChocolateProduct :FoodStuff)
+
+# Class: :Cinnamon (:Cinnamon)
+
+SubClassOf(:Cinnamon :Spice)
+
+# Class: :CocoaButter (:CocoaButter)
+
+SubClassOf(:CocoaButter :CocoaProduct)
+
+# Class: :CocoaProduct (:CocoaProduct)
+
+SubClassOf(:CocoaProduct :FoodStuff)
+
+# Class: :Coconut (:Coconut)
+
+SubClassOf(:Coconut :FruitProduct)
+
+# Class: :ConfectioneryCoating (:ConfectioneryCoating)
+
+SubClassOf(:ConfectioneryCoating :ChocolateProduct)
+
+# Class: :Cookie (:Cookie)
+
+SubClassOf(:Cookie :FoodStuff)
+
+# Class: :CornSyrup (:CornSyrup)
+
+SubClassOf(:CornSyrup :FoodSyrup)
+
+# Class: :Cornstarch (:Cornstarch)
+
+SubClassOf(:Cornstarch :GrainStarch)
+DisjointClasses(:Cornstarch :WheatStarch)
+
+# Class: :CottonSeedOil (:CottonSeedOil)
+
+SubClassOf(:CottonSeedOil :VegetableOil)
+
+# Class: :CreamOfTartar (:CreamOfTartar)
+
+SubClassOf(:CreamOfTartar :FoodStuff)
+
+# Class: :DairyProduct (:DairyProduct)
+
+SubClassOf(:DairyProduct :FoodStuff)
+
+# Class: :DehydratedCaneJuice (:DehydratedCaneJuice)
+
+SubClassOf(:DehydratedCaneJuice :SugarProduct)
+
+# Class: :DriedCaneSyrup (:DriedCaneSyrup)
+
+SubClassOf(:DriedCaneSyrup :CaneSyrup)
+DisjointClasses(:DriedCaneSyrup :InvertCaneSyrup)
+
+# Class: :DutchedCocoa (:DutchedCocoa)
+
+SubClassOf(:DutchedCocoa :CocoaProduct)
+
+# Class: :Egg (:Egg)
+
+SubClassOf(:Egg :FoodStuff)
+
+# Class: :EnrichedWheatFlour (:EnrichedWheatFlour)
+
+SubClassOf(:EnrichedWheatFlour :Flour)
+SubClassOf(:EnrichedWheatFlour ObjectSomeValuesFrom(:hasIngredient :FolicAcid))
+SubClassOf(:EnrichedWheatFlour ObjectSomeValuesFrom(:hasIngredient :Niacin))
+SubClassOf(:EnrichedWheatFlour ObjectSomeValuesFrom(:hasIngredient :ReducedIron))
+SubClassOf(:EnrichedWheatFlour ObjectSomeValuesFrom(:hasIngredient :Riboflavin))
+SubClassOf(:EnrichedWheatFlour ObjectSomeValuesFrom(:hasIngredient :ThiaminMononitrate))
+SubClassOf(:EnrichedWheatFlour ObjectSomeValuesFrom(:hasIngredient :WheatFlour))
+
+# Class: :EssentialOil (:EssentialOil)
+
+SubClassOf(:EssentialOil :PlantOil)
+DisjointClasses(:EssentialOil :VegetableOil)
+
+# Class: :EvaporatedCaneJuice (:EvaporatedCaneJuice)
+
+SubClassOf(:EvaporatedCaneJuice :CaneJuiceProduct)
+
+# Class: :EvaporatedSalt (:EvaporatedSalt)
+
+SubClassOf(:EvaporatedSalt :Salt)
+DisjointClasses(:EvaporatedSalt :SeaSalt)
+
+# Class: :Extract (:Extract)
+
+SubClassOf(:Extract :FoodStuff)
+
+# Class: :FlakeProduct (:FlakeProduct)
+
+SubClassOf(:FlakeProduct :FoodStuff)
+
+# Class: :Flour (:Flour)
+
+SubClassOf(:Flour :FoodStuff)
+
+# Class: :FolicAcid (:FolicAcid)
+
+SubClassOf(:FolicAcid :VitaminB9)
+
+# Class: :FoodSyrup (:FoodSyrup)
+
+SubClassOf(:FoodSyrup :SugarProduct)
+
+# Class: :Fructan (:Fructan)
+
+SubClassOf(:Fructan :FoodStuff)
+
+# Class: :FruitFlake (:FruitFlake)
+
+SubClassOf(:FruitFlake :FlakeProduct)
+
+# Class: :FruitProduct (:FruitProduct)
+
+SubClassOf(:FruitProduct :FoodStuff)
+
+# Class: :FudgeCoating (:FudgeCoating)
+
+SubClassOf(:FudgeCoating :ConfectioneryCoating)
+SubClassOf(:FudgeCoating ObjectSomeValuesFrom(:hasIngredient :PalmKernelOil))
+SubClassOf(:FudgeCoating ObjectSomeValuesFrom(:hasIngredient :SoyLecithin))
+SubClassOf(:FudgeCoating ObjectSomeValuesFrom(:hasIngredient :Whey))
+SubClassOf(:FudgeCoating ObjectSomeValuesFrom(:hasIngredient :WhiteSugar))
+DisjointClasses(:FudgeCoating :SweetChocolateCoating)
+
+# Class: :FudgeMintCookie (:FudgeMintCookie)
+
+SubClassOf(:FudgeMintCookie :Cookie)
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :DutchedCocoa))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :EvaporatedCaneJuice))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :FudgeCoating))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :OrganicEvaporatedCaneJuiceInvertSyrup))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :PalmOil))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :PeppermintOil))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :SeaSalt))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :SodiumBicarbonate))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :SoyLecithin))
+SubClassOf(:FudgeMintCookie ObjectSomeValuesFrom(:hasIngredient :WheatFlour))
+
+# Class: :Gelatin (:Gelatin)
+
+SubClassOf(:Gelatin :FoodStuff)
+
+# Class: :Ginger (:Ginger)
+
+SubClassOf(:Ginger :Spice)
+
+# Class: :Gluten (:Gluten)
+
+SubClassOf(:Gluten :FoodStuff)
+
+# Class: :GoldenFlaxFlour (:GoldenFlaxFlour)
+
+SubClassOf(:GoldenFlaxFlour :Flour)
+
+# Class: :GrainStarch (:GrainStarch)
+
+SubClassOf(:GrainStarch :FoodStuff)
+
+# Class: :GroceryItemThatContainsSoy (:GroceryItemThatContainsSoy)
+
+SubClassOf(:GroceryItemThatContainsSoy :FoodStuff)
+
+# Class: :HardRedWheat (:HardRedWheat)
+
+SubClassOf(:HardRedWheat :Wheat)
+
+# Class: :Hazelnut (:Hazelnut)
+
+SubClassOf(:Hazelnut :Nut)
+
+# Class: :HighFructoseCornSyrup (:HighFructoseCornSyrup)
+
+SubClassOf(:HighFructoseCornSyrup :FoodSyrup)
+
+# Class: :Honey (:Honey)
+
+SubClassOf(:Honey :FoodStuff)
+
+# Class: :HydrogenatedSoyBeanOil (:HydrogenatedSoyBeanOil)
+
+SubClassOf(:HydrogenatedSoyBeanOil :VegetableOil)
+
+# Class: :InvertCaneSugar (:InvertCaneSugar)
+
+SubClassOf(:InvertCaneSugar :SugarProduct)
+
+# Class: :InvertCaneSyrup (:InvertCaneSyrup)
+
+SubClassOf(:InvertCaneSyrup :CaneSyrup)
+
+# Class: :KashiCrunchChocolateChipBar (:KashiCrunchChocolateChipBar)
+
+SubClassOf(:KashiCrunchChocolateChipBar :Cookie)
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :Barley))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :BrownRiceFlour))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :Buckwheat))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :CanolaOil))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :ChiaSeed))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :Coconut))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :DriedCaneSyrup))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :EvaporatedSalt))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :HardRedWheat))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :InvertCaneSyrup))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :Molasses))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :Quinoa))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :SemiSweetChocolateChips))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :SodiumBicarbonate))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :SoyLecithin))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :Triticale))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :UnmodifiedCornstarch))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :VanillaExtract))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :WholeGrainOat))
+SubClassOf(:KashiCrunchChocolateChipBar ObjectSomeValuesFrom(:hasIngredient :WholeOatFlour))
+
+# Class: :KashiCrunchChocolateChipBarItem (:KashiCrunchChocolateChipBarItem)
+
+AnnotationAssertion(foaf:depiction :KashiCrunchChocolateChipBarItem <http://i.imgur.com/PR0kmvA.jpg>)
+SubClassOf(:KashiCrunchChocolateChipBarItem :GroceryItem)
+SubClassOf(:KashiCrunchChocolateChipBarItem ObjectSomeValuesFrom(:containsFoodStuff :KashiCrunchChocolateChipBar))
+
+# Class: :Lactose (:Lactose)
+
+SubClassOf(:Lactose :DairyProduct)
+
+# Class: :LotusBiscoffCookiesItem (:LotusBiscoffCookiesItem)
+
+SubClassOf(:LotusBiscoffCookiesItem :GroceryItem)
+SubClassOf(:LotusBiscoffCookiesItem ObjectSomeValuesFrom(:containsFoodStuff :BiscoffCookie))
+
+# Class: :Macadamia (:Macadamia)
+
+SubClassOf(:Macadamia :Nut)
+
+# Class: :MallomarsCookie (:MallomarsCookie)
+
+SubClassOf(:MallomarsCookie :Cookie)
+SubClassOf(:MallomarsCookie ObjectUnionOf(ObjectSomeValuesFrom(:hasIngredient :CanolaOil) ObjectSomeValuesFrom(:hasIngredient :PalmKernelOil) ObjectSomeValuesFrom(:hasIngredient :PalmOil)))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :CornSyrup))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :EnrichedWheatFlour))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :Gelatin))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :HighFructoseCornSyrup))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :InvertCaneSugar))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :Salt))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :SodiumBicarbonate))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :SoyLecithin))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :SweetChocolateCoating))
+SubClassOf(:MallomarsCookie ObjectSomeValuesFrom(:hasIngredient :WhiteSugar))
+
+# Class: :MallomarsCookiesPureChocolateItem (:MallomarsCookiesPureChocolateItem)
+
+AnnotationAssertion(foaf:depiction :MallomarsCookiesPureChocolateItem <http://i.imgur.com/giWpIbx.jpg>)
+SubClassOf(:MallomarsCookiesPureChocolateItem :GroceryItem)
+SubClassOf(:MallomarsCookiesPureChocolateItem ObjectSomeValuesFrom(:containsFoodStuff :MallomarsCookie))
+
+# Class: :Milk (:Milk)
+
+SubClassOf(:Milk :DairyProduct)
+
+# Class: :MilkPowder (:MilkPowder)
+
+SubClassOf(:MilkPowder :DairyProduct)
+
+# Class: :Millet (:Millet)
+
+SubClassOf(:Millet :CerealGrain)
+
+# Class: :MilletFlake (:MilletFlake)
+
+SubClassOf(:MilletFlake :FlakeProduct)
+
+# Class: :MilletFlour (:MilletFlour)
+
+SubClassOf(:MilletFlour :Flour)
+
+# Class: :ModifiedCornstarch (:ModifiedCornstarch)
+
+SubClassOf(:ModifiedCornstarch :Cornstarch)
+DisjointClasses(:ModifiedCornstarch :UnmodifiedCornstarch)
+
+# Class: :Molasses (:Molasses)
+
+SubClassOf(:Molasses :SugarProduct)
+
+# Class: :NaturalCocoa (:NaturalCocoa)
+
+SubClassOf(:NaturalCocoa :CocoaProduct)
+
+# Class: :Niacin (:Niacin)
+
+SubClassOf(:Niacin :VitaminB3)
+
+# Class: :Nut (:Nut)
+
+SubClassOf(:Nut :NutProduct)
+DisjointClasses(:Nut :TreeNutMeal)
+
+# Class: :NutProduct (:NutProduct)
+
+SubClassOf(:NutProduct :FoodStuff)
+
+# Class: :Oat (:Oat)
+
+SubClassOf(:Oat :CerealGrain)
+
+# Class: :OatFlake (:OatFlake)
+
+SubClassOf(:OatFlake :FlakeProduct)
+
+# Class: :OatFlour (:OatFlour)
+
+SubClassOf(:OatFlour :Flour)
+
+# Class: :OrganicEvaporatedCaneJuice (:OrganicEvaporatedCaneJuice)
+
+SubClassOf(:OrganicEvaporatedCaneJuice :CaneJuiceProduct)
+
+# Class: :OrganicEvaporatedCaneJuiceInvertSyrup (:OrganicEvaporatedCaneJuiceInvertSyrup)
+
+SubClassOf(:OrganicEvaporatedCaneJuiceInvertSyrup :FoodSyrup)
+
+# Class: :PalmKernelOil (:PalmKernelOil)
+
+SubClassOf(:PalmKernelOil :VegetableOil)
+
+# Class: :PalmOil (:PalmOil)
+
+SubClassOf(:PalmOil :VegetableOil)
+
+# Class: :Pecan (:Pecan)
+
+SubClassOf(:Pecan :Nut)
+
+# Class: :PepperidgeFarmTahoeWhiteChocolateMacadamiaCookiesItem (:PepperidgeFarmTahoeWhiteChocolateMacadamiaCookiesItem)
+
+AnnotationAssertion(foaf:depiction :PepperidgeFarmTahoeWhiteChocolateMacadamiaCookiesItem <http://i.imgur.com/1WSAbEU.jpg>)
+SubClassOf(:PepperidgeFarmTahoeWhiteChocolateMacadamiaCookiesItem :GroceryItem)
+SubClassOf(:PepperidgeFarmTahoeWhiteChocolateMacadamiaCookiesItem ObjectSomeValuesFrom(:containsFoodStuff :WhiteChocolateMacadamiaCookie))
+
+# Class: :PeppermintOil (:PeppermintOil)
+
+SubClassOf(:PeppermintOil :EssentialOil)
+
+# Class: :PlantOil (:PlantOil)
+
+SubClassOf(:PlantOil :FoodStuff)
+
+# Class: :Quinoa (:Quinoa)
+
+SubClassOf(:Quinoa :CerealGrain)
+
+# Class: :QuinoaFlour (:QuinoaFlour)
+
+SubClassOf(:QuinoaFlour :Flour)
+
+# Class: :Raisin (:Raisin)
+
+SubClassOf(:Raisin :FruitProduct)
+
+# Class: :RaisinJuice (:RaisinJuice)
+
+SubClassOf(:RaisinJuice :FruitProduct)
+
+# Class: :RaisinJuiceConcentrate (:RaisinJuiceConcentrate)
+
+SubClassOf(:RaisinJuiceConcentrate :FruitProduct)
+
+# Class: :ReducedIron (:ReducedIron)
+
+SubClassOf(:ReducedIron :FoodStuff)
+
+# Class: :Riboflavin (:Riboflavin)
+
+SubClassOf(:Riboflavin :VitaminB2)
+
+# Class: :Rice (:Rice)
+
+SubClassOf(:Rice :CerealGrain)
+
+# Class: :RiceFlour (:RiceFlour)
+
+SubClassOf(:RiceFlour :Flour)
+
+# Class: :Rye (:Rye)
+
+SubClassOf(:Rye :CerealGrain)
+
+# Class: :Salt (:Salt)
+
+SubClassOf(:Salt :FoodStuff)
+
+# Class: :SeaSalt (:SeaSalt)
+
+SubClassOf(:SeaSalt :Salt)
+
+# Class: :SemiSweetChocolateChips (:SemiSweetChocolateChips)
+
+SubClassOf(:SemiSweetChocolateChips :ChocolateProduct)
+SubClassOf(:SemiSweetChocolateChips ObjectSomeValuesFrom(:hasIngredient :ChocolateLiquor))
+SubClassOf(:SemiSweetChocolateChips ObjectSomeValuesFrom(:hasIngredient :CocoaButter))
+SubClassOf(:SemiSweetChocolateChips ObjectSomeValuesFrom(:hasIngredient :DriedCaneSyrup))
+SubClassOf(:SemiSweetChocolateChips ObjectSomeValuesFrom(:hasIngredient :SoyLecithin))
+SubClassOf(:SemiSweetChocolateChips ObjectSomeValuesFrom(:hasIngredient :VanillaBean))
+
+# Class: :Semolina (:Semolina)
+
+SubClassOf(:Semolina :Flour)
+
+# Class: :Shortbread (:Shortbread)
+
+SubClassOf(:Shortbread :Cookie)
+
+# Class: :SkimMilkPowder (:SkimMilkPowder)
+
+SubClassOf(:SkimMilkPowder :MilkPowder)
+DisjointClasses(:SkimMilkPowder :WholeMilkPowder)
+
+# Class: :SodiumBicarbonate (Bicarbonato de Sodio)
+
+AnnotationAssertion(dcterms:creator :SodiumBicarbonate "Your Name Here")
+AnnotationAssertion(rdfs:label :SodiumBicarbonate "Bicarbonato de Sodio"@es)
+AnnotationAssertion(rdfs:label :SodiumBicarbonate "Natriumbicarbonat"@de)
+AnnotationAssertion(rdfs:label :SodiumBicarbonate "Sodium Bicarbonate"@en)
+AnnotationAssertion(rdfs:seeAlso :SodiumBicarbonate <https://en.wikipedia.org/wiki/Sodium_bicarbonate>)
+AnnotationAssertion(skos:altLabel :SodiumBicarbonate "Backpulver"@de)
+AnnotationAssertion(skos:altLabel :SodiumBicarbonate "Baking Soda"@en)
+AnnotationAssertion(skos:definition :SodiumBicarbonate "Sodium bicarbonate, referred to as 'baking soda', is primarily used in baking, as a leavening agent. It reacts with acidic components in batters, releasing carbon dioxide, which causes expansion of the batter and forms the characteristic texture and grain in pancakes, cakes, quick breads, soda bread, and other baked and fried foods. Acidic compounds that induce this reaction include phosphates, cream of tartar, lemon juice, yogurt, buttermilk, cocoa and vinegar. Natural acids in sourdough can be leavened with the addition of small amounts as well. Sodium bicarbonate can be substituted for baking powder provided sufficient acid reagent is also added to the recipe. Many forms of baking powder contain sodium bicarbonate combined with calcium acid phosphate, sodium aluminium phosphate or cream of tartar. Sodium bicarbonate was sometimes used in cooking vegetables, to make them softer, although this has gone out of fashion, as most people now prefer firmer vegetables. However, it is still used in Asian and Latin American cuisine to tenderise meats. Baking soda may react with acids in food, including vitamin C (L-ascorbic acid). It is also used in breading such as for fried foods to enhance crispness and allow passages for steam to escape, so the breading is not blown off during cooking."@en)
+AnnotationAssertion(foaf:depiction :SodiumBicarbonate <https://imgur.com/rKr2e6v.jpg>)
+SubClassOf(:SodiumBicarbonate :FoodStuff)
+
+# Class: :Soy (:Soy)
+
+SubClassOf(:Soy :FoodStuff)
+
+# Class: :SoyBeanOil (:SoyBeanOil)
+
+SubClassOf(:SoyBeanOil :VegetableOil)
+SubClassOf(:SoyBeanOil ObjectSomeValuesFrom(:contains :Soy))
+
+# Class: :SoyFlour (:SoyFlour)
+
+SubClassOf(:SoyFlour :Flour)
+SubClassOf(:SoyFlour ObjectSomeValuesFrom(:contains :Soy))
+
+# Class: :SoyLecithin (:SoyLecithin)
+
+SubClassOf(:SoyLecithin :FoodStuff)
+SubClassOf(:SoyLecithin ObjectSomeValuesFrom(:contains :Soy))
+
+# Class: :Spice (:Spice)
+
+SubClassOf(:Spice :FoodStuff)
+
+# Class: :SugarProduct (:SugarProduct)
+
+SubClassOf(:SugarProduct :FoodStuff)
+
+# Class: :SunflowerOil (:SunflowerOil)
+
+SubClassOf(:SunflowerOil :VegetableOil)
+
+# Class: :SweetChocolateCoating (:SweetChocolateCoating)
+
+SubClassOf(:SweetChocolateCoating :ConfectioneryCoating)
+SubClassOf(:SweetChocolateCoating ObjectSomeValuesFrom(:hasIngredient :Chocolate))
+SubClassOf(:SweetChocolateCoating ObjectSomeValuesFrom(:hasIngredient :CocoaButter))
+SubClassOf(:SweetChocolateCoating ObjectSomeValuesFrom(:hasIngredient :DutchedCocoa))
+SubClassOf(:SweetChocolateCoating ObjectSomeValuesFrom(:hasIngredient :WhiteSugar))
+
+# Class: :ThiaminMononitrate (:ThiaminMononitrate)
+
+SubClassOf(:ThiaminMononitrate :VitaminB1)
+
+# Class: :TreeNutMeal (:TreeNutMeal)
+
+SubClassOf(:TreeNutMeal :NutProduct)
+SubClassOf(:TreeNutMeal ObjectSomeValuesFrom(:hasIngredient :Almond))
+SubClassOf(:TreeNutMeal ObjectSomeValuesFrom(:hasIngredient :Cashew))
+SubClassOf(:TreeNutMeal ObjectSomeValuesFrom(:hasIngredient :Macadamia))
+SubClassOf(:TreeNutMeal ObjectSomeValuesFrom(:hasIngredient :Pecan))
+SubClassOf(:TreeNutMeal ObjectSomeValuesFrom(:hasIngredient :Walnut))
+
+# Class: :TripotassiumPhosphate (:TripotassiumPhosphate)
+
+SubClassOf(:TripotassiumPhosphate :FoodStuff)
+
+# Class: :Triticale (:Triticale)
+
+SubClassOf(:Triticale :CerealGrain)
+
+# Class: :UnmodifiedCornstarch (:UnmodifiedCornstarch)
+
+SubClassOf(:UnmodifiedCornstarch :Cornstarch)
+
+# Class: :VanillaBean (:VanillaBean)
+
+SubClassOf(:VanillaBean :Spice)
+
+# Class: :VanillaExtract (:VanillaExtract)
+
+SubClassOf(:VanillaExtract :Extract)
+
+# Class: :VegetableOil (:VegetableOil)
+
+SubClassOf(:VegetableOil :PlantOil)
+
+# Class: :Vitamin (:Vitamin)
+
+SubClassOf(:Vitamin :FoodStuff)
+
+# Class: :VitaminB (:VitaminB)
+
+SubClassOf(:VitaminB :Vitamin)
+
+# Class: :VitaminB1 (:VitaminB1)
+
+SubClassOf(:VitaminB1 :VitaminB)
+
+# Class: :VitaminB2 (:VitaminB2)
+
+SubClassOf(:VitaminB2 :VitaminB)
+
+# Class: :VitaminB3 (:VitaminB3)
+
+SubClassOf(:VitaminB3 :VitaminB)
+
+# Class: :VitaminB9 (:VitaminB9)
+
+SubClassOf(:VitaminB9 :VitaminB)
+
+# Class: :WalkersShortbread (:WalkersShortbread)
+
+AnnotationAssertion(rdfs:comment :WalkersShortbread "Shortbread made to the Walkers recipe.")
+SubClassOf(:WalkersShortbread :Shortbread)
+SubClassOf(:WalkersShortbread ObjectSomeValuesFrom(:hasIngredient :Butter))
+SubClassOf(:WalkersShortbread ObjectSomeValuesFrom(:hasIngredient :Salt))
+SubClassOf(:WalkersShortbread ObjectSomeValuesFrom(:hasIngredient :WhiteFlour))
+SubClassOf(:WalkersShortbread ObjectSomeValuesFrom(:hasIngredient :WhiteSugar))
+
+# Class: :WalkersShortbreadFingersBox (:WalkersShortbreadFingersBox)
+
+AnnotationAssertion(schema:gtin12 :WalkersShortbreadFingersBox "039047001152")
+AnnotationAssertion(rdfs:seeAlso :WalkersShortbreadFingersBox <http://www.upcitemdb.com/upc/39047001152>)
+SubClassOf(:WalkersShortbreadFingersBox :WalkersShortbreadItem)
+
+# Class: :WalkersShortbreadItem (:WalkersShortbreadItem)
+
+SubClassOf(:WalkersShortbreadItem :GroceryItem)
+SubClassOf(:WalkersShortbreadItem ObjectSomeValuesFrom(:containsFoodStuff :WalkersShortbread))
+
+# Class: :WalkersShortbreadRoundsBox (:WalkersShortbreadRoundsBox)
+
+SubClassOf(:WalkersShortbreadRoundsBox :WalkersShortbreadItem)
+
+# Class: :Walnut (:Walnut)
+
+SubClassOf(:Walnut :Nut)
+
+# Class: :Wheat (:Wheat)
+
+SubClassOf(:Wheat :CerealGrain)
+SubClassOf(:Wheat ObjectSomeValuesFrom(:contains :Gluten))
+
+# Class: :WheatFlake (:WheatFlake)
+
+SubClassOf(:WheatFlake :FlakeProduct)
+
+# Class: :WheatFlour (:WheatFlour)
+
+SubClassOf(:WheatFlour :Flour)
+SubClassOf(:WheatFlour ObjectSomeValuesFrom(:contains :Wheat))
+
+# Class: :WheatStarch (:WheatStarch)
+
+SubClassOf(:WheatStarch :GrainStarch)
+
+# Class: :Whey (:Whey)
+
+SubClassOf(:Whey :DairyProduct)
+
+# Class: :WhiteChocolate (:WhiteChocolate)
+
+SubClassOf(:WhiteChocolate :ChocolateProduct)
+SubClassOf(:WhiteChocolate ObjectSomeValuesFrom(:hasIngredient :CocoaButter))
+SubClassOf(:WhiteChocolate ObjectSomeValuesFrom(:hasIngredient :SkimMilkPowder))
+SubClassOf(:WhiteChocolate ObjectSomeValuesFrom(:hasIngredient :SoyLecithin))
+SubClassOf(:WhiteChocolate ObjectSomeValuesFrom(:hasIngredient :VanillaExtract))
+SubClassOf(:WhiteChocolate ObjectSomeValuesFrom(:hasIngredient :WhiteSugar))
+
+# Class: :WhiteChocolateMacadamiaCookie (:WhiteChocolateMacadamiaCookie)
+
+SubClassOf(:WhiteChocolateMacadamiaCookie :Cookie)
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectUnionOf(ObjectSomeValuesFrom(:hasIngredient :CottonSeedOil) ObjectSomeValuesFrom(:hasIngredient :HydrogenatedSoyBeanOil) ObjectSomeValuesFrom(:hasIngredient :PalmOil)))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :AmmoniumBicarbonate))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :BrownSugar))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :Butter))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :Cornstarch))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :CreamOfTartar))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :Egg))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :EnrichedWheatFlour))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :Macadamia))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :Salt))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :SodiumBicarbonate))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :TreeNutMeal))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :WhiteChocolate))
+SubClassOf(:WhiteChocolateMacadamiaCookie ObjectSomeValuesFrom(:hasIngredient :WhiteSugar))
+
+# Class: :WhiteFlour (:WhiteFlour)
+
+SubClassOf(:WhiteFlour :WheatFlour)
+
+# Class: :WhiteSugar (:WhiteSugar)
+
+SubClassOf(:WhiteSugar :SugarProduct)
+
+# Class: :WholeGrainBrownRiceFlour (:WholeGrainBrownRiceFlour)
+
+SubClassOf(:WholeGrainBrownRiceFlour :RiceFlour)
+
+# Class: :WholeGrainOat (:WholeGrainOat)
+
+SubClassOf(:WholeGrainOat :Oat)
+
+# Class: :WholeMilkPowder (:WholeMilkPowder)
+
+SubClassOf(:WholeMilkPowder :MilkPowder)
+
+# Class: :WholeOatFlour (:WholeOatFlour)
+
+SubClassOf(:WholeOatFlour :OatFlour)
+
+# Class: :WholeSorghumFlour (:WholeSorghumFlour)
+
+SubClassOf(:WholeSorghumFlour :Flour)
+
+# Class: :WholemealFlour (:WholemealFlour)
+
+SubClassOf(:WholemealFlour :WheatFlour)
+
+
+DisjointClasses(:Almond :Cashew :Hazelnut :Macadamia :Pecan :Walnut)
+DisjointClasses(:AmaranthFlour :ChiaFlour :EnrichedWheatFlour :GoldenFlaxFlour :MilletFlour :OatFlour :QuinoaFlour :RiceFlour :Semolina :SoyFlour :WheatFlour :WholeSorghumFlour)
+DisjointClasses(:AmmoniumBicarbonate :CerealGrain :CerealProduct :ChiaSeed :ChocolateProduct :CocoaProduct :CreamOfTartar :DairyProduct :Egg :Extract :FlakeProduct :Flour :Fructan :FruitProduct :Gelatin :Gluten :GrainStarch :Honey :NutProduct :PlantOil :ReducedIron :Salt :SodiumBicarbonate :Soy :SoyLecithin :Spice :SugarProduct :TripotassiumPhosphate :Vitamin)
+DisjointClasses(:Apple :BananaPuree :Coconut :Raisin :RaisinJuice :RaisinJuiceConcentrate)
+DisjointClasses(:Barley :Millet :Oat :Quinoa :Rice :Rye :Triticale :Wheat)
+DisjointClasses(:BrownFlour :WhiteFlour :WholemealFlour)
+DisjointClasses(:BrownSugar :CaneJuiceProduct :DehydratedCaneJuice :FoodSyrup :InvertCaneSugar :Molasses :WhiteSugar)
+DisjointClasses(:ButterProduct :Lactose :Milk :MilkPowder :Whey)
+DisjointClasses(:CaneJuice :EvaporatedCaneJuice :OrganicEvaporatedCaneJuice)
+DisjointClasses(:CaneSyrup :CornSyrup :HighFructoseCornSyrup :OrganicEvaporatedCaneJuiceInvertSyrup)
+DisjointClasses(:CanolaOil :CottonSeedOil :HydrogenatedSoyBeanOil :PalmKernelOil :PalmOil :SoyBeanOil :SunflowerOil)
+DisjointClasses(:Chocolate :ConfectioneryCoating :SemiSweetChocolateChips :WhiteChocolate)
+DisjointClasses(:ChocolateLiquor :CocoaButter :DutchedCocoa :NaturalCocoa)
+DisjointClasses(:Cinnamon :Ginger :VanillaBean)
+DisjointClasses(:FruitFlake :MilletFlake :OatFlake :WheatFlake)
+DisjointClasses(:VitaminB1 :VitaminB2 :VitaminB3 :VitaminB9)
+)

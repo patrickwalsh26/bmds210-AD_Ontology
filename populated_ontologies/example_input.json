@@ -1,0 +1,108 @@
+{
+  "patient_id": "jane_doe_001",
+  "patient_name": "Jane Doe",
+  "proxy": {
+    "name": "John Doe",
+    "relationship": "Spouse"
+  },
+  "source_document": {
+    "type": "living_will",
+    "label": "Jane Doe's Living Will"
+  },
+  "preferences": [
+    {
+      "label": "No CPR if NYHA IV without reversible cause",
+      "intervention": "cpr",
+      "negated": true,
+      "strength": "Absolute",
+      "original_text": "If my heart stops and I am in NYHA Class IV with no reversible cause, do not attempt CPR.",
+      "type": "conditional",
+      "activation_conditions": {
+        "nyha_class": "IV",
+        "conditions": [
+          "cardiac_arrest"
+        ],
+        "reversible_cause": false
+      }
+    },
+    {
+      "label": "Accept temporary ventilation if reversible cause",
+      "intervention": "temporary_ventilation",
+      "negated": false,
+      "strength": "Conditional",
+      "original_text": "I would accept temporary intubation if there is a reversible cause, but not indefinite ventilation.",
+      "type": "conditional",
+      "activation_conditions": {
+        "reversible_cause": true
+      }
+    },
+    {
+      "label": "No indefinite ventilation",
+      "intervention": "indefinite_ventilation",
+      "negated": true,
+      "strength": "Absolute",
+      "original_text": "I would accept temporary intubation if there is a reversible cause, but not indefinite ventilation.",
+      "type": "clear"
+    },
+    {
+      "label": "Deactivate ICD if enrolled in hospice",
+      "intervention": "icd_deactivation",
+      "negated": false,
+      "strength": "Strong",
+      "original_text": "Deactivate my ICD if I am enrolled in hospice.",
+      "type": "conditional",
+      "activation_conditions": {
+        "care_context": "hospice"
+      }
+    },
+    {
+      "label": "No chronic dialysis",
+      "intervention": "chronic_dialysis",
+      "negated": true,
+      "strength": "Absolute",
+      "original_text": "I do not want to be placed on long-term maintenance dialysis.",
+      "type": "clear"
+    },
+    {
+      "label": "Accept acute dialysis if recoverable",
+      "intervention": "acute_dialysis",
+      "negated": false,
+      "strength": "Conditional",
+      "original_text": "I would accept short-term dialysis if my kidney function is expected to recover.",
+      "type": "conditional",
+      "activation_conditions": {
+        "reversible_cause": true,
+        "conditions": [
+          "cardiorenal_syndrome"
+        ]
+      }
+    },
+    {
+      "label": "Escalate inotropes only if LVAD or transplant planned",
+      "intervention": "inotrope_escalation",
+      "negated": false,
+      "strength": "Conditional",
+      "original_text": "Escalate inotropes only if there is a plan for LVAD or transplant evaluation.",
+      "type": "conditional",
+      "activation_conditions": {
+        "conditions": [
+          "cardiogenic_shock"
+        ]
+      }
+    },
+    {
+      "label": "Withdraw vasopressors if no improvement after 72 hours",
+      "intervention": "vasopressor_withdrawal",
+      "negated": false,
+      "strength": "Strong",
+      "original_text": "If I am on vasopressors with no improvement after 3 days, withdraw them.",
+      "type": "conditional",
+      "activation_conditions": {
+        "time_bound": "no improvement after 72 hours",
+        "conditions": [
+          "cardiogenic_shock"
+        ]
+      }
+    }
+  ]
+}

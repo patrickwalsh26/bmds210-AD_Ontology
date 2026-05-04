@@ -1,0 +1,787 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://purl.org/ado/ontology#"
+     xml:base="http://purl.org/ado/ontology"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+     xmlns:dcterms="http://purl.org/dc/terms/"
+     xmlns:ado="http://purl.org/ado/ontology#">
+    <owl:Ontology rdf:about="http://purl.org/ado/ontology">
+        <dcterms:title>Advanced Directive Ontology for Heart Failure End-of-Life Care</dcterms:title>
+        <dcterms:description>An OWL ontology modeling computable end-of-life care preferences for patients with advanced heart failure, scoped to five core clinical decision points: CPR/Resuscitation, Mechanical Ventilation, ICD Deactivation, Vasopressor/Inotrope Escalation, and Dialysis.</dcterms:description>
+        <dcterms:creator>Patrick Walsh</dcterms:creator>
+        <owl:versionInfo>0.1.0</owl:versionInfo>
+    </owl:Ontology>
+
+    <!--
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    //    Annotation Properties
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    -->
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/title"/>
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/description"/>
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/creator"/>
+    <owl:AnnotationProperty rdf:about="http://www.w3.org/2004/02/skos/core#definition"/>
+    <owl:AnnotationProperty rdf:about="http://www.w3.org/2004/02/skos/core#altLabel"/>
+    <owl:AnnotationProperty rdf:about="http://www.w3.org/2004/02/skos/core#example"/>
+
+    <!--
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    //    Object Properties
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    -->
+
+    <!-- hasProxy: links a Patient to their DecisionMaker -->
+    <owl:ObjectProperty rdf:about="#hasProxy">
+        <rdfs:domain rdf:resource="#Patient"/>
+        <rdfs:range rdf:resource="#DecisionMaker"/>
+        <rdfs:label>has proxy</rdfs:label>
+        <skos:definition>Links a patient to the person designated to make healthcare decisions on their behalf.</skos:definition>
+    </owl:ObjectProperty>
+
+    <!-- hasPreference: links a Patient to a PreferenceStatement -->
+    <owl:ObjectProperty rdf:about="#hasPreference">
+        <rdfs:domain rdf:resource="#Patient"/>
+        <rdfs:range rdf:resource="#PreferenceStatement"/>
+        <rdfs:label>has preference</rdfs:label>
+        <skos:definition>Links a patient to a stated end-of-life care preference.</skos:definition>
+    </owl:ObjectProperty>
+
+    <!-- specifiesIntervention: links a PreferenceStatement to an Intervention -->
+    <owl:ObjectProperty rdf:about="#specifiesIntervention">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="#Intervention"/>
+        <rdfs:label>specifies intervention</rdfs:label>
+        <skos:definition>Links a preference statement to the clinical intervention it addresses.</skos:definition>
+    </owl:ObjectProperty>
+
+    <!-- appliesToCondition: links a PreferenceStatement to a ClinicalCondition -->
+    <owl:ObjectProperty rdf:about="#appliesToCondition">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>applies to condition</rdfs:label>
+        <skos:definition>Links a preference statement to the clinical condition under which it applies.</skos:definition>
+    </owl:ObjectProperty>
+
+    <!-- hasActivationCondition: links a PreferenceStatement to an ActivationCondition -->
+    <owl:ObjectProperty rdf:about="#hasActivationCondition">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="#ActivationCondition"/>
+        <rdfs:label>has activation condition</rdfs:label>
+        <skos:definition>Links a preference statement to the conditions that must be met for it to take effect.</skos:definition>
+    </owl:ObjectProperty>
+
+    <!-- hasFunctionalStatus: links a Patient or ActivationCondition to a FunctionalStatus -->
+    <owl:ObjectProperty rdf:about="#hasFunctionalStatus">
+        <rdfs:range rdf:resource="#FunctionalStatus"/>
+        <rdfs:label>has functional status</rdfs:label>
+        <skos:definition>Links to the patient's NYHA functional classification.</skos:definition>
+    </owl:ObjectProperty>
+
+    <!-- hasCurrentCondition: links a ClinicalScenario to a ClinicalCondition -->
+    <owl:ObjectProperty rdf:about="#hasCurrentCondition">
+        <rdfs:domain rdf:resource="#ClinicalScenario"/>
+        <rdfs:range rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>has current condition</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- hasCurrentFunctionalStatus: links a ClinicalScenario to FunctionalStatus -->
+    <owl:ObjectProperty rdf:about="#hasCurrentFunctionalStatus">
+        <rdfs:domain rdf:resource="#ClinicalScenario"/>
+        <rdfs:range rdf:resource="#FunctionalStatus"/>
+        <rdfs:label>has current functional status</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- requiresFunctionalStatus: activation condition requires a specific NYHA class -->
+    <owl:ObjectProperty rdf:about="#requiresFunctionalStatus">
+        <rdfs:domain rdf:resource="#ActivationCondition"/>
+        <rdfs:range rdf:resource="#FunctionalStatus"/>
+        <rdfs:label>requires functional status</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- requiresCondition: activation condition requires a specific clinical condition -->
+    <owl:ObjectProperty rdf:about="#requiresCondition">
+        <rdfs:domain rdf:resource="#ActivationCondition"/>
+        <rdfs:range rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>requires condition</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- hasDecisionOutcome: links a PreferenceStatement to a DecisionOutcome -->
+    <owl:ObjectProperty rdf:about="#hasDecisionOutcome">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="#DecisionOutcome"/>
+        <rdfs:label>has decision outcome</rdfs:label>
+        <skos:definition>The care decision that results from this preference in context.</skos:definition>
+    </owl:ObjectProperty>
+
+    <!-- sourceDocument: links a PreferenceStatement to an AdvanceDirectiveDocument -->
+    <owl:ObjectProperty rdf:about="#sourceDocument">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="#AdvanceDirectiveDocument"/>
+        <rdfs:label>source document</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!--
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    //    Data Properties
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    -->
+
+    <!-- isNegated: boolean indicating exclusionary preference ("I do NOT want X") -->
+    <owl:DatatypeProperty rdf:about="#isNegated">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:label>is negated</rdfs:label>
+        <skos:definition>True if the preference is exclusionary (e.g., "I do not want mechanical ventilation").</skos:definition>
+    </owl:DatatypeProperty>
+
+    <!-- hasPreferenceStrength: captures certainty/strength of the preference -->
+    <owl:DatatypeProperty rdf:about="#hasPreferenceStrength">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>has preference strength</rdfs:label>
+        <skos:definition>The strength or certainty of the preference: Absolute, Strong, Conditional, or Weak.</skos:definition>
+    </owl:DatatypeProperty>
+
+    <!-- originalText: preserves the patient's original language -->
+    <owl:DatatypeProperty rdf:about="#originalText">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>original text</rdfs:label>
+        <skos:definition>The original patient language from which this preference was derived.</skos:definition>
+    </owl:DatatypeProperty>
+
+    <!-- hasTimeBound: e.g., "no improvement after 7 days" -->
+    <owl:DatatypeProperty rdf:about="#hasTimeBound">
+        <rdfs:domain rdf:resource="#ActivationCondition"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>has time bound</rdfs:label>
+        <skos:definition>A temporal constraint on the activation condition (e.g., "after 7 days with no improvement").</skos:definition>
+    </owl:DatatypeProperty>
+
+    <!-- hasReversibleCause: boolean indicating whether a reversible cause is present -->
+    <owl:DatatypeProperty rdf:about="#hasReversibleCause">
+        <rdfs:domain rdf:resource="#ActivationCondition"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+        <rdfs:label>has reversible cause</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- dateDocumented -->
+    <owl:DatatypeProperty rdf:about="#dateDocumented">
+        <rdfs:domain rdf:resource="#PreferenceStatement"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+        <rdfs:label>date documented</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- proxyName -->
+    <owl:DatatypeProperty rdf:about="#proxyName">
+        <rdfs:domain rdf:resource="#DecisionMaker"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>proxy name</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!-- proxyRelationship -->
+    <owl:DatatypeProperty rdf:about="#proxyRelationship">
+        <rdfs:domain rdf:resource="#DecisionMaker"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:label>proxy relationship</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <!--
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    //    Classes
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    -->
+
+    <!-- ===== Top-Level Classes ===== -->
+
+    <owl:Class rdf:about="#Patient">
+        <rdfs:label>Patient</rdfs:label>
+        <skos:definition>A person who has documented end-of-life care preferences.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PreferenceStatement">
+        <rdfs:label>Preference Statement</rdfs:label>
+        <skos:definition>A computable representation of a patient's stated care preference, linking an intervention to conditions and strength of preference.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ClinicalCondition">
+        <rdfs:label>Clinical Condition</rdfs:label>
+        <skos:definition>A medical condition or clinical state relevant to end-of-life decision making.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Intervention">
+        <rdfs:label>Intervention</rdfs:label>
+        <skos:definition>A clinical intervention or treatment that may be addressed in an advance directive.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#DecisionMaker">
+        <rdfs:label>Decision Maker</rdfs:label>
+        <skos:definition>A person designated to make healthcare decisions on behalf of a patient.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ActivationCondition">
+        <rdfs:label>Activation Condition</rdfs:label>
+        <skos:definition>The set of conditions that must be met for a preference statement to take effect.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#FunctionalStatus">
+        <rdfs:label>Functional Status</rdfs:label>
+        <skos:definition>The patient's functional classification, primarily NYHA class for heart failure.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ClinicalScenario">
+        <rdfs:label>Clinical Scenario</rdfs:label>
+        <skos:definition>A specific clinical situation requiring a care decision, used as input to the reasoner.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#DecisionOutcome">
+        <rdfs:label>Decision Outcome</rdfs:label>
+        <skos:definition>The result of reasoning over preferences and a clinical scenario.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#AdvanceDirectiveDocument">
+        <rdfs:label>Advance Directive Document</rdfs:label>
+        <skos:definition>The source document from which preferences were extracted.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CareContext">
+        <rdfs:label>Care Context</rdfs:label>
+        <skos:definition>The broader care setting or circumstance (e.g., ICU, hospice enrollment, outpatient).</skos:definition>
+    </owl:Class>
+
+    <!-- ===== PreferenceStatement Subclasses ===== -->
+
+    <owl:Class rdf:about="#ClearPreference">
+        <rdfs:subClassOf rdf:resource="#PreferenceStatement"/>
+        <rdfs:label>Clear Preference</rdfs:label>
+        <skos:definition>A preference that can be unambiguously encoded in the ontology.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#VaguePreference">
+        <rdfs:subClassOf rdf:resource="#PreferenceStatement"/>
+        <rdfs:label>Vague Preference</rdfs:label>
+        <skos:definition>A preference that uses imprecise language (e.g., "no heroic measures") and cannot be fully resolved to formal classes. The original patient language is preserved via originalText.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ConditionalPreference">
+        <rdfs:subClassOf rdf:resource="#PreferenceStatement"/>
+        <rdfs:label>Conditional Preference</rdfs:label>
+        <skos:definition>A preference that applies only when specific activation conditions are met.</skos:definition>
+    </owl:Class>
+
+    <!-- ===== Intervention Hierarchy (5 Core HF Decision Points) ===== -->
+
+    <!-- 1. CPR / Resuscitation -->
+    <owl:Class rdf:about="#ResuscitationIntervention">
+        <rdfs:subClassOf rdf:resource="#Intervention"/>
+        <rdfs:label>Resuscitation Intervention</rdfs:label>
+        <skos:definition>Interventions related to cardiopulmonary resuscitation.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CPR">
+        <rdfs:subClassOf rdf:resource="#ResuscitationIntervention"/>
+        <rdfs:label>CPR</rdfs:label>
+        <skos:definition>Cardiopulmonary resuscitation including chest compressions and rescue breathing.</skos:definition>
+        <skos:altLabel>Cardiopulmonary Resuscitation</skos:altLabel>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Defibrillation">
+        <rdfs:subClassOf rdf:resource="#ResuscitationIntervention"/>
+        <rdfs:label>Defibrillation</rdfs:label>
+        <skos:definition>External electrical shock to restore normal heart rhythm during cardiac arrest.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#TranscutaneousPacing">
+        <rdfs:subClassOf rdf:resource="#ResuscitationIntervention"/>
+        <rdfs:label>Transcutaneous Pacing</rdfs:label>
+        <skos:definition>External electrical pacing of the heart through the chest wall.</skos:definition>
+    </owl:Class>
+
+    <!-- 2. Mechanical Ventilation / Intubation -->
+    <owl:Class rdf:about="#VentilationIntervention">
+        <rdfs:subClassOf rdf:resource="#Intervention"/>
+        <rdfs:label>Ventilation Intervention</rdfs:label>
+        <skos:definition>Interventions related to assisted breathing and airway management.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Intubation">
+        <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+        <rdfs:label>Intubation</rdfs:label>
+        <skos:definition>Insertion of an endotracheal tube to secure the airway.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#MechanicalVentilation">
+        <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+        <rdfs:label>Mechanical Ventilation</rdfs:label>
+        <skos:definition>Machine-assisted breathing via ventilator.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#TemporaryVentilation">
+        <rdfs:subClassOf rdf:resource="#MechanicalVentilation"/>
+        <rdfs:label>Temporary Ventilation</rdfs:label>
+        <skos:definition>Short-term mechanical ventilation as a bridge to recovery.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#IndefiniteVentilation">
+        <rdfs:subClassOf rdf:resource="#MechanicalVentilation"/>
+        <rdfs:label>Indefinite Ventilation</rdfs:label>
+        <skos:definition>Long-term or permanent mechanical ventilation with no planned weaning.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#VentilationWithdrawal">
+        <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+        <rdfs:label>Ventilation Withdrawal</rdfs:label>
+        <skos:definition>Removal of mechanical ventilation support.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#NonInvasiveVentilation">
+        <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+        <rdfs:label>Non-Invasive Ventilation</rdfs:label>
+        <skos:definition>Ventilation support without intubation (e.g., BiPAP, CPAP).</skos:definition>
+        <skos:altLabel>BiPAP</skos:altLabel>
+    </owl:Class>
+
+    <!-- 3. ICD Deactivation -->
+    <owl:Class rdf:about="#DeviceIntervention">
+        <rdfs:subClassOf rdf:resource="#Intervention"/>
+        <rdfs:label>Device Intervention</rdfs:label>
+        <skos:definition>Interventions related to implanted cardiac devices.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ICDDeactivation">
+        <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+        <rdfs:label>ICD Deactivation</rdfs:label>
+        <skos:definition>Turning off the shock therapy function of an implantable cardioverter-defibrillator. Ethically distinct from withdrawal of treatment — the pacing function may remain active.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ICDShockTherapy">
+        <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+        <rdfs:label>ICD Shock Therapy</rdfs:label>
+        <skos:definition>Active shock delivery by an implantable cardioverter-defibrillator.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#LVADWithdrawal">
+        <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+        <rdfs:label>LVAD Withdrawal</rdfs:label>
+        <skos:definition>Discontinuation of left ventricular assist device support.</skos:definition>
+        <skos:altLabel>Left Ventricular Assist Device Withdrawal</skos:altLabel>
+    </owl:Class>
+
+    <owl:Class rdf:about="#LVADContinuation">
+        <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+        <rdfs:label>LVAD Continuation</rdfs:label>
+        <skos:definition>Continued operation of a left ventricular assist device.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PacemakerDeactivation">
+        <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+        <rdfs:label>Pacemaker Deactivation</rdfs:label>
+        <skos:definition>Turning off cardiac pacemaker function.</skos:definition>
+    </owl:Class>
+
+    <!-- 4. Vasopressor / Inotrope Escalation -->
+    <owl:Class rdf:about="#PharmacologicIntervention">
+        <rdfs:subClassOf rdf:resource="#Intervention"/>
+        <rdfs:label>Pharmacologic Intervention</rdfs:label>
+        <skos:definition>Medication-based interventions for hemodynamic support.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#InotropeEscalation">
+        <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+        <rdfs:label>Inotrope Escalation</rdfs:label>
+        <skos:definition>Increasing dosage or adding inotropic agents to support cardiac contractility.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#InotropeWithdrawal">
+        <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+        <rdfs:label>Inotrope Withdrawal</rdfs:label>
+        <skos:definition>Discontinuation of inotropic support.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#VasopressorEscalation">
+        <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+        <rdfs:label>Vasopressor Escalation</rdfs:label>
+        <skos:definition>Increasing dosage or adding vasopressor agents to maintain blood pressure.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#VasopressorWithdrawal">
+        <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+        <rdfs:label>Vasopressor Withdrawal</rdfs:label>
+        <skos:definition>Discontinuation of vasopressor support.</skos:definition>
+    </owl:Class>
+
+    <!-- 5. Dialysis -->
+    <owl:Class rdf:about="#DialysisIntervention">
+        <rdfs:subClassOf rdf:resource="#Intervention"/>
+        <rdfs:label>Dialysis Intervention</rdfs:label>
+        <skos:definition>Renal replacement therapy interventions.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#AcuteDialysis">
+        <rdfs:subClassOf rdf:resource="#DialysisIntervention"/>
+        <rdfs:label>Acute Dialysis</rdfs:label>
+        <skos:definition>Short-term dialysis for acute kidney injury with potential for recovery.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ChronicDialysis">
+        <rdfs:subClassOf rdf:resource="#DialysisIntervention"/>
+        <rdfs:label>Chronic Dialysis</rdfs:label>
+        <skos:definition>Long-term maintenance dialysis without expectation of renal recovery.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#DialysisWithdrawal">
+        <rdfs:subClassOf rdf:resource="#DialysisIntervention"/>
+        <rdfs:label>Dialysis Withdrawal</rdfs:label>
+        <skos:definition>Discontinuation of ongoing dialysis treatment.</skos:definition>
+    </owl:Class>
+
+    <!-- ===== Clinical Condition Hierarchy ===== -->
+
+    <owl:Class rdf:about="#HeartFailure">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Heart Failure</rdfs:label>
+        <skos:definition>A clinical syndrome where the heart cannot pump blood effectively.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#AdvancedHeartFailure">
+        <rdfs:subClassOf rdf:resource="#HeartFailure"/>
+        <rdfs:label>Advanced Heart Failure</rdfs:label>
+        <skos:definition>Stage D / NYHA Class III-IV heart failure refractory to standard therapy.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CardiacArrest">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Cardiac Arrest</rdfs:label>
+        <skos:definition>Sudden cessation of effective cardiac pumping activity.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CardiogenicShock">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Cardiogenic Shock</rdfs:label>
+        <skos:definition>Severe hemodynamic compromise due to cardiac pump failure.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#AcuteDecompensation">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Acute Decompensation</rdfs:label>
+        <skos:definition>Rapid worsening of heart failure symptoms requiring urgent intervention.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CardiorenalSyndrome">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Cardiorenal Syndrome</rdfs:label>
+        <skos:definition>Combined cardiac and renal dysfunction where failure of one organ precipitates failure of the other.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#RespiratoryFailure">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Respiratory Failure</rdfs:label>
+        <skos:definition>Inability to maintain adequate gas exchange.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#TerminalCondition">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Terminal Condition</rdfs:label>
+        <skos:definition>An incurable condition from which death is expected in a relatively short time. Note: this term is frequently used in ADs but is clinically ambiguous in HF, where patients may live years with severe symptoms.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PermanentUnconsciousness">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Permanent Unconsciousness</rdfs:label>
+        <skos:definition>A state of permanent unconsciousness with no reasonable medical expectation of recovery (e.g., persistent vegetative state).</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Incapacity">
+        <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+        <rdfs:label>Incapacity</rdfs:label>
+        <skos:definition>Inability to make or communicate healthcare decisions.</skos:definition>
+    </owl:Class>
+
+    <!-- ===== Functional Status (NYHA Classification) ===== -->
+
+    <owl:Class rdf:about="#NYHA_ClassI">
+        <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+        <rdfs:label>NYHA Class I</rdfs:label>
+        <skos:definition>No limitation of physical activity. Ordinary physical activity does not cause undue fatigue, palpitation, or dyspnea.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#NYHA_ClassII">
+        <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+        <rdfs:label>NYHA Class II</rdfs:label>
+        <skos:definition>Slight limitation of physical activity. Comfortable at rest. Ordinary activity results in fatigue, palpitation, or dyspnea.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#NYHA_ClassIII">
+        <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+        <rdfs:label>NYHA Class III</rdfs:label>
+        <skos:definition>Marked limitation of physical activity. Comfortable at rest. Less than ordinary activity causes fatigue, palpitation, or dyspnea.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#NYHA_ClassIV">
+        <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+        <rdfs:label>NYHA Class IV</rdfs:label>
+        <skos:definition>Unable to carry on any physical activity without discomfort. Symptoms at rest. If any physical activity is undertaken, discomfort is increased.</skos:definition>
+    </owl:Class>
+
+    <!-- Disjointness: NYHA classes are mutually exclusive -->
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#NYHA_ClassI"/>
+            <rdf:Description rdf:about="#NYHA_ClassII"/>
+            <rdf:Description rdf:about="#NYHA_ClassIII"/>
+            <rdf:Description rdf:about="#NYHA_ClassIV"/>
+        </owl:members>
+    </rdf:Description>
+
+    <!-- ===== Decision Outcome Categories ===== -->
+
+    <owl:Class rdf:about="#ClearMatch">
+        <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+        <rdfs:label>Clear Match</rdfs:label>
+        <skos:definition>Activation conditions fully met, preference is unambiguous. The system can provide a definitive recommendation.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PartialMatch">
+        <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+        <rdfs:label>Partial Match</rdfs:label>
+        <skos:definition>Some activation conditions are met but others are unspecified or uncertain.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#NoCoverage">
+        <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+        <rdfs:label>No Coverage</rdfs:label>
+        <skos:definition>The patient's advance directive does not address this clinical scenario.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#VagueMatch">
+        <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+        <rdfs:label>Vague Match</rdfs:label>
+        <skos:definition>The preference uses terms that cannot be fully resolved. The system returns the original patient language with its best class mapping.</skos:definition>
+    </owl:Class>
+
+    <!-- Disjointness: outcome categories are mutually exclusive -->
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="#ClearMatch"/>
+            <rdf:Description rdf:about="#PartialMatch"/>
+            <rdf:Description rdf:about="#NoCoverage"/>
+            <rdf:Description rdf:about="#VagueMatch"/>
+        </owl:members>
+    </rdf:Description>
+
+    <!-- ===== Care Context ===== -->
+
+    <owl:Class rdf:about="#ICUSetting">
+        <rdfs:subClassOf rdf:resource="#CareContext"/>
+        <rdfs:label>ICU Setting</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#EmergencyDepartment">
+        <rdfs:subClassOf rdf:resource="#CareContext"/>
+        <rdfs:label>Emergency Department</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#HospiceEnrollment">
+        <rdfs:subClassOf rdf:resource="#CareContext"/>
+        <rdfs:label>Hospice Enrollment</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#OutpatientSetting">
+        <rdfs:subClassOf rdf:resource="#CareContext"/>
+        <rdfs:label>Outpatient Setting</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PrehospitalSetting">
+        <rdfs:subClassOf rdf:resource="#CareContext"/>
+        <rdfs:label>Prehospital Setting</rdfs:label>
+        <skos:definition>EMS/first responder setting before hospital arrival.</skos:definition>
+    </owl:Class>
+
+    <!-- ===== Advance Directive Document Types ===== -->
+
+    <owl:Class rdf:about="#LivingWill">
+        <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+        <rdfs:label>Living Will</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#HealthCarePowerOfAttorney">
+        <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+        <rdfs:label>Health Care Power of Attorney</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#POLSTForm">
+        <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+        <rdfs:label>POLST Form</rdfs:label>
+        <skos:definition>Physician Orders for Life-Sustaining Treatment — portable medical orders actionable by EMS.</skos:definition>
+    </owl:Class>
+
+    <owl:Class rdf:about="#DNROrder">
+        <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+        <rdfs:label>DNR Order</rdfs:label>
+        <skos:definition>Do Not Resuscitate order.</skos:definition>
+    </owl:Class>
+
+    <!--
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    //    Example Individuals (for testing in Protege)
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    -->
+
+    <!-- Example Patient -->
+    <owl:NamedIndividual rdf:about="#ExamplePatient_JaneDoe">
+        <rdf:type rdf:resource="#Patient"/>
+        <rdfs:label>Jane Doe (Example Patient)</rdfs:label>
+        <hasProxy rdf:resource="#ExampleProxy_JohnDoe"/>
+        <hasPreference rdf:resource="#Pref_JaneDoe_NoCPR"/>
+        <hasPreference rdf:resource="#Pref_JaneDoe_TempVentOK"/>
+        <hasPreference rdf:resource="#Pref_JaneDoe_DeactivateICD"/>
+        <hasPreference rdf:resource="#Pref_JaneDoe_NoChronicDialysis"/>
+        <hasPreference rdf:resource="#Pref_JaneDoe_InotropeConditional"/>
+    </owl:NamedIndividual>
+
+    <!-- Example Decision Maker -->
+    <owl:NamedIndividual rdf:about="#ExampleProxy_JohnDoe">
+        <rdf:type rdf:resource="#DecisionMaker"/>
+        <rdfs:label>John Doe (Healthcare Proxy)</rdfs:label>
+        <proxyName>John Doe</proxyName>
+        <proxyRelationship>Spouse</proxyRelationship>
+    </owl:NamedIndividual>
+
+    <!-- Preference 1: No CPR if NYHA IV with no reversible cause -->
+    <owl:NamedIndividual rdf:about="#Pref_JaneDoe_NoCPR">
+        <rdf:type rdf:resource="#ConditionalPreference"/>
+        <rdfs:label>No CPR if NYHA IV without reversible cause</rdfs:label>
+        <specifiesIntervention rdf:resource="#CPR"/>
+        <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+        <hasPreferenceStrength>Absolute</hasPreferenceStrength>
+        <hasActivationCondition rdf:resource="#AC_NYHAIV_NoReversible"/>
+        <originalText>If my heart stops and I am in NYHA Class IV with no reversible cause, do not attempt CPR.</originalText>
+    </owl:NamedIndividual>
+
+    <!-- Preference 2: Accept temporary ventilation if reversible cause -->
+    <owl:NamedIndividual rdf:about="#Pref_JaneDoe_TempVentOK">
+        <rdf:type rdf:resource="#ConditionalPreference"/>
+        <rdfs:label>Accept temporary ventilation if reversible cause</rdfs:label>
+        <specifiesIntervention rdf:resource="#TemporaryVentilation_Instance"/>
+        <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+        <hasPreferenceStrength>Conditional</hasPreferenceStrength>
+        <hasActivationCondition rdf:resource="#AC_ReversibleCause"/>
+        <originalText>I would accept temporary intubation if there is a reversible cause, but not indefinite ventilation.</originalText>
+    </owl:NamedIndividual>
+
+    <!-- Preference 3: Deactivate ICD if enrolled in hospice -->
+    <owl:NamedIndividual rdf:about="#Pref_JaneDoe_DeactivateICD">
+        <rdf:type rdf:resource="#ConditionalPreference"/>
+        <rdfs:label>Deactivate ICD if enrolled in hospice</rdfs:label>
+        <specifiesIntervention rdf:resource="#ICDDeactivation_Instance"/>
+        <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+        <hasPreferenceStrength>Strong</hasPreferenceStrength>
+        <hasActivationCondition rdf:resource="#AC_HospiceEnrolled"/>
+        <originalText>Deactivate my ICD if I am enrolled in hospice.</originalText>
+    </owl:NamedIndividual>
+
+    <!-- Preference 4: No chronic dialysis -->
+    <owl:NamedIndividual rdf:about="#Pref_JaneDoe_NoChronicDialysis">
+        <rdf:type rdf:resource="#ClearPreference"/>
+        <rdfs:label>No chronic dialysis</rdfs:label>
+        <specifiesIntervention rdf:resource="#ChronicDialysis_Instance"/>
+        <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+        <hasPreferenceStrength>Absolute</hasPreferenceStrength>
+        <originalText>I do not want to be placed on long-term maintenance dialysis.</originalText>
+    </owl:NamedIndividual>
+
+    <!-- Preference 5: Escalate inotropes only if LVAD/transplant plan -->
+    <owl:NamedIndividual rdf:about="#Pref_JaneDoe_InotropeConditional">
+        <rdf:type rdf:resource="#ConditionalPreference"/>
+        <rdfs:label>Escalate inotropes only if LVAD or transplant evaluation planned</rdfs:label>
+        <specifiesIntervention rdf:resource="#InotropeEscalation_Instance"/>
+        <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+        <hasPreferenceStrength>Conditional</hasPreferenceStrength>
+        <hasActivationCondition rdf:resource="#AC_LVADTransplantPlan"/>
+        <originalText>Escalate inotropes only if there is a plan for LVAD or transplant evaluation.</originalText>
+    </owl:NamedIndividual>
+
+    <!-- Activation Conditions -->
+    <owl:NamedIndividual rdf:about="#AC_NYHAIV_NoReversible">
+        <rdf:type rdf:resource="#ActivationCondition"/>
+        <rdfs:label>NYHA IV with no reversible cause</rdfs:label>
+        <requiresFunctionalStatus rdf:resource="#NYHAIV_Status"/>
+        <requiresCondition rdf:resource="#CardiacArrest_Instance"/>
+        <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</hasReversibleCause>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#AC_ReversibleCause">
+        <rdf:type rdf:resource="#ActivationCondition"/>
+        <rdfs:label>Reversible cause present</rdfs:label>
+        <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</hasReversibleCause>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#AC_HospiceEnrolled">
+        <rdf:type rdf:resource="#ActivationCondition"/>
+        <rdfs:label>Patient enrolled in hospice</rdfs:label>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#AC_LVADTransplantPlan">
+        <rdf:type rdf:resource="#ActivationCondition"/>
+        <rdfs:label>LVAD or transplant evaluation is planned</rdfs:label>
+    </owl:NamedIndividual>
+
+    <!-- Intervention Instances -->
+    <owl:NamedIndividual rdf:about="#TemporaryVentilation_Instance">
+        <rdf:type rdf:resource="#TemporaryVentilation"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#ICDDeactivation_Instance">
+        <rdf:type rdf:resource="#ICDDeactivation"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#ChronicDialysis_Instance">
+        <rdf:type rdf:resource="#ChronicDialysis"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#InotropeEscalation_Instance">
+        <rdf:type rdf:resource="#InotropeEscalation"/>
+    </owl:NamedIndividual>
+
+    <!-- Condition / Status Instances -->
+    <owl:NamedIndividual rdf:about="#CardiacArrest_Instance">
+        <rdf:type rdf:resource="#CardiacArrest"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#NYHAIV_Status">
+        <rdf:type rdf:resource="#NYHA_ClassIV"/>
+    </owl:NamedIndividual>
+
+    <!--
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    //    Example Clinical Scenario (for reasoner testing)
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    -->
+
+    <owl:NamedIndividual rdf:about="#Scenario_CardiacArrest_NYHAIV">
+        <rdf:type rdf:resource="#ClinicalScenario"/>
+        <rdfs:label>Cardiac arrest in NYHA IV patient, no reversible cause identified</rdfs:label>
+        <hasCurrentCondition rdf:resource="#CardiacArrest_Instance"/>
+        <hasCurrentFunctionalStatus rdf:resource="#NYHAIV_Status"/>
+    </owl:NamedIndividual>
+
+</rdf:RDF>
