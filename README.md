@@ -10,6 +10,7 @@ This project builds an OWL ontology (the Advance Directive Ontology, or ADO) tha
 .
 ├── advanced_directives.owl              # Base OWL ontology (67 classes, 20 properties)
 ├── preference_input.py                  # Python pipeline for populating the ontology
+├── query_evaluation.py                  # Scenario-based query evaluation (12 clinical vignettes)
 ├── populated_ontologies/                # Output directory for populated patient ontologies
 │   ├── example_input.json              # Example patient preference JSON
 │   └── ado_jane_doe_001.owl            # Example populated ontology
@@ -64,6 +65,15 @@ python preference_input.py --interactive
 ```
 
 Walks through each of the 5 decision points and prompts for preferences interactively.
+
+### 4. Run the scenario-based evaluation
+
+```bash
+python query_evaluation.py                          # Uses the default example patient
+python query_evaluation.py --owl path/to/file.owl   # Uses a specific populated ontology
+```
+
+Runs 12 clinical vignettes against the populated ontology and reports decision accuracy and match type accuracy. Each vignette tests whether the system correctly infers what care is indicated given the patient's encoded preferences and a clinical scenario.
 
 ## Viewing the Ontology
 

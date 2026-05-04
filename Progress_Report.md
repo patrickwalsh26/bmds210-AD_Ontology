@@ -80,9 +80,61 @@ Each preference maps to a `PreferenceStatement` individual linked to its `Interv
 
 ### c. Results / Analysis
 
-**Pipeline validation.** We ran the example patient (Jane Doe) through the full pipeline. All 8 preference statements — spanning all 5 decision points, including both clear and conditional preferences, negated and affirming, with varying strength levels — were successfully instantiated as OWL individuals. The populated ontology contains 47 individuals (1 patient, 2 decision makers, 1 source document, 8 preference statements, 8 interventions, 6 activation conditions, 4 clinical condition instances, 2 NYHA status instances, and pre-existing example individuals). No warnings or class-not-found errors were produced.
+#### Pipeline Validation
 
-**Preliminary coverage analysis.** We assessed how the 9 common decision points identified across our 50-template concept inventory map to the current ontology:
+We ran the example patient (Jane Doe) through the full pipeline. All 8 preference statements — spanning all 5 decision points, including both clear and conditional preferences, negated and affirming, with varying strength levels — were successfully instantiated as OWL individuals. The populated ontology contains 47 individuals (1 patient, 2 decision makers, 1 source document, 8 preference statements, 8 interventions, 6 activation conditions, 4 clinical condition instances, 2 NYHA status instances, and pre-existing example individuals). No warnings or class-not-found errors were produced.
+
+#### Scenario-Based Query Evaluation
+
+We designed 12 clinical vignettes to test whether the system correctly infers care decisions from encoded preferences. Each vignette defines a clinical scenario (the patient's current state) and asks whether a specific intervention is indicated. The system queries the populated ontology, matches activation conditions against the scenario, and returns a decision (`yes`, `no`, `partial`, or `no_coverage`) and match type (`clear`, `partial`, `no_coverage`, or `vague`). Results are compared against human-defined expected answers.
+
+**Summary results:**
+
+| Metric | Score |
+|---|---|
+| Decision accuracy | 11/12 (92%) |
+| Match type accuracy | 12/12 (100%) |
+
+**Results by expected match type:**
+
+| Match Type | Decision Accuracy | Match Type Accuracy |
+|---|---|---|
+| Clear match | 8/8 (100%) | 8/8 (100%) |
+| Partial match | 1/2 (50%) | 2/2 (100%) |
+| No coverage | 2/2 (100%) | 2/2 (100%) |
+
+**Detailed vignette results:**
+
+| ID | Clinical Scenario | Intervention | Expected | System | Result |
+|---|---|---|---|---|---|
+| V1 | Cardiac arrest, NYHA IV, no reversible cause | CPR | No (clear) | No (clear) | PASS |
+| V2 | Cardiac arrest, NYHA III, reversible cause (hyperkalemia) | CPR | Partial | Partial | PASS |
+| V3 | Respiratory failure, reversible cause (pneumonia) | Temporary ventilation | Yes (clear) | Yes (clear) | PASS |
+| V4 | On ventilator 10 days, no improvement, no reversible cause | Indefinite ventilation | No (clear) | No (clear) | PASS |
+| V5 | Enrolled in hospice | ICD deactivation | Yes (clear) | Yes (clear) | PASS* |
+| V6 | In ICU, not in hospice | ICD deactivation | Yes (clear) | Yes (clear) | PASS* |
+| V7 | Cardiorenal syndrome, expected kidney recovery | Acute dialysis | Yes (clear) | Yes (clear) | PASS |
+| V8 | Progressive kidney failure, no recovery expected | Chronic dialysis | No (clear) | No (clear) | PASS |
+| V9 | Cardiogenic shock | Inotrope escalation | Yes (clear) | Yes (clear) | PASS |
+| V10 | Cardiogenic shock, vasopressors 4 days, no improvement | Vasopressor withdrawal | Yes (partial) | Partial | FAIL |
+| V11 | Respiratory failure | Non-invasive ventilation (BiPAP) | No coverage | No coverage | PASS |
+| V12 | Stable, NYHA II | Pacemaker deactivation | No coverage | No coverage | PASS |
+
+*V5/V6 note: see "Identified Gaps" below.
+
+#### Analysis of Failures and Identified Gaps
+
+The evaluation revealed three categories of findings:
+
+**1. Temporal reasoning limitation (V10).** The single decision failure occurred because the system cannot formally evaluate time-bound activation conditions. The patient's preference states "withdraw vasopressors if no improvement after 72 hours." The system correctly identifies the cardiogenic shock condition match and correctly flags the time bound as requiring human interpretation (match type = partial). However, because it cannot evaluate whether the 96-hour elapsed time exceeds the 72-hour bound, it returns `partial` instead of `yes`. This is a known OWL limitation — time bounds are stored as strings (`hasTimeBound`), not as computable values.
+
+**2. Missing care context property (V5/V6).** The ontology lacks a `requiresCareContext` object property on `ActivationCondition`. The patient's preference to deactivate her ICD *if enrolled in hospice* is encoded during input, but the hospice condition is not stored in the activation condition because no property exists to link it. As a result, the system treats this as an unconditional preference. V5 returns the correct decision (yes) for the wrong reason; V6 produces a **false positive** — it says "yes, deactivate ICD" even though the patient is in the ICU, not hospice. This identifies a concrete ontology improvement: adding a `requiresCareContext` object property linking `ActivationCondition` to `CareContext`.
+
+**3. Encoding fidelity vs. reasoning fidelity (V9).** The inotrope escalation preference includes the natural-language qualifier "only if there is a plan for LVAD or transplant evaluation" in the `originalText`, but this condition was not captured as a formal activation condition during encoding. The system correctly matches the conditions that *were* encoded (cardiogenic shock) but misses the nuance. This highlights the distinction between encoding fidelity (how completely the input pipeline captures patient intent) and reasoning fidelity (how correctly the reasoner evaluates what was encoded). Both matter, and the evaluation framework can distinguish between them.
+
+#### Preliminary Coverage Analysis
+
+We assessed how the 9 common decision points identified across our 50-template concept inventory map to the current ontology:
 
 | Decision Point | Ontology Coverage | Notes |
 |---|---|---|
@@ -97,19 +149,6 @@ Each preference maps to a `PreferenceStatement` individual linked to its `Interv
 | Organ / Tissue Donation | Not covered | Deferred to future work |
 
 For the 5 in-scope decision points, the ontology provides **21 specific intervention classes** — significantly more granular than any single AD template in the concept inventory. For example, standard ADs typically offer a binary yes/no on "mechanical ventilation," while the ontology distinguishes 6 ventilation-related interventions that capture the clinically meaningful distinctions (temporary vs. indefinite, invasive vs. non-invasive, withdrawal).
-
-**Conditional preference representation.** Of the 8 example preferences, 5 are conditional — each with different activation condition structures:
-
-| Preference | Activation Conditions |
-|---|---|
-| No CPR if NYHA IV without reversible cause | NYHA class + clinical condition + reversible cause flag |
-| Accept temporary ventilation if reversible | Reversible cause flag only |
-| Deactivate ICD if enrolled in hospice | Care context only |
-| Accept acute dialysis if cardiorenal + recoverable | Clinical condition + reversible cause flag |
-| Escalate inotropes only if LVAD/transplant plan | Clinical condition only |
-| Withdraw vasopressors if no improvement after 72h | Clinical condition + time bound |
-
-This demonstrates that the ontology's `ActivationCondition` class can represent the diverse conditional structures found in real clinical preferences — a capability absent from standard AD templates and POLST forms.
 
 ---
 
