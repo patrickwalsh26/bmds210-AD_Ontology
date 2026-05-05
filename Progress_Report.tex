@@ -1,0 +1,373 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{ltablex}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{microtype}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    urlcolor=blue!60!black,
+    citecolor=blue!60!black
+}
+
+\newcommand{\onto}[1]{\texttt{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{Project Progress Report\\[0.3em]
+\large Toward a Computable Ontology of End-of-Life Care Preferences\\in Advanced Heart Failure}
+\author{BMDS 210 / CS 270 --- Spring 2026}
+\date{May 5, 2026}
+
+\begin{document}
+\maketitle
+
+%=============================================================================
+\section{Progress Made So Far}
+%=============================================================================
+
+\subsection{Introduction / Background}
+
+Advance directives (ADs) are legal documents in which patients specify their end-of-life (EOL) care preferences. Despite their importance, current ADs are almost entirely free-text documents that cannot be queried, reasoned over, or transferred reliably across care settings. Clinicians frequently encounter ADs at moments of acute crisis and must interpret ambiguous natural language under time pressure. An estimated 67\% of ICU patients lack decision-making capacity at end of life~\cite{silveira2010}, yet fewer than 37\% of US adults have any form of advance directive on file~\cite{yadav2017}, and those that exist are rarely interoperable with EHR systems~\cite{hl7adi2024}.
+
+This project builds an OWL ontology~\cite{owl2primer} of EOL care preferences---an Advance Directive Ontology (ADO)---that enables a reasoner to match a patient's documented preferences to their current clinical situation and infer appropriate care decisions. We scope the ontology to \textbf{advanced heart failure (HF)}, specifically the five most common clinical decision points where advance directives are consulted:
+
+\begin{enumerate}[nosep]
+    \item \textbf{CPR / Resuscitation}---most time-critical; HF patients frequently arrest, yet free-text ADs use vague language (``no heroic measures'')
+    \item \textbf{Mechanical Ventilation / Intubation}---ADs rarely distinguish temporary ventilation (bridge to recovery) from indefinite ventilation
+    \item \textbf{ICD Deactivation}---approximately 200,000 HF patients in the US have ICDs~\cite{kremers2023}, but most generic AD templates do not mention them
+    \item \textbf{Vasopressor / Inotrope Escalation}---almost never addressed in ADs; usually left to clinical judgment without documented patient preferences
+    \item \textbf{Dialysis}---ADs that mention dialysis rarely distinguish acute (recoverable) from chronic (maintenance) dialysis
+\end{enumerate}
+
+HF was chosen because of its unpredictable trajectory (oscillating between stable and acute states), device-specific decisions (ICDs, LVADs) that most AD templates were never designed to address, and frequent acute presentations that create time-pressured AD interpretation events~\cite{allen2012}.
+
+\subsection{Methodology}
+
+\subsubsection{Dataset(s)}
+
+\paragraph{Advanced Directive Concept Inventory (50 templates).}
+We compiled and cataloged 50 advance directive templates across 8 categories (Table~\ref{tab:inventory}), drawing from state statutory forms, national repositories (CaringInfo~\cite{caringinfo}, National POLST~\cite{polst}), and specialized populations.
+
+\begin{table}[ht]
+\centering
+\caption{Advance directive concept inventory by category.}
+\label{tab:inventory}
+\begin{tabularx}{\textwidth}{Xc>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Category} & \textbf{Count} & \textbf{Examples} \\
+\midrule
+State-specific ADs (US) & 10 & California AHCD, Texas Directive, NY Health Care Proxy \\
+POLST/MOLST forms & 6 & National POLST, CA POLST, NY MOLST \\
+Specialized populations & 4 & Five Wishes, Voicing My Choices, Dementia-specific \\
+Psychiatric/mental health & 7 & Bazelon Center PAD, SAMHSA guide \\
+Religious/faith-based & 9 & Catholic (NCBC), Halachic, Islamic (IMANA) \\
+Organizational & 4 & VA Form 10-0137, AAFP, Mayo Clinic \\
+DNR/DNAR forms & 5 & Texas OOH-DNR, CA Prehospital DNR \\
+International & 5 & UK ADRT (NHS), BC ``My Voice'' \\
+\midrule
+\textbf{Total} & \textbf{50} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Relevance and suitability.}
+This corpus captures the real-world diversity of AD formats. Preliminary analysis revealed 9 common decision points, 4 types of activation triggers (incapacity, terminal condition, permanent unconsciousness, disease stage), and population-specific considerations (dementia staging, psychiatric medication preferences, religious authority structures). Critically, the inventory confirmed our hypothesis: HF-specific decisions we target (ICD deactivation, inotrope/vasopressor escalation) are almost entirely absent from standard AD templates, validating the need for a specialized ontology.
+
+\subsubsection{Techniques and Algorithms}
+
+\paragraph{OWL Ontology (Prot\'eg\'e).}
+The ADO contains 67 classes, 12 object properties, and 8 data properties organized under 11 top-level classes. The Web Ontology Language (OWL 2)~\cite{owl2primer} was chosen for its formal description logic semantics and compatibility with automated reasoners. The ontology was built in Prot\'eg\'e~\cite{protege}, the standard open-source ontology editor. Key classes include:
+
+\begin{itemize}[nosep]
+    \item \onto{PreferenceStatement} (subclasses: \onto{ClearPreference}, \onto{ConditionalPreference}, \onto{VaguePreference})---the core representational unit
+    \item \onto{Intervention} (with subclass trees for resuscitation, ventilation, device, pharmacologic, and dialysis interventions)---21 specific interventions across the 5 decision points
+    \item \onto{ActivationCondition}---encodes conditional logic (NYHA class~\cite{nyha}, clinical conditions, reversible cause, time bounds)
+    \item \onto{FunctionalStatus}---NYHA Classes I--IV, since HF preferences are typically conditional on functional status
+    \item \onto{DecisionOutcome}---4-category output (\onto{ClearMatch}, \onto{PartialMatch}, \onto{NoCoverage}, \onto{VagueMatch})
+\end{itemize}
+
+Key object properties include \onto{hasPreference}, \onto{specifiesIntervention}, \onto{hasActivationCondition}, \onto{requiresFunctionalStatus}, and \onto{requiresCondition}. Data properties capture \onto{isNegated} (boolean), \onto{hasPreferenceStrength} (Absolute/Strong/Conditional/Weak), \onto{originalText}, \onto{hasReversibleCause}, and \onto{hasTimeBound}.
+
+\paragraph{Structured Preference Input Pipeline (Python / owlready2).}
+We built a Python pipeline (\texttt{preference\_input.py}) that takes patient preferences as structured JSON and programmatically instantiates OWL individuals using owlready2~\cite{owlready2}. The pipeline supports three input modes: (1)~interactive CLI questionnaire; (2)~JSON file input for batch processing; and (3)~example generation for testing. The pipeline validates inputs against controlled vocabularies for all 21 interventions, 10 conditions, 4 NYHA classes, 5 care contexts, and 4 document types.
+
+\paragraph{Scenario-Based Query Engine (Python / owlready2).}
+We built a query evaluation engine (\texttt{query\_evaluation.py}) that tests the populated ontology against clinical vignettes. Given a clinical scenario, the engine queries all patient preferences, matches activation conditions against the scenario state, and classifies each result into one of the four outcome categories. Results are compared against human-defined expected answers.
+
+\paragraph{HermiT Reasoner (in progress).}
+The next stage will implement DL queries and SWRL rules~\cite{swrl} within Prot\'eg\'e using the HermiT reasoner~\cite{hermit} for classification and consistency checking, complementing the Python-based query engine.
+
+\paragraph{Why these techniques are appropriate.}
+OWL provides the formal expressivity needed for conditional, negatable preferences with graded strength---capabilities that neither free-text ADs nor the HL7 FHIR ADI implementation guide~\cite{hl7adi2024} currently support. The \onto{ActivationCondition} class hierarchy enables inference rather than simple lookup, and the 4-category output is designed to be clinically honest---flagging uncertainty rather than forcing an answer.
+
+\subsubsection{Other Relevant Aspects}
+
+\paragraph{Negation handling.}
+Exclusionary preferences are represented with a boolean \onto{isNegated} data property and, where necessary, \onto{complementOf} class expressions---a deliberate design choice given OWL's open-world assumption~\cite{owl2primer}.
+
+\paragraph{Vagueness as a first-class problem.}
+The \onto{VaguePreference} subclass preserves original patient language via \onto{originalText} while assigning it to the nearest formal class, allowing the system to acknowledge what it cannot fully represent rather than forcing false precision.
+
+\paragraph{SNOMED CT grounding.}
+Clinical concepts are grounded in SNOMED CT~\cite{snomedct} to support interoperability with existing clinical systems.
+
+\subsection{Results / Analysis}
+
+\subsubsection{Pipeline Validation}
+
+We ran an example patient through the full pipeline. All 8 preference statements---spanning all 5 decision points, including clear and conditional preferences, negated and affirming, with varying strength levels---were successfully instantiated as OWL individuals. The populated ontology contains 47 individuals. No warnings or class-not-found errors were produced.
+
+\subsubsection{Scenario-Based Query Evaluation}
+
+We designed 12 clinical vignettes to test whether the system correctly infers care decisions from encoded preferences. Each vignette defines a clinical scenario and asks whether a specific intervention is indicated. The system returns a decision (\textit{yes}, \textit{no}, \textit{partial}, or \textit{no\_coverage}) and a match type (\textit{clear}, \textit{partial}, \textit{no\_coverage}, or \textit{vague}), compared against human-defined expected answers.
+
+\begin{table}[ht]
+\centering
+\caption{Overall evaluation accuracy (left) and accuracy by expected match type (right).}
+\label{tab:summary}
+\begin{tabular}{lc}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Decision accuracy & 11/12 (92\%) \\
+Match type accuracy & 12/12 (100\%) \\
+\bottomrule
+\end{tabular}
+\hspace{1.5em}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Match Type} & \textbf{Decision} & \textbf{Match Type} \\
+\midrule
+Clear & 8/8 (100\%) & 8/8 (100\%) \\
+Partial & 1/2 (50\%) & 2/2 (100\%) \\
+No coverage & 2/2 (100\%) & 2/2 (100\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Clinical vignette evaluation results. *See Section~\ref{sec:gaps} for V5/V6 notes.}
+\label{tab:vignettes}
+\small
+\begin{tabular}{c L{3.2cm} L{2.2cm} L{1.8cm} L{1.8cm} c}
+\toprule
+\textbf{ID} & \textbf{Clinical Scenario} & \textbf{Intervention} & \textbf{Expected} & \textbf{System} & \textbf{Result} \\
+\midrule
+V1  & Cardiac arrest, NYHA IV, no reversible cause & CPR & No (clear) & No (clear) & PASS \\[3pt]
+V2  & Cardiac arrest, NYHA III, reversible cause & CPR & Partial & Partial & PASS \\[3pt]
+V3  & Resp.\ failure, reversible cause & Temp.\ ventilation & Yes (clear) & Yes (clear) & PASS \\[3pt]
+V4  & Ventilator 10d, no improvement & Indef.\ ventilation & No (clear) & No (clear) & PASS \\[3pt]
+V5  & Enrolled in hospice & ICD deactivation & Yes (clear) & Yes (clear) & PASS* \\[3pt]
+V6  & In ICU, not hospice & ICD deactivation & Yes (clear) & Yes (clear) & PASS* \\[3pt]
+V7  & Cardiorenal syndrome, recovery expected & Acute dialysis & Yes (clear) & Yes (clear) & PASS \\[3pt]
+V8  & Kidney failure, no recovery & Chronic dialysis & No (clear) & No (clear) & PASS \\[3pt]
+V9  & Cardiogenic shock & Inotrope escalation & Yes (clear) & Yes (clear) & PASS \\[3pt]
+V10 & Cardiogenic shock, vasopressors 4d & Vasopressor w/d & Yes (partial) & Partial & FAIL \\[3pt]
+V11 & Respiratory failure & NIV (BiPAP) & No coverage & No coverage & PASS \\[3pt]
+V12 & Stable, NYHA II & Pacemaker deactivation & No coverage & No coverage & PASS \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Analysis of Failures and Identified Gaps}
+\label{sec:gaps}
+
+The evaluation revealed three categories of findings:
+
+\paragraph{1. Temporal reasoning limitation (V10).}
+The single decision failure occurred because OWL cannot natively evaluate time-bound conditions~\cite{owl2primer}. The patient's preference (``withdraw vasopressors if no improvement after 72 hours'') has a time bound stored as a string (\onto{hasTimeBound}), which the system correctly flags as requiring human interpretation (match type = partial) but cannot resolve to a \textit{yes} decision. Future work will explore SWRL temporal rules~\cite{swrl}.
+
+\paragraph{2. Missing care context property (V5/V6).}
+The ontology lacks a \onto{requiresCareContext} object property on \onto{ActivationCondition}. The patient's hospice-conditional ICD deactivation preference loses its care context during population, causing the system to treat it as unconditional. V5 returns the correct decision for the wrong reason; V6 produces a \textbf{false positive}. This identifies a concrete ontology fix: adding a \onto{requiresCareContext} property linking \onto{ActivationCondition} to \onto{CareContext}.
+
+\paragraph{3. Encoding fidelity vs.\ reasoning fidelity (V9).}
+The inotrope escalation preference includes the qualifier ``only if there is a plan for LVAD or transplant evaluation'' in \onto{originalText}, but this was not captured as a formal activation condition. The system correctly matches what \textit{was} encoded but misses the nuance---highlighting the distinction between \textbf{encoding fidelity} (how completely the pipeline captures patient intent) and \textbf{reasoning fidelity} (how correctly the reasoner evaluates what was encoded).
+
+\subsubsection{Preliminary Coverage Analysis}
+
+Table~\ref{tab:coverage} shows how common AD decision points map to the ontology.
+
+\begin{table}[ht]
+\centering
+\caption{Ontology coverage of common AD decision points.}
+\label{tab:coverage}
+\small
+\begin{tabular}{L{3.5cm} L{3cm} L{7cm}}
+\toprule
+\textbf{Decision Point} & \textbf{Coverage} & \textbf{Notes} \\
+\midrule
+CPR / Resuscitation & Full (3 subclasses) & CPR, defibrillation, transcutaneous pacing \\
+Mechanical Ventilation & Full (6 subclasses) & Temporary vs.\ indefinite, invasive vs.\ non-invasive, withdrawal \\
+ICD / Device Mgmt & Full (5 subclasses) & ICD deactivation, shock therapy, LVAD, pacemaker \\
+Vasopressor / Inotrope & Full (4 subclasses) & Escalation and withdrawal for both \\
+Dialysis & Full (3 subclasses) & Acute, chronic, withdrawal \\
+\midrule
+Nutrition / Hydration & Not covered & Deferred to future work \\
+Antibiotics & Not covered & Deferred to future work \\
+Pain Mgmt / Comfort & Not covered & Deferred to future work \\
+Organ / Tissue Donation & Not covered & Deferred to future work \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the 5 in-scope decision points, the ontology provides 21 specific intervention classes---significantly more granular than any single AD template in the inventory. Standard ADs typically offer a binary yes/no on ``mechanical ventilation,'' while the ontology distinguishes 6 ventilation-related interventions capturing clinically meaningful distinctions.
+
+%=============================================================================
+\section{Updates / Changes to Original Proposal}
+%=============================================================================
+
+\begin{enumerate}
+    \item \textbf{Narrowed disease scope with deeper clinical modeling.} The proposal mentioned scoping to HF broadly; the current implementation defines 5 specific clinical decision points with 21 distinct intervention subclasses, providing clinical depth over breadth.
+
+    \item \textbf{Full programmatic ontology population via owlready2~\cite{owlready2}.} The proposal mentioned owlready2 for SNOMED CT grounding. The project now includes a complete Python pipeline that programmatically instantiates OWL individuals from structured JSON---establishing a working end-to-end path from patient input to populated ontology.
+\end{enumerate}
+
+\noindent Additional changes:
+\begin{itemize}[nosep]
+    \item Expanded concept inventory from 30--40 to 50 templates across 8 categories.
+    \item Added a third evaluation track (patient preference fidelity).
+    \item Deferred FHIR ADI expressivity comparison~\cite{hl7adi2024} to future work.
+    \item Shifted reasoning layer to weeks 3--4; prioritized input pipeline first.
+\end{itemize}
+
+%=============================================================================
+\section{Updated Plan / Timeline}
+%=============================================================================
+
+\begin{table}[ht]
+\centering
+\caption{Updated project timeline.}
+\label{tab:timeline}
+\small
+\begin{tabular}{L{2.5cm} L{9cm} L{2cm}}
+\toprule
+\textbf{Week} & \textbf{Milestone} & \textbf{Status} \\
+\midrule
+1--2 (by Apr 27) & Complete concept inventory (50 templates), finalize ontology design, begin Prot\'eg\'e implementation & Complete \\[4pt]
+2--3 (by May 4) & Complete OWL ontology (67 classes, 20 properties), build preference input pipeline, SNOMED CT grounding & Complete \\[4pt]
+3--4 (by May 11) & Implement reasoning layer (DL queries + SWRL rules), test on clinical vignettes, validate 4-category output & In progress \\[4pt]
+4--5 (by May 18) & NLP extraction (stretch), design 15--20 evaluation vignettes, recruit reviewers and participants & Upcoming \\[4pt]
+5--6 (by May 27) & Run all three evaluation tracks: expert concordance, patient fidelity, coverage analysis & Upcoming \\[4pt]
+7 (Jun 1 / Jun 5) & Synthesize findings, prepare poster/presentation, write final report & Upcoming \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%=============================================================================
+\section{Roadblocks or Challenges}
+%=============================================================================
+
+\paragraph{Negation under OWL's open-world assumption.}
+OWL assumes anything not stated is unknown (not false), complicating exclusionary preferences. Our \onto{isNegated} workaround is functional but has edge cases we are documenting.
+
+\paragraph{Temporal reasoning limitations.}
+OWL lacks native temporal reasoning~\cite{owl2primer}, yet preferences frequently reference time. Time bounds are currently stored as strings; SWRL rules~\cite{swrl} or an external temporal reasoner are future work. This was empirically confirmed by vignette V10.
+
+\paragraph{Care context representation.}
+As identified in V5/V6, the missing \onto{requiresCareContext} property causes false positives for care-context-dependent preferences. This is a concrete gap to address next.
+
+\paragraph{Evaluation recruitment.}
+Recruiting 2--3 bioethicists/palliative care attendings for expert concordance may be challenging. Backup: published vignettes with established ground-truth answers. The patient fidelity track (10--15 participants) will recruit from classmates, pending IRB guidance.
+
+\paragraph{Reasoning layer complexity.}
+Writing SWRL rules that correctly handle conditional preferences, negation, preference strength, and vagueness simultaneously is the most technically challenging remaining task.
+
+%=============================================================================
+\section{Questions for the Teaching Team}
+%=============================================================================
+
+\begin{enumerate}[nosep]
+    \item \textbf{IRB requirements}: Does recruiting 10--15 participants to encode hypothetical EOL preferences require IRB approval, or does it qualify as a course-related educational activity?
+    \item \textbf{Evaluation scope}: Is it acceptable to prioritize coverage analysis and scenario-based reasoning over the full expert concordance study, given the timeline?
+    \item \textbf{NLP stretch goal}: Should remaining time go toward the NLP extraction pipeline or toward deepening the reasoning layer and evaluation?
+\end{enumerate}
+
+%=============================================================================
+\begin{thebibliography}{99}
+\small
+
+\bibitem{silveira2010}
+M.~J. Silveira, S.~Y.~H. Kim, and K.~M. Langa,
+``Advance directives and outcomes of surrogate decision making before death,''
+\textit{New England Journal of Medicine}, vol.~362, no.~13, pp.~1211--1218, 2010.
+
+\bibitem{yadav2017}
+K.~N. Yadav, N.~B. Gabler, E.~Cooney, et al.,
+``Approximately one in three US adults completes any type of advance directive for end-of-life care,''
+\textit{Health Affairs}, vol.~36, no.~7, pp.~1244--1251, 2017.
+
+\bibitem{hl7adi2024}
+HL7 International,
+``FHIR Advance Directive Interoperability Implementation Guide,''
+Release 1.1, 2024.
+\url{https://hl7.org/fhir/us/pacio-adi/}
+
+\bibitem{owl2primer}
+W3C OWL Working Group,
+``OWL 2 Web Ontology Language Primer (Second Edition),''
+W3C Recommendation, December 2012.
+\url{https://www.w3.org/TR/owl2-primer/}
+
+\bibitem{kremers2023}
+F.~W. Kremers et al.,
+``Trends in the prevalence of implantable cardioverter-defibrillators in the United States,''
+\textit{Heart Rhythm}, vol.~20, no.~5, pp.~698--706, 2023.
+
+\bibitem{allen2012}
+L.~A. Allen, L.~W. Stevenson, K.~L. Grady, et al.,
+``Decision making in advanced heart failure: a scientific statement from the American Heart Association,''
+\textit{Circulation}, vol.~125, no.~15, pp.~1928--1952, 2012.
+
+\bibitem{protege}
+M.~A. Musen,
+``The Prot\'eg\'e project: a look back and a look forward,''
+\textit{AI Matters}, vol.~1, no.~4, pp.~4--12, 2015.
+
+\bibitem{owlready2}
+J.-B. Lamy,
+``Owlready: Ontology-oriented programming in Python with automatic classification and high level constructs for biomedical ontologies,''
+\textit{Artificial Intelligence in Medicine}, vol.~80, pp.~11--28, 2017.
+
+\bibitem{hermit}
+B.~Glimm, I.~Horrocks, B.~Motik, G.~Stoilos, and Z.~Wang,
+``HermiT: An OWL 2 reasoner,''
+\textit{Journal of Automated Reasoning}, vol.~53, no.~3, pp.~245--269, 2014.
+
+\bibitem{swrl}
+I.~Horrocks, P.~F. Patel-Schneider, H.~Boley, et al.,
+``SWRL: A Semantic Web Rule Language combining OWL and RuleML,''
+W3C Member Submission, May 2004.
+\url{https://www.w3.org/Submission/SWRL/}
+
+\bibitem{snomedct}
+SNOMED International,
+``SNOMED CT,'' 2024.
+\url{https://www.snomed.org/}
+
+\bibitem{nyha}
+The Criteria Committee of the New York Heart Association,
+\textit{Nomenclature and Criteria for Diagnosis of Diseases of the Heart and Great Vessels}, 9th~ed.
+Boston: Little, Brown, 1994.
+
+\bibitem{caringinfo}
+National Hospice and Palliative Care Organization,
+``CaringInfo: Advance Directives by State,'' 2024.
+\url{https://www.caringinfo.org/planning/advance-directives/by-state/}
+
+\bibitem{polst}
+National POLST,
+``POLST: Portable Medical Orders,'' 2024.
+\url{https://polst.org/}
+
+\end{thebibliography}
+
+\end{document}
