@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.85in]{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{titlesec}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    urlcolor=blue!60!black,
+    citecolor=blue!60!black
+}
+
+\titlespacing*{\section}{0pt}{1.0ex plus 0.3ex minus 0.2ex}{0.5ex plus 0.2ex}
+
+\newcommand{\onto}[1]{\texttt{\small #1}}
+
+\setlist[itemize]{nosep, leftmargin=*, topsep=2pt, partopsep=0pt}
+\setlist[enumerate]{nosep, leftmargin=*, topsep=2pt, partopsep=0pt}
+
+\pagestyle{empty}
+\date{}
+
+\begin{document}
+
+\begin{center}
+{\Large\bfseries Advance Directive Ontology (ADO): Expert Review Packet}\\[0.3em]
+{\small A Computable Ontology of End-of-Life Care Preferences in Advanced Heart Failure}\\[0.4em]
+{\small Prepared for Dr.\ David Magnus \textbar{} CS 270 / BMDS 210, Spring 2026}\\[0.1em]
+{\small Patrick Walsh \& Darren Chan \textbar{} \href{mailto:walshp26@stanford.edu}{walshp26@stanford.edu} \textbar{} \href{https://github.com/patrickwalsh26/bmds210-AD_Ontology}{github.com/patrickwalsh26/bmds210-AD\_Ontology}}
+\end{center}
+
+\section*{1.\ \ The Problem}
+
+Advance directives are free-text legal documents that clinicians must interpret under time pressure at moments of acute crisis. About 67\% of ICU patients lack decision-making capacity at end of life, yet fewer than 37\% of US adults have any AD on file, and those that exist are rarely interoperable with EHR systems. At 2~AM during a cardiac arrest, no one reads a six-page PDF.
+
+We built the \textbf{Advance Directive Ontology (ADO)}, an OWL ontology that formally represents end-of-life preferences and lets a reasoner match a patient's documented preferences to their current clinical state. We scope it to \textbf{advanced heart failure} because HF involves device-specific decisions (ICDs, LVADs) that generic ADs were never designed to address, and because HF patients cycle through acute presentations where time-pressured AD interpretation is routine.
+
+\section*{2.\ \ What We Built}
+
+The ontology contains 67 classes and 22 properties, scoped to the five HF decision points where ADs are most often consulted: CPR, mechanical ventilation, ICD/device management, vasopressor/inotrope escalation, and dialysis --- with 21 specific intervention subclasses. Each preference is encoded as a \onto{PreferenceStatement} linking an intervention to an \onto{ActivationCondition} (NYHA class, clinical condition, reversible cause, care context, time bound), a \onto{PreferenceStrength} (Absolute / Strong / Conditional / Weak), an \onto{isNegated} flag, and the patient's original language verbatim via \onto{originalText} --- vague preferences are preserved, not flattened.
+
+Given a populated patient ontology plus a clinical scenario, the reasoner returns one of four outputs:
+\begin{itemize}
+    \item \textbf{Clear match} --- activation conditions met, preference unambiguous
+    \item \textbf{Partial match} --- some conditions met, others unspecified or explicitly unmet
+    \item \textbf{No coverage} --- the AD does not address this scenario
+    \item \textbf{Vague match} --- preference uses irreducibly imprecise terms; original language surfaced alongside the nearest formal class
+\end{itemize}
+
+This 4-category output is the central design choice. It is meant to be \emph{clinically honest} --- flagging uncertainty rather than forcing an answer. It is the design choice we'd most value your input on.
+
+\section*{3.\ \ Where ADO Fits}
+
+To our knowledge no published OWL ontology supports description-logic reasoning over conditional, negatable, graded end-of-life preferences. Adjacent work occupies different layers:
+
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Layer} & \textbf{Existing work} & \textbf{Gap} \\
+\midrule
+Document transport & HL7 PACIO ADI (FHIR) & No reasoning over preferences \\
+Clinician orders   & POLST / MOLST & Binary checkboxes; loses conditionality \\
+Narrative ADs      & Stanford Letter Project (Periyakoil) & Not computable \\
+\textbf{Inference layer} & \textbf{ADO (this project)} & --- \\
+\bottomrule
+\end{tabularx}
+
+The positioning: \emph{PACIO ADI moves the document; ADO is the missing inference layer above it.}
+
+\section*{4.\ \ Evaluation Status}
+
+We tested the reasoner against 12 clinical vignettes spanning all 5 decision points and four preference types (clear / conditional / negated / vague). Each returns a system decision compared against a human-defined expected answer.
+
+\begin{tabularx}{\textwidth}{Xcc}
+\toprule
+\textbf{Metric} & \textbf{Score} & \textbf{Notes} \\
+\midrule
+Decision accuracy   & 12 / 12 (100\%) & After May 22 reasoner improvements \\
+Match-type accuracy & 12 / 12 (100\%) & V5/V6 care-context and V10 temporal gaps now resolved \\
+\bottomrule
+\end{tabularx}
+
+The May 6 progress report documented three gaps. Two are now closed: a missing \onto{requiresCareContext} property (a hospice-conditional ICD-deactivation preference now defers correctly when the patient is in ICU rather than hospice), and a temporal-reasoning gap (\onto{hasTimeBoundHours} now allows numeric comparison, so ``withdraw vasopressors if no improvement after 72\,h'' resolves to a clear decision once 72\,h has elapsed). The third gap is open by design: the preference ``escalate inotropes only if there is a plan for LVAD or transplant evaluation'' currently captures the cardiogenic-shock condition but leaves the LVAD/transplant qualifier in \onto{originalText} --- it surfaces the question of how much linguistic nuance to formalize before structure itself becomes the problem.
+
+\textbf{Next 10 days:} expand to 20--25 vignettes; coverage analysis against 25--30 verbatim AD statements from a 50-template inventory; 5--6 classmate fidelity study; expert review (this packet).
+
+\section*{5.\ \ Questions for Dr.\ Magnus}
+
+Any subset is welcome; written reply equally welcome if a meeting does not work.
+
+\begin{enumerate}
+    \item \textbf{The 4-category output.} Is ``Clear / Partial / No coverage / Vague'' the right ethical shape for a reasoner's output? In particular, is there a risk that \textbf{``No coverage''} gets read at the bedside as \textbf{``no preference, therefore proceed''}, when it should mean \textbf{``the AD does not authorize action, escalate to surrogate''}? Should the system phrase it differently?
+
+    \item \textbf{Surrogate hierarchy.} Where does a reasoner output sit relative to the surrogate? When the reasoner returns a clear match and the surrogate disagrees, what should the system's default be --- and what should it record in the chart?
+
+    \item \textbf{Liability and defensibility.} If a clinician relies on ADO output and is later second-guessed, what would the system need to produce to be ethically defensible? Is showing the patient's \onto{originalText} plus the inference path enough?
+
+    \item \textbf{Category error.} Is formalizing preferences as graded, conditional logic a \emph{category error} --- does it medicalize what should remain interpretive and relational? The Letter Project's choice to preserve narrative is a response to this concern. Where is the line between useful structure and harmful flattening?
+
+    \item \textbf{Documented vs.\ situational preferences.} People change their minds when confronted with the actual scenario. Should the system explicitly model this divergence, or does that risk paternalism?
+\end{enumerate}
+
+\section*{6.\ \ Logistics}
+
+We'd value 15 minutes at whatever time Olga sets; happy to come to your office or meet over Zoom. Even a paragraph in reply to any subset of these questions would carry weight in our final report. Class presentation is \textbf{June 1}; final report \textbf{June 5}. Thank you for taking the time.
+
+\end{document}

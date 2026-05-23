@@ -80,6 +80,13 @@
   <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">requires condition</rdfs:label>
 </owl:ObjectProperty>
 
+<owl:ObjectProperty rdf:about="#requiresCareContext">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="#CareContext"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">requires care context</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links an activation condition to a required care setting (e.g., HospiceEnrollment, ICUSetting). Added to fix the V5/V6 false-positive identified in the May 2026 progress report.</core:definition>
+</owl:ObjectProperty>
+
 <owl:ObjectProperty rdf:about="#hasDecisionOutcome">
   <rdfs:domain rdf:resource="#PreferenceStatement"/>
   <rdfs:range rdf:resource="#DecisionOutcome"/>
@@ -118,7 +125,14 @@
   <rdfs:domain rdf:resource="#ActivationCondition"/>
   <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
   <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has time bound</rdfs:label>
-  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A temporal constraint on the activation condition (e.g., "after 7 days with no improvement").</core:definition>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A human-readable temporal constraint on the activation condition (e.g., "after 7 days with no improvement"). Paired with hasTimeBoundHours for computable evaluation.</core:definition>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#hasTimeBoundHours">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has time bound hours</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Duration threshold in hours, used for numeric comparison against scenario elapsed time. Enables SWRL temporal rules (swrlb:greaterThan) and Python-side temporal matching. Added to fix the V10 temporal-reasoning gap identified in the May 2026 progress report.</core:definition>
 </owl:DatatypeProperty>
 
 <owl:DatatypeProperty rdf:about="#hasReversibleCause">
@@ -197,6 +211,11 @@
   <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A specific clinical situation requiring a care decision, used as input to the reasoner.</core:definition>
 </owl:Class>
 
+<owl:Class rdf:about="#CareContext">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Care Context</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The broader care setting or circumstance (e.g., ICU, hospice enrollment, outpatient).</core:definition>
+</owl:Class>
+
 <owl:Class rdf:about="#DecisionOutcome">
   <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Decision Outcome</rdfs:label>
   <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The result of reasoning over preferences and a clinical scenario.</core:definition>
@@ -205,11 +224,6 @@
 <owl:Class rdf:about="#AdvanceDirectiveDocument">
   <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Advance Directive Document</rdfs:label>
   <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The source document from which preferences were extracted.</core:definition>
-</owl:Class>
-
-<owl:Class rdf:about="#CareContext">
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Care Context</rdfs:label>
-  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The broader care setting or circumstance (e.g., ICU, hospice enrollment, outpatient).</core:definition>
 </owl:Class>
 
 <owl:Class rdf:about="#ClearPreference">
@@ -678,6 +692,7 @@
   <hasPreference rdf:resource="#Pref_jane_doe_001_6"/>
   <hasPreference rdf:resource="#Pref_jane_doe_001_7"/>
   <hasPreference rdf:resource="#Pref_jane_doe_001_8"/>
+  <hasPreference rdf:resource="#Pref_jane_doe_001_9"/>
   <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Jane Doe</rdfs:label>
 </owl:NamedIndividual>
 
@@ -702,7 +717,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Absolute</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If my heart stops and I am in NYHA Class IV with no reversible cause, do not attempt CPR.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_cpr">
@@ -734,7 +749,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept temporary intubation if there is a reversible cause, but not indefinite ventilation.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_temporary_ventilation">
@@ -755,7 +770,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Absolute</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept temporary intubation if there is a reversible cause, but not indefinite ventilation.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_indefinite_ventilation">
@@ -771,7 +786,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Deactivate my ICD if I am enrolled in hospice.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_icd_deactivation">
@@ -780,7 +795,12 @@
 
 <owl:NamedIndividual rdf:about="#AC_Pref_jane_doe_001_4">
   <rdf:type rdf:resource="#ActivationCondition"/>
+  <requiresCareContext rdf:resource="#Ctx_jane_doe_001_hospice"/>
   <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Deactivate ICD if enrolled in hospice</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Ctx_jane_doe_001_hospice">
+  <rdf:type rdf:resource="#HospiceEnrollment"/>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Pref_jane_doe_001_5">
@@ -791,7 +811,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Absolute</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I do not want to be placed on long-term maintenance dialysis.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_chronic_dialysis">
@@ -807,7 +827,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept short-term dialysis if my kidney function is expected to recover.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_acute_dialysis">
@@ -834,7 +854,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Escalate inotropes only if there is a plan for LVAD or transplant evaluation.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_inotrope_escalation">
@@ -860,7 +880,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I am on vasopressors with no improvement after 3 days, withdraw them.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-04</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_jane_doe_001_vasopressor_withdrawal">
@@ -872,6 +892,22 @@
   <requiresCondition rdf:resource="#Cond_jane_doe_001_cardiogenic_shock"/>
   <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Withdraw vasopressors if no improvement after 72 hours</rdfs:label>
   <hasTimeBound rdf:datatype="http://www.w3.org/2001/XMLSchema#string">no improvement after 72 hours</hasTimeBound>
+  <hasTimeBoundHours rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">72</hasTimeBoundHours>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_jane_doe_001_9">
+  <rdf:type rdf:resource="#VaguePreference"/>
+  <specifiesIntervention rdf:resource="#Interv_jane_doe_001_non_invasive_ventilation"/>
+  <sourceDocument rdf:resource="#Doc_jane_doe_001_living_will"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vague: no aggressive measures</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Weak</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I am dying, I do not want aggressive measures or to be kept alive by machines.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_jane_doe_001_non_invasive_ventilation">
+  <rdf:type rdf:resource="#NonInvasiveVentilation"/>
 </owl:NamedIndividual>
 
 <owl:AllDisjointClasses>

@@ -134,41 +134,49 @@ Take free-text ADs from the 50-template concept inventory and build an extractio
 
 ## Stage 5: Evaluation (Weeks 5-7)
 
-Three evaluation tracks, ordered by priority.
+**Revised May 2026 (post-TA feedback)**: Track priorities have been rebalanced to put scenario-based reasoning and coverage analysis first, with a smaller fidelity study and a lighter-touch expert review. The reasoning layer is the core technical contribution and receives the most evaluation effort.
 
-### Track 1: Expert Concordance (Primary)
+### Track 1: Scenario-Based Reasoning Evaluation (Primary)
 
-**Question**: Does the system's reasoning match clinical expert judgment?
+**Question**: Does the reasoner correctly infer care decisions from encoded preferences across diverse clinical scenarios?
 
-- Design 15-20 clinical vignettes: patient profile + encoded preferences + acute clinical scenario (scoped to the five core HF decision points)
-- Recruit 2-3 Stanford bioethicists or palliative care attendings
-- Each expert independently answers: "Based on this patient's stated preferences and current clinical state, what care is indicated?"
-- Run the same vignettes through the reasoner
-- **Metric**: Cohen's kappa between system output and expert consensus
-- Case-by-case analysis of disagreements — these are the most interesting findings
+- Expand the existing 12-vignette suite to **20-25 vignettes** (4-5 per decision point)
+- Deliberate coverage of clear, conditional, vague, and negated preferences; the three known failure modes (temporal, care-context, encoding fidelity); and cases that require SWRL inference rather than pure DL classification
+- **Metrics**:
+  - Decision accuracy and match-type accuracy (per vignette and aggregate)
+  - Per-intervention precision/recall, so coverage of less common decision points (pacemaker deactivation, NIV) is visible
+  - **Ablation**: identical vignette set evaluated with and without the new SWRL rule layer, isolating the reasoner's contribution from the Python query engine
 
-### Track 2: Patient Preference Fidelity (Secondary)
-
-**Question**: Does the system correctly represent what people actually want?
-
-- Recruit 10-15 participants (classmates, community members — check with professor on IRB requirements)
-- Have each participant encode their HF-specific EOL preferences using the structured input tool (Stage 2)
-- Present them with 5-6 clinical scenarios (scoped to the five core decision points) and ask: "What would you want in this situation?"
-- Run the same scenarios through the reasoner using their encoded preferences
-- **Metric**: Agreement rate between system output and participant's stated situational preference
-- **Key finding**: Cases where a person's *documented preferences* (what they wrote down in advance) diverge from their *situational preferences* (what they say when confronted with a specific scenario). This is a known problem with ADs in general — if the system surfaces it, that's a finding about the limits of advance directives, not a system failure.
-
-### Track 3: Coverage Analysis
+### Track 2: Coverage Analysis (Primary)
 
 **Question**: What can the ontology represent, and what can't it?
 
-- Encode 25-30 real preference statements drawn from AD templates (focusing on the five core HF decision points)
-- Measure the proportion that can be represented without loss of meaning
-- Categorize failures:
-  - Missing class (ontology doesn't have the concept)
-  - OWL expressivity limitation (concept exists but can't be formally modeled)
-  - Inherent vagueness (statement is intentionally imprecise)
-- This analysis characterizes the ontology's expressiveness and identifies concrete areas for future work
+- Encode **25-30 verbatim preference statements** drawn from the 50-template concept inventory, focusing on the five core HF decision points
+- Each statement classified as:
+  - (a) representable without loss
+  - (b) representable with documented vagueness (`VaguePreference` with `originalText` preserved)
+  - (c) missing ontology class
+  - (d) OWL expressivity limitation
+  - (e) inherent natural-language vagueness
+- Output: concrete enumeration of what the ontology can and cannot represent across real AD templates, plus a prioritized list of additions for future work
+
+### Track 3: Patient Preference Fidelity (Secondary, Reduced Scope)
+
+**Question**: Does the system correctly represent what people actually want?
+
+- Recruit **5-6 classmates** from BMDS 210 / CS 270 (revised from 10-15 per TA guidance)
+- Each participant (i) encodes their own HF-specific EOL preferences via the structured input tool, then (ii) answers 5-6 clinical scenarios in their own words
+- **Metric**: Agreement rate between system output and participant's stated situational preference
+- **Key finding**: Cases where documented preferences diverge from situational preferences — a known limitation of ADs in general, characterized qualitatively
+
+### Track 4: Expert Ontology Review (Light-Touch)
+
+**Question**: Does the ontology pass external clinical face validity?
+
+- Reframed from a vignette survey to a **written ontology review by 1-2 domain experts** (palliative care or bioethics)
+- Reviewers receive: the ontology, a one-page summary of the 5 decision points and 21 interventions, and the V5/V6/V10 gap analysis
+- Structured feedback requested on class taxonomy, missing concepts, and clinical face validity
+- Disagreements documented as future-work items rather than scored quantitatively (Cohen's kappa was deferred since the sample is too small to be meaningful)
 
 ---
 
@@ -189,9 +197,10 @@ Three evaluation tracks, ordered by priority.
 | Structured input -> ontology pipeline (Python/OwlReady2) | Patient preferences can be computably encoded |
 | Reasoner queries (DL + SWRL) with 4-category output | System can infer care decisions and honestly flag uncertainty |
 | NLP extraction pipeline (stretch) | Could work on real free-text AD documents |
-| Expert concordance evaluation (kappa) | System agrees with clinical expert judgment |
-| Patient fidelity evaluation | System reflects what people actually want |
-| Coverage analysis with failure categorization | Characterizes what the ontology can and cannot represent |
+| Expanded scenario evaluation (20-25 vignettes) with SWRL ablation | Reasoner correctly infers care decisions across the 5 decision points |
+| Coverage analysis on 25-30 real AD statements with failure categorization | Characterizes what the ontology can and cannot represent against real AD templates |
+| 5-6 classmate fidelity study | System reflects what people actually want; surfaces documented-vs-situational preference gap |
+| Written expert ontology review (1-2 reviewers) | External clinical face validity check on the model |
 
 ---
 

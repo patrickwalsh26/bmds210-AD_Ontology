@@ -108,8 +108,14 @@ We built a Python pipeline (\texttt{preference\_input.py}) that takes patient pr
 \paragraph{Scenario-Based Query Engine (Python / owlready2).}
 We built a query evaluation engine (\texttt{query\_evaluation.py}) that tests the populated ontology against clinical vignettes. Given a clinical scenario, the engine queries all patient preferences, matches activation conditions against the scenario state, and classifies each result into one of the four outcome categories. Results are compared against human-defined expected answers.
 
-\paragraph{HermiT Reasoner (in progress).}
-The next stage will implement DL queries and SWRL rules~\cite{swrl} within Prot\'eg\'e using the HermiT reasoner~\cite{hermit} for classification and consistency checking, complementing the Python-based query engine.
+\paragraph{HermiT Reasoner and SWRL Rule Layer (next stage).}
+The next stage implements DL queries and SWRL rules~\cite{swrl} within Prot\'eg\'e using the HermiT reasoner~\cite{hermit} for classification and consistency checking, complementing the Python-based query engine. Three concrete rule sets are planned, each directly motivated by gaps identified in Section~\ref{sec:gaps}:
+\begin{itemize}[nosep]
+    \item \textbf{Temporal activation rules (V10 gap).} SWRL rules using the \texttt{swrlb:greaterThan} built-in evaluate \onto{hasTimeBound} against a scenario's elapsed duration, enabling time-conditioned withdrawal preferences (e.g., ``withdraw vasopressors if no improvement after 72\,h'') to resolve to a definitive decision rather than a partial match.
+    \item \textbf{Care-context activation rules (V5/V6 gap).} A new \onto{requiresCareContext} object property links \onto{ActivationCondition} to \onto{CareContext}; SWRL rules fire a preference only when the patient's encoded care context (e.g., hospice enrollment) matches the activation requirement, eliminating the false positive observed in V6.
+    \item \textbf{Negation-aware classification.} DL class expressions combining \onto{isNegated} with \onto{hasPreferenceStrength} derive \onto{ProhibitedIntervention} and \onto{PermittedIntervention} as inferred classes, moving negation semantics from the Python layer into the reasoner.
+\end{itemize}
+HermiT will additionally perform consistency checking on every populated patient ontology: conflicting preferences for the same intervention (e.g., simultaneously \texttt{Absolute} affirming and \texttt{Absolute} negating) will be flagged before query evaluation runs, providing an automated sanity check on the input pipeline.
 
 \paragraph{Why these techniques are appropriate.}
 OWL provides the formal expressivity needed for conditional, negatable preferences with graded strength---capabilities that neither free-text ADs nor the HL7 FHIR ADI implementation guide~\cite{hl7adi2024} currently support. The \onto{ActivationCondition} class hierarchy enables inference rather than simple lookup, and the 4-category output is designed to be clinically honest---flagging uncertainty rather than forcing an answer.
@@ -245,6 +251,28 @@ For the 5 in-scope decision points, the ontology provides 21 specific interventi
     \item Shifted reasoning layer to weeks 3--4; prioritized input pipeline first.
 \end{itemize}
 
+\subsection{Revised Evaluation Plan (Post-Feedback)}
+\label{sec:revised-eval}
+
+Following teaching-team feedback on the original three-track plan, we have re-scoped evaluation to prioritize the reasoning layer and tractable, well-defined evaluation. The revised plan retains all three tracks but rebalances effort: coverage analysis and scenario-based reasoning become primary; the participant fidelity sample is reduced; expert concordance is reframed as a small, well-defined ontology review rather than a clinician survey.
+
+\paragraph{Track 1 (primary): Scenario-based reasoning evaluation.}
+Expand the existing 12-vignette suite (Table~\ref{tab:vignettes}) to \textbf{20--25 vignettes} (4--5 per decision point), with deliberate coverage of (i) clear, conditional, vague, and negated preferences; (ii) the three known failure modes (temporal, care-context, encoding fidelity); and (iii) cases requiring SWRL inference rather than pure DL classification. Metrics reported per vignette and aggregated:
+\begin{itemize}[nosep]
+    \item Decision accuracy and match-type accuracy (already implemented; will be re-run after SWRL integration).
+    \item Per-intervention precision/recall, so coverage of less common decision points (e.g., pacemaker deactivation, NIV) is visible rather than hidden in an aggregate.
+    \item \textbf{Ablation}: identical vignette set evaluated with and without the new SWRL rule layer, to isolate the contribution of the reasoner from the contribution of the Python query engine.
+\end{itemize}
+
+\paragraph{Track 2 (primary): Coverage analysis against the 50-template inventory.}
+Systematically encode \textbf{25--30 verbatim preference statements} drawn from the 50-template inventory (Table~\ref{tab:inventory}), focusing on the five in-scope decision points. Each statement is classified as: (a)~representable without loss; (b)~representable with documented vagueness (\onto{VaguePreference} with \onto{originalText} preserved); (c)~missing ontology class; (d)~OWL expressivity limitation; or (e)~inherent natural-language vagueness. The output is a concrete enumeration of what the ontology can and cannot represent across real AD templates, plus a prioritized list of additions for future work.
+
+\paragraph{Track 3 (secondary): Participant fidelity study, scoped to 5--6 classmates.}
+Per teaching-team guidance, the participant fidelity track is reduced from 10--15 participants to \textbf{5--6 classmates} recruited from BMDS 210 / CS 270. Each participant (i)~encodes their own HF-specific EOL preferences via the structured input tool, then (ii)~answers 5--6 clinical scenarios in their own words. We report the agreement rate between system output (from their encoded ontology) and their stated situational preference, and qualitatively characterize divergences between documented and situational preferences---a known limitation of advance directives in general.
+
+\paragraph{Track 4 (light-touch): Expert ontology review, not survey.}
+The expert concordance track is reframed as an \textbf{ontology review by 1--2 domain experts} (palliative care or bioethics), not a vignette survey. Reviewers receive the ontology, a one-page summary of the 5 decision points and 21 interventions, and the V5/V6/V10 gap analysis, and are asked for structured feedback on class taxonomy, missing concepts, and clinical face validity. Disagreements are documented as future-work items rather than scored quantitatively. This eliminates recruitment overhead while preserving an external clinical check on the model.
+
 %=============================================================================
 \section{Updated Plan / Timeline}
 %=============================================================================
@@ -261,8 +289,8 @@ For the 5 in-scope decision points, the ontology provides 21 specific interventi
 1--2 (by Apr 27) & Complete concept inventory (50 templates), finalize ontology design, begin Prot\'eg\'e implementation & Complete \\[4pt]
 2--3 (by May 4) & Complete OWL ontology (67 classes, 20 properties), build preference input pipeline, SNOMED CT grounding & Complete \\[4pt]
 3--4 (by May 11) & Implement reasoning layer (DL queries + SWRL rules), test on clinical vignettes, validate 4-category output & In progress \\[4pt]
-4--5 (by May 18) & NLP extraction (stretch), design 15--20 evaluation vignettes, recruit reviewers and participants & Upcoming \\[4pt]
-5--6 (by May 27) & Run all three evaluation tracks: expert concordance, patient fidelity, coverage analysis & Upcoming \\[4pt]
+4--5 (by May 22) & Add \onto{requiresCareContext} property; implement SWRL rules for temporal, care-context, and negation reasoning (Section~\ref{sec:gaps}); expand scenario suite to 20--25 vignettes; recruit 5--6 classmates for fidelity study & In progress \\[4pt]
+5--6 (by May 29) & Run scenario evaluation with SWRL ablation; run coverage analysis on 25--30 statements from 50-template inventory; conduct 5--6 classmate fidelity sessions; circulate ontology to 1--2 reviewers for written feedback & Upcoming \\[4pt]
 7 (Jun 1 / Jun 5) & Synthesize findings, prepare poster/presentation, write final report & Upcoming \\
 \bottomrule
 \end{tabular}
@@ -282,7 +310,7 @@ OWL lacks native temporal reasoning~\cite{owl2primer}, yet preferences frequentl
 As identified in V5/V6, the missing \onto{requiresCareContext} property causes false positives for care-context-dependent preferences. This is a concrete gap to address next.
 
 \paragraph{Evaluation recruitment.}
-Recruiting 2--3 bioethicists/palliative care attendings for expert concordance may be challenging. Backup: published vignettes with established ground-truth answers. The patient fidelity track (10--15 participants) will recruit from classmates, pending IRB guidance.
+Per teaching-team guidance (Section~\ref{sec:revised-eval}), the fidelity study is scoped to 5--6 BMDS 210 / CS 270 classmates rather than 10--15 general participants, which is tractable within the remaining timeline and consistent with a course-scale study. The expert track is reframed as a written ontology review by 1--2 reviewers rather than a vignette survey, removing recruitment risk while preserving an external clinical check.
 
 \paragraph{Reasoning layer complexity.}
 Writing SWRL rules that correctly handle conditional preferences, negation, preference strength, and vagueness simultaneously is the most technically challenging remaining task.
@@ -292,10 +320,12 @@ Writing SWRL rules that correctly handle conditional preferences, negation, pref
 %=============================================================================
 
 \begin{enumerate}[nosep]
-    \item \textbf{IRB requirements}: Does recruiting 10--15 participants to encode hypothetical EOL preferences require IRB approval, or does it qualify as a course-related educational activity?
-    \item \textbf{Evaluation scope}: Is it acceptable to prioritize coverage analysis and scenario-based reasoning over the full expert concordance study, given the timeline?
-    \item \textbf{NLP stretch goal}: Should remaining time go toward the NLP extraction pipeline or toward deepening the reasoning layer and evaluation?
+    \item \textbf{IRB requirements}: Does recruiting 5--6 classmates to encode hypothetical EOL preferences and respond to clinical scenarios qualify as a course-related educational activity, or does it require IRB review?
+    \item \textbf{Reviewer identification}: For the reframed expert ontology review (1--2 reviewers, written feedback), can the teaching team suggest a palliative care or bioethics faculty contact, or should we rely on existing clinical advisors?
+    \item \textbf{NLP stretch goal}: Given the re-prioritization toward the reasoning layer and evaluation, we plan to defer the NLP extraction pipeline to future work unless time permits. Is this acceptable?
 \end{enumerate}
+
+\noindent \emph{Note: The Q2 question from the May 6 submission (``is it acceptable to prioritize coverage analysis and scenario-based reasoning over expert concordance?'') has been answered affirmatively by the teaching team and is reflected in Section~\ref{sec:revised-eval}.}
 
 %=============================================================================
 \section{Summary of Team Member Contributions}

@@ -264,10 +264,24 @@ def populate_patient(onto, patient_data):
                 if rev is not None:
                     ac.hasReversibleCause = [rev]
 
-                # Time bound
+                # Time bound (human-readable string)
                 tb = ac_data.get("time_bound")
                 if tb:
                     ac.hasTimeBound = [tb]
+
+                # Time bound (machine-comparable hours) — enables temporal reasoning
+                tb_hours = ac_data.get("time_bound_hours")
+                if tb_hours is not None:
+                    ac.hasTimeBoundHours = [int(tb_hours)]
+
+                # Care context (e.g., HospiceEnrollment, ICUSetting)
+                ctx_key = ac_data.get("care_context")
+                if ctx_key and ctx_key in CARE_CONTEXTS:
+                    ctx_individual = get_or_create_individual(
+                        onto, CARE_CONTEXTS[ctx_key], f"Ctx_{pid}_{ctx_key}"
+                    )
+                    if ctx_individual:
+                        ac.requiresCareContext = [ctx_individual]
 
                 pref.hasActivationCondition = [ac]
 
@@ -536,8 +550,17 @@ def generate_example():
                 "type": "conditional",
                 "activation_conditions": {
                     "time_bound": "no improvement after 72 hours",
+                    "time_bound_hours": 72,
                     "conditions": ["cardiogenic_shock"]
                 }
+            },
+            {
+                "label": "Vague: no aggressive measures",
+                "intervention": "non_invasive_ventilation",
+                "negated": True,
+                "strength": "Weak",
+                "original_text": "If I am dying, I do not want aggressive measures or to be kept alive by machines.",
+                "type": "vague"
             }
         ]
     }

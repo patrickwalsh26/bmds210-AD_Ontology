@@ -99,10 +99,19 @@
       "type": "conditional",
       "activation_conditions": {
         "time_bound": "no improvement after 72 hours",
+        "time_bound_hours": 72,
         "conditions": [
           "cardiogenic_shock"
         ]
       }
+    },
+    {
+      "label": "Vague: no aggressive measures",
+      "intervention": "non_invasive_ventilation",
+      "negated": true,
+      "strength": "Weak",
+      "original_text": "If I am dying, I do not want aggressive measures or to be kept alive by machines.",
+      "type": "vague"
     }
   ]
 }

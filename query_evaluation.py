@@ -11,6 +11,7 @@ Usage:
 """
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -19,6 +20,30 @@ try:
 except ImportError:
     print("ERROR: owlready2 is not installed. Run: pip install owlready2")
     sys.exit(1)
+
+
+def parse_duration_to_hours(value):
+    """Parse a duration string like '96 hours', '3 days', '4d', '72h' into hours.
+
+    Returns an int or None if unparseable. Pure ints/floats are treated as hours.
+    """
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return int(value)
+    s = str(value).strip().lower()
+    m = re.match(r"^\s*(\d+(?:\.\d+)?)\s*([a-z]*)\s*", s)
+    if not m:
+        return None
+    n = float(m.group(1))
+    unit = m.group(2)
+    if unit in ("", "h", "hr", "hrs", "hour", "hours"):
+        return int(n)
+    if unit in ("d", "day", "days"):
+        return int(n * 24)
+    if unit in ("m", "min", "mins", "minute", "minutes"):
+        return int(n / 60)
+    return None
 
 
 # ── Clinical Vignettes ──────────────────────────────────────────────────────
@@ -101,7 +126,7 @@ VIGNETTES = [
         "expected": {
             "decision": "yes",
             "match_type": "clear",
-            "reasoning": "Patient wants ICD deactivation if enrolled in hospice. The ontology lacks a requiresCareContext property, so the hospice activation condition is not formally stored — the system treats this as an unconditional preference and returns 'yes'. The decision is correct but the reasoning path is incomplete (known ontology gap).",
+            "reasoning": "Patient wants ICD deactivation if enrolled in hospice. With requiresCareContext now populated, the hospice activation condition matches the scenario and the reasoner returns a clear 'yes' via the correct reasoning path.",
         },
     },
     {
@@ -113,9 +138,9 @@ VIGNETTES = [
             "care_context": "ICUSetting",
         },
         "expected": {
-            "decision": "yes",
-            "match_type": "clear",
-            "reasoning": "KNOWN GAP: Patient wants ICD deactivation only if in hospice, but the ontology lacks a requiresCareContext property. The hospice condition is lost during population, so the system treats this as unconditional and incorrectly returns 'yes'. This is a false positive that reveals a missing object property in the ontology.",
+            "decision": "partial",
+            "match_type": "partial",
+            "reasoning": "Patient's only ICD deactivation preference is conditional on hospice enrollment. Scenario is ICU, so the activation condition (HospiceEnrollment) is explicitly unmet. The AD addresses ICD deactivation but provides no guidance for this care context — partial match, decision deferred to surrogate.",
         },
     },
     {
@@ -169,8 +194,8 @@ VIGNETTES = [
         },
         "expected": {
             "decision": "yes",
-            "match_type": "partial",
-            "reasoning": "Patient wants vasopressor withdrawal if cardiogenic shock with no improvement after 72 hours. Condition is met and time exceeds the bound, but the system cannot formally evaluate time bounds (stored as string). Partial match — the cardiogenic shock condition matches but the time bound requires human interpretation.",
+            "match_type": "clear",
+            "reasoning": "Patient wants vasopressor withdrawal if cardiogenic shock with no improvement after 72 hours. With hasTimeBoundHours now stored as a numeric property and a comparable scenario time, the reasoner evaluates 96h >= 72h directly and returns a clear 'yes'. Resolves the V10 temporal-reasoning gap from the May 6 progress report.",
         },
     },
     {
@@ -181,9 +206,9 @@ VIGNETTES = [
             "conditions": ["RespiratoryFailure"],
         },
         "expected": {
-            "decision": "no_coverage",
-            "match_type": "no_coverage",
-            "reasoning": "Patient's AD does not address non-invasive ventilation specifically. Preferences exist for temporary and indefinite ventilation, but non-invasive ventilation is a distinct intervention class.",
+            "decision": "vague",
+            "match_type": "vague",
+            "reasoning": "Patient's only NIV-relevant statement is 'If I am dying, I do not want aggressive measures or to be kept alive by machines.' The system surfaces the original language verbatim and flags the match as vague rather than forcing a binary answer — 'aggressive measures' is broader than the formal NIV class. Demonstrates how the ontology preserves patient voice when language is irreducibly imprecise.",
         },
     },
     {
@@ -198,6 +223,62 @@ VIGNETTES = [
             "decision": "no_coverage",
             "match_type": "no_coverage",
             "reasoning": "Patient's AD does not mention pacemaker deactivation at all. No preference exists for this intervention.",
+        },
+    },
+    {
+        "id": "V13",
+        "description": "Patient is in cardiogenic shock, on vasopressors for only 48 hours, no improvement yet. Should vasopressors be withdrawn?",
+        "query_intervention": "VasopressorWithdrawal",
+        "scenario_state": {
+            "conditions": ["CardiogenicShock"],
+            "time_elapsed": "48 hours",
+        },
+        "expected": {
+            "decision": "partial",
+            "match_type": "partial",
+            "reasoning": "Patient wants vasopressor withdrawal if cardiogenic shock with no improvement after 72 hours. Cardiogenic shock matches, but only 48h elapsed — time threshold not yet met. Reasoner correctly returns partial: 'wait, not yet authorized.' Demonstrates the temporal logic in the 'doesn't fire yet' direction (complement of V10).",
+        },
+    },
+    {
+        "id": "V14",
+        "description": "Patient has sepsis-induced acute kidney injury (not cardiorenal syndrome); kidney recovery is expected. Should acute dialysis be initiated?",
+        "query_intervention": "AcuteDialysis",
+        "scenario_state": {
+            "conditions": [],
+            "reversible_cause": True,
+        },
+        "expected": {
+            "decision": "partial",
+            "match_type": "partial",
+            "reasoning": "Patient's acute dialysis preference requires both cardiorenal syndrome AND a reversible cause. Reversible cause matches, but the underlying clinical condition is sepsis-AKI, not cardiorenal syndrome. Reasoner correctly flags partial: the AD's authorization is conditioned on a specific HF-related etiology, not generic AKI.",
+        },
+    },
+    {
+        "id": "V15",
+        "description": "Patient is stable, in an outpatient nephrology consultation about long-term dialysis access. Should chronic dialysis be initiated?",
+        "query_intervention": "ChronicDialysis",
+        "scenario_state": {
+            "conditions": [],
+            "care_context": "OutpatientSetting",
+        },
+        "expected": {
+            "decision": "no",
+            "match_type": "clear",
+            "reasoning": "Patient has an Absolute, unconditional refusal of chronic dialysis. Preference applies regardless of care context, NYHA class, or other state. Demonstrates that an Absolute preference correctly fires in non-acute settings — not just at end of life.",
+        },
+    },
+    {
+        "id": "V16",
+        "description": "Patient is in ventricular tachycardia and the ICD is about to deliver a shock. Should ICD shock therapy be allowed to proceed?",
+        "query_intervention": "ICDShockTherapy",
+        "scenario_state": {
+            "conditions": [],
+            "care_context": "ICUSetting",
+        },
+        "expected": {
+            "decision": "no_coverage",
+            "match_type": "no_coverage",
+            "reasoning": "Patient's only ICD-related preference addresses deactivation (a planned, durable change) conditional on hospice enrollment. ICD shock therapy is a distinct intervention — a single therapeutic event during an arrhythmia. The reasoner correctly distinguishes the two and reports no coverage rather than defaulting to the nearest ICD preference. Tests that intervention granularity prevents over-inference.",
         },
     },
 ]
@@ -233,11 +314,19 @@ def find_matching_preferences(onto, patient, query_intervention, scenario_state)
             if type(interv).__name__ != query_intervention:
                 continue
 
+        # Pre-compute VaguePreference flag so the early-return branch below can honor it.
+        is_vague = any(getattr(cls, "name", "") == "VaguePreference" for cls in pref.is_a)
+
         # This preference addresses the right intervention — now check activation conditions
         activation_conditions = pref.hasActivationCondition
         if not activation_conditions:
             # No activation conditions = unconditional preference (always applies)
-            matches.append((pref, "clear", "No activation conditions — applies unconditionally"))
+            if is_vague:
+                orig = pref.originalText[0] if pref.originalText else "(no original text recorded)"
+                detail = f"VAGUE preference — original language: \"{orig}\". Applies unconditionally but in irreducibly imprecise language."
+                matches.append((pref, "vague", detail))
+            else:
+                matches.append((pref, "clear", "No activation conditions — applies unconditionally"))
             continue
 
         ac = activation_conditions[0]
@@ -281,15 +370,49 @@ def find_matching_preferences(onto, patient, query_intervention, scenario_state)
             else:
                 conditions_unmet.append("Reversible cause status unknown in scenario")
 
-        # Check time bound (string — cannot formally evaluate)
-        time_bound = ac.hasTimeBound
-        if time_bound:
-            conditions_unmet.append(f"Time bound '{time_bound[0]}' requires human interpretation")
+        # Check care context (e.g., HospiceEnrollment, ICUSetting)
+        required_ctx = ac.requiresCareContext
+        if required_ctx:
+            req_ctx_name = type(required_ctx[0]).__name__
+            scenario_ctx = scenario_state.get("care_context")
+            if scenario_ctx == req_ctx_name:
+                conditions_met.append(f"Care context: {req_ctx_name}")
+            elif scenario_ctx:
+                conditions_unmet.append(
+                    f"Requires care context {req_ctx_name}, scenario has {scenario_ctx}"
+                )
+            else:
+                conditions_unmet.append(f"Requires care context {req_ctx_name}, none in scenario")
+
+        # Check time bound: prefer numeric hasTimeBoundHours; fall back to string
+        time_bound_hours = ac.hasTimeBoundHours
+        scenario_elapsed_hours = parse_duration_to_hours(scenario_state.get("time_elapsed"))
+        if time_bound_hours:
+            req_hours = int(time_bound_hours[0])
+            if scenario_elapsed_hours is not None:
+                if scenario_elapsed_hours >= req_hours:
+                    conditions_met.append(
+                        f"Time bound: scenario {scenario_elapsed_hours}h >= required {req_hours}h"
+                    )
+                else:
+                    conditions_unmet.append(
+                        f"Time bound: scenario {scenario_elapsed_hours}h < required {req_hours}h"
+                    )
+            else:
+                conditions_unmet.append(
+                    f"Time bound: requires >= {req_hours}h elapsed, scenario time unknown"
+                )
+        else:
+            time_bound = ac.hasTimeBound
+            if time_bound:
+                conditions_unmet.append(
+                    f"Time bound '{time_bound[0]}' requires human interpretation"
+                )
 
         # Determine match type
         if not conditions_unmet:
             match_type = "clear"
-            detail = "All activation conditions met: " + "; ".join(conditions_met)
+            detail = "All activation conditions met: " + "; ".join(conditions_met) if conditions_met else "No activation conditions — applies unconditionally"
         elif conditions_met and conditions_unmet:
             match_type = "partial"
             detail = ("Met: " + "; ".join(conditions_met) +
@@ -297,6 +420,14 @@ def find_matching_preferences(onto, patient, query_intervention, scenario_state)
         else:
             match_type = "partial"
             detail = "Unmet: " + "; ".join(conditions_unmet)
+
+        # VaguePreference always carries forward as 'vague' regardless of activation logic,
+        # because the underlying preference language is irreducibly imprecise. The original
+        # text is surfaced so a human can interpret rather than the reasoner forcing an answer.
+        if is_vague:
+            orig = pref.originalText[0] if pref.originalText else "(no original text recorded)"
+            detail = f"VAGUE preference — original language: \"{orig}\". " + detail
+            match_type = "vague"
 
         matches.append((pref, match_type, detail))
 
@@ -320,17 +451,24 @@ def evaluate_vignette(onto, patient, vignette):
         negated = pref.isNegated[0] if pref.isNegated else False
         if match_type == "clear":
             system_decision = "no" if negated else "yes"
+        elif match_type == "vague":
+            system_decision = "vague"
         else:
             system_decision = "partial"
         system_match_type = match_type
     else:
-        # Multiple matches — find the strongest clear match
+        # Multiple matches — clear > vague > partial in priority
         clear_matches = [(p, mt, d) for p, mt, d in matches if mt == "clear"]
+        vague_matches = [(p, mt, d) for p, mt, d in matches if mt == "vague"]
         if clear_matches:
             pref, match_type, detail = clear_matches[0]
             negated = pref.isNegated[0] if pref.isNegated else False
             system_decision = "no" if negated else "yes"
             system_match_type = "clear"
+        elif vague_matches:
+            pref, match_type, detail = vague_matches[0]
+            system_decision = "vague"
+            system_match_type = "vague"
         else:
             pref, match_type, detail = matches[0]
             system_decision = "partial"
