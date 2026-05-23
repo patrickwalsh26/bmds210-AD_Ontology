@@ -186,7 +186,12 @@ LLM_PIPELINE_SCENARIO = {
     ),
     "query_intervention": "CPR",
     "scenario_state": {
-        "conditions": ["CardiacArrest"],
+        # Realistic clinical scenario for a NYHA IV cardiac-arrest patient with HF.
+        # AdvancedHeartFailure is part of the baseline state, not just a discovery
+        # mid-code. The LLM faithfully encodes the patient's "if I have advanced
+        # heart failure" qualifier as a separate activation condition, so the
+        # scenario must reflect that same condition explicitly.
+        "conditions": ["CardiacArrest", "AdvancedHeartFailure"],
         "nyha_class": "NYHA_ClassIV",
         "reversible_cause": False,
     },

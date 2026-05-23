@@ -1,0 +1,903 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:owl="http://www.w3.org/2002/07/owl#"
+         xml:base="http://purl.org/ado/ontology"
+         xmlns="http://purl.org/ado/ontology#"
+         xmlns:term="http://purl.org/dc/terms/"
+         xmlns:core="http://www.w3.org/2004/02/skos/core#">
+
+<owl:Ontology rdf:about="http://purl.org/ado/ontology">
+  <term:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Advanced Directive Ontology for Heart Failure End-of-Life Care</term:title>
+  <term:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An OWL ontology modeling computable end-of-life care preferences for patients with advanced heart failure, scoped to five core clinical decision points: CPR/Resuscitation, Mechanical Ventilation, ICD Deactivation, Vasopressor/Inotrope Escalation, and Dialysis.</term:description>
+  <term:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Patrick Walsh</term:creator>
+  <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.0</owl:versionInfo>
+</owl:Ontology>
+
+<owl:ObjectProperty rdf:about="#hasProxy">
+  <rdfs:domain rdf:resource="#Patient"/>
+  <rdfs:range rdf:resource="#DecisionMaker"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has proxy</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a patient to the person designated to make healthcare decisions on their behalf.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasPreference">
+  <rdfs:domain rdf:resource="#Patient"/>
+  <rdfs:range rdf:resource="#PreferenceStatement"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has preference</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a patient to a stated end-of-life care preference.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#specifiesIntervention">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="#Intervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">specifies intervention</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a preference statement to the clinical intervention it addresses.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#appliesToCondition">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">applies to condition</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a preference statement to the clinical condition under which it applies.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasActivationCondition">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="#ActivationCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has activation condition</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links a preference statement to the conditions that must be met for it to take effect.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasFunctionalStatus">
+  <rdfs:range rdf:resource="#FunctionalStatus"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has functional status</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links to the patient's NYHA functional classification.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasCurrentCondition">
+  <rdfs:domain rdf:resource="#ClinicalScenario"/>
+  <rdfs:range rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has current condition</rdfs:label>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasCurrentFunctionalStatus">
+  <rdfs:domain rdf:resource="#ClinicalScenario"/>
+  <rdfs:range rdf:resource="#FunctionalStatus"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has current functional status</rdfs:label>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#requiresFunctionalStatus">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="#FunctionalStatus"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">requires functional status</rdfs:label>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#requiresCondition">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">requires condition</rdfs:label>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#requiresCareContext">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="#CareContext"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">requires care context</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Links an activation condition to a required care setting (e.g., HospiceEnrollment, ICUSetting). Added to fix the V5/V6 false-positive identified in the May 2026 progress report.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#hasDecisionOutcome">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="#DecisionOutcome"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has decision outcome</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The care decision that results from this preference in context.</core:definition>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="#sourceDocument">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="#AdvanceDirectiveDocument"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">source document</rdfs:label>
+</owl:ObjectProperty>
+
+<owl:DatatypeProperty rdf:about="#isNegated">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">is negated</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">True if the preference is exclusionary (e.g., "I do not want mechanical ventilation").</core:definition>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#hasPreferenceStrength">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has preference strength</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The strength or certainty of the preference: Absolute, Strong, Conditional, or Weak.</core:definition>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#originalText">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">original text</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The original patient language from which this preference was derived.</core:definition>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#hasTimeBound">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has time bound</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A human-readable temporal constraint on the activation condition (e.g., "after 7 days with no improvement"). Paired with hasTimeBoundHours for computable evaluation.</core:definition>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#hasTimeBoundHours">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has time bound hours</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Duration threshold in hours, used for numeric comparison against scenario elapsed time. Enables SWRL temporal rules (swrlb:greaterThan) and Python-side temporal matching. Added to fix the V10 temporal-reasoning gap identified in the May 2026 progress report.</core:definition>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#hasReversibleCause">
+  <rdfs:domain rdf:resource="#ActivationCondition"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">has reversible cause</rdfs:label>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#dateDocumented">
+  <rdfs:domain rdf:resource="#PreferenceStatement"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#date"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">date documented</rdfs:label>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#proxyName">
+  <rdfs:domain rdf:resource="#DecisionMaker"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">proxy name</rdfs:label>
+</owl:DatatypeProperty>
+
+<owl:DatatypeProperty rdf:about="#proxyRelationship">
+  <rdfs:domain rdf:resource="#DecisionMaker"/>
+  <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">proxy relationship</rdfs:label>
+</owl:DatatypeProperty>
+
+<owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/title"/>
+
+<owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/description"/>
+
+<owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/creator"/>
+
+<owl:AnnotationProperty rdf:about="http://www.w3.org/2004/02/skos/core#definition"/>
+
+<owl:AnnotationProperty rdf:about="http://www.w3.org/2004/02/skos/core#altLabel"/>
+
+<owl:AnnotationProperty rdf:about="http://www.w3.org/2004/02/skos/core#example"/>
+
+<owl:Class rdf:about="#Patient">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Patient</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A person who has documented end-of-life care preferences.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#DecisionMaker">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Decision Maker</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A person designated to make healthcare decisions on behalf of a patient.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#PreferenceStatement">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Preference Statement</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A computable representation of a patient's stated care preference, linking an intervention to conditions and strength of preference.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#Intervention">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Intervention</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A clinical intervention or treatment that may be addressed in an advance directive.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ClinicalCondition">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Clinical Condition</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A medical condition or clinical state relevant to end-of-life decision making.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ActivationCondition">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation Condition</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The set of conditions that must be met for a preference statement to take effect.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#FunctionalStatus">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Functional Status</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The patient's functional classification, primarily NYHA class for heart failure.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ClinicalScenario">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Clinical Scenario</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A specific clinical situation requiring a care decision, used as input to the reasoner.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#CareContext">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Care Context</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The broader care setting or circumstance (e.g., ICU, hospice enrollment, outpatient).</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#DecisionOutcome">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Decision Outcome</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The result of reasoning over preferences and a clinical scenario.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#AdvanceDirectiveDocument">
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Advance Directive Document</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The source document from which preferences were extracted.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ClearPreference">
+  <rdfs:subClassOf rdf:resource="#PreferenceStatement"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Clear Preference</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A preference that can be unambiguously encoded in the ontology.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#VaguePreference">
+  <rdfs:subClassOf rdf:resource="#PreferenceStatement"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vague Preference</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A preference that uses imprecise language (e.g., "no heroic measures") and cannot be fully resolved to formal classes. The original patient language is preserved via originalText.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ConditionalPreference">
+  <rdfs:subClassOf rdf:resource="#PreferenceStatement"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional Preference</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A preference that applies only when specific activation conditions are met.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ResuscitationIntervention">
+  <rdfs:subClassOf rdf:resource="#Intervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Resuscitation Intervention</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Interventions related to cardiopulmonary resuscitation.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#CPR">
+  <rdfs:subClassOf rdf:resource="#ResuscitationIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">CPR</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cardiopulmonary resuscitation including chest compressions and rescue breathing.</core:definition>
+  <core:altLabel rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cardiopulmonary Resuscitation</core:altLabel>
+</owl:Class>
+
+<owl:Class rdf:about="#Defibrillation">
+  <rdfs:subClassOf rdf:resource="#ResuscitationIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Defibrillation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">External electrical shock to restore normal heart rhythm during cardiac arrest.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#TranscutaneousPacing">
+  <rdfs:subClassOf rdf:resource="#ResuscitationIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Transcutaneous Pacing</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">External electrical pacing of the heart through the chest wall.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#VentilationIntervention">
+  <rdfs:subClassOf rdf:resource="#Intervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ventilation Intervention</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Interventions related to assisted breathing and airway management.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#Intubation">
+  <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Intubation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Insertion of an endotracheal tube to secure the airway.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#MechanicalVentilation">
+  <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mechanical Ventilation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Machine-assisted breathing via ventilator.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#TemporaryVentilation">
+  <rdfs:subClassOf rdf:resource="#MechanicalVentilation"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Temporary Ventilation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Short-term mechanical ventilation as a bridge to recovery.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#IndefiniteVentilation">
+  <rdfs:subClassOf rdf:resource="#MechanicalVentilation"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Indefinite Ventilation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Long-term or permanent mechanical ventilation with no planned weaning.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#VentilationWithdrawal">
+  <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ventilation Withdrawal</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Removal of mechanical ventilation support.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#NonInvasiveVentilation">
+  <rdfs:subClassOf rdf:resource="#VentilationIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Non-Invasive Ventilation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ventilation support without intubation (e.g., BiPAP, CPAP).</core:definition>
+  <core:altLabel rdf:datatype="http://www.w3.org/2001/XMLSchema#string">BiPAP</core:altLabel>
+</owl:Class>
+
+<owl:Class rdf:about="#DeviceIntervention">
+  <rdfs:subClassOf rdf:resource="#Intervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Device Intervention</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Interventions related to implanted cardiac devices.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ICDDeactivation">
+  <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ICD Deactivation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Turning off the shock therapy function of an implantable cardioverter-defibrillator. Ethically distinct from withdrawal of treatment — the pacing function may remain active.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ICDShockTherapy">
+  <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ICD Shock Therapy</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Active shock delivery by an implantable cardioverter-defibrillator.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#LVADWithdrawal">
+  <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">LVAD Withdrawal</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Discontinuation of left ventricular assist device support.</core:definition>
+  <core:altLabel rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Left Ventricular Assist Device Withdrawal</core:altLabel>
+</owl:Class>
+
+<owl:Class rdf:about="#LVADContinuation">
+  <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">LVAD Continuation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Continued operation of a left ventricular assist device.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#PacemakerDeactivation">
+  <rdfs:subClassOf rdf:resource="#DeviceIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pacemaker Deactivation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Turning off cardiac pacemaker function.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#PharmacologicIntervention">
+  <rdfs:subClassOf rdf:resource="#Intervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pharmacologic Intervention</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Medication-based interventions for hemodynamic support.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#InotropeEscalation">
+  <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Inotrope Escalation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Increasing dosage or adding inotropic agents to support cardiac contractility.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#InotropeWithdrawal">
+  <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Inotrope Withdrawal</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Discontinuation of inotropic support.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#VasopressorEscalation">
+  <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vasopressor Escalation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Increasing dosage or adding vasopressor agents to maintain blood pressure.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#VasopressorWithdrawal">
+  <rdfs:subClassOf rdf:resource="#PharmacologicIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vasopressor Withdrawal</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Discontinuation of vasopressor support.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#DialysisIntervention">
+  <rdfs:subClassOf rdf:resource="#Intervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dialysis Intervention</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Renal replacement therapy interventions.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#AcuteDialysis">
+  <rdfs:subClassOf rdf:resource="#DialysisIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Acute Dialysis</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Short-term dialysis for acute kidney injury with potential for recovery.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ChronicDialysis">
+  <rdfs:subClassOf rdf:resource="#DialysisIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Chronic Dialysis</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Long-term maintenance dialysis without expectation of renal recovery.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#DialysisWithdrawal">
+  <rdfs:subClassOf rdf:resource="#DialysisIntervention"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Dialysis Withdrawal</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Discontinuation of ongoing dialysis treatment.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#HeartFailure">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Heart Failure</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A clinical syndrome where the heart cannot pump blood effectively.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#AdvancedHeartFailure">
+  <rdfs:subClassOf rdf:resource="#HeartFailure"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Advanced Heart Failure</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Stage D / NYHA Class III-IV heart failure refractory to standard therapy.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#CardiacArrest">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cardiac Arrest</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Sudden cessation of effective cardiac pumping activity.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#CardiogenicShock">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cardiogenic Shock</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Severe hemodynamic compromise due to cardiac pump failure.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#AcuteDecompensation">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Acute Decompensation</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Rapid worsening of heart failure symptoms requiring urgent intervention.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#CardiorenalSyndrome">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cardiorenal Syndrome</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Combined cardiac and renal dysfunction where failure of one organ precipitates failure of the other.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#RespiratoryFailure">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Respiratory Failure</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Inability to maintain adequate gas exchange.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#TerminalCondition">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Terminal Condition</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">An incurable condition from which death is expected in a relatively short time. Note: this term is frequently used in ADs but is clinically ambiguous in HF, where patients may live years with severe symptoms.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#PermanentUnconsciousness">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Permanent Unconsciousness</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A state of permanent unconsciousness with no reasonable medical expectation of recovery (e.g., persistent vegetative state).</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#Incapacity">
+  <rdfs:subClassOf rdf:resource="#ClinicalCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Incapacity</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Inability to make or communicate healthcare decisions.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#NYHA_ClassI">
+  <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NYHA Class I</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No limitation of physical activity. Ordinary physical activity does not cause undue fatigue, palpitation, or dyspnea.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#NYHA_ClassII">
+  <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NYHA Class II</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Slight limitation of physical activity. Comfortable at rest. Ordinary activity results in fatigue, palpitation, or dyspnea.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#NYHA_ClassIII">
+  <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NYHA Class III</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Marked limitation of physical activity. Comfortable at rest. Less than ordinary activity causes fatigue, palpitation, or dyspnea.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#NYHA_ClassIV">
+  <rdfs:subClassOf rdf:resource="#FunctionalStatus"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NYHA Class IV</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Unable to carry on any physical activity without discomfort. Symptoms at rest. If any physical activity is undertaken, discomfort is increased.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ClearMatch">
+  <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Clear Match</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions fully met, preference is unambiguous. The system can provide a definitive recommendation.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#PartialMatch">
+  <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Partial Match</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Some activation conditions are met but others are unspecified or uncertain.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#NoCoverage">
+  <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No Coverage</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The patient's advance directive does not address this clinical scenario.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#VagueMatch">
+  <rdfs:subClassOf rdf:resource="#DecisionOutcome"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vague Match</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The preference uses terms that cannot be fully resolved. The system returns the original patient language with its best class mapping.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#ICUSetting">
+  <rdfs:subClassOf rdf:resource="#CareContext"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ICU Setting</rdfs:label>
+</owl:Class>
+
+<owl:Class rdf:about="#EmergencyDepartment">
+  <rdfs:subClassOf rdf:resource="#CareContext"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Emergency Department</rdfs:label>
+</owl:Class>
+
+<owl:Class rdf:about="#HospiceEnrollment">
+  <rdfs:subClassOf rdf:resource="#CareContext"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Hospice Enrollment</rdfs:label>
+</owl:Class>
+
+<owl:Class rdf:about="#OutpatientSetting">
+  <rdfs:subClassOf rdf:resource="#CareContext"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Outpatient Setting</rdfs:label>
+</owl:Class>
+
+<owl:Class rdf:about="#PrehospitalSetting">
+  <rdfs:subClassOf rdf:resource="#CareContext"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Prehospital Setting</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">EMS/first responder setting before hospital arrival.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#LivingWill">
+  <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Living Will</rdfs:label>
+</owl:Class>
+
+<owl:Class rdf:about="#HealthCarePowerOfAttorney">
+  <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Health Care Power of Attorney</rdfs:label>
+</owl:Class>
+
+<owl:Class rdf:about="#POLSTForm">
+  <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">POLST Form</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Physician Orders for Life-Sustaining Treatment — portable medical orders actionable by EMS.</core:definition>
+</owl:Class>
+
+<owl:Class rdf:about="#DNROrder">
+  <rdfs:subClassOf rdf:resource="#AdvanceDirectiveDocument"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">DNR Order</rdfs:label>
+  <core:definition rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Do Not Resuscitate order.</core:definition>
+</owl:Class>
+
+<owl:NamedIndividual rdf:about="#ExamplePatient_JaneDoe">
+  <rdf:type rdf:resource="#Patient"/>
+  <hasProxy rdf:resource="#ExampleProxy_JohnDoe"/>
+  <hasPreference rdf:resource="#Pref_JaneDoe_NoCPR"/>
+  <hasPreference rdf:resource="#Pref_JaneDoe_TempVentOK"/>
+  <hasPreference rdf:resource="#Pref_JaneDoe_DeactivateICD"/>
+  <hasPreference rdf:resource="#Pref_JaneDoe_NoChronicDialysis"/>
+  <hasPreference rdf:resource="#Pref_JaneDoe_InotropeConditional"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Jane Doe (Example Patient)</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#ExampleProxy_JohnDoe">
+  <rdf:type rdf:resource="#DecisionMaker"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">John Doe (Healthcare Proxy)</rdfs:label>
+  <proxyName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">John Doe</proxyName>
+  <proxyRelationship rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Spouse</proxyRelationship>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_JaneDoe_NoCPR">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#CPR"/>
+  <hasActivationCondition rdf:resource="#AC_NYHAIV_NoReversible"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No CPR if NYHA IV without reversible cause</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Absolute</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If my heart stops and I am in NYHA Class IV with no reversible cause, do not attempt CPR.</originalText>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_JaneDoe_TempVentOK">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#TemporaryVentilation_Instance"/>
+  <hasActivationCondition rdf:resource="#AC_ReversibleCause"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Accept temporary ventilation if reversible cause</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept temporary intubation if there is a reversible cause, but not indefinite ventilation.</originalText>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_JaneDoe_DeactivateICD">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#ICDDeactivation_Instance"/>
+  <hasActivationCondition rdf:resource="#AC_HospiceEnrolled"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Deactivate ICD if enrolled in hospice</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Deactivate my ICD if I am enrolled in hospice.</originalText>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_JaneDoe_NoChronicDialysis">
+  <rdf:type rdf:resource="#ClearPreference"/>
+  <specifiesIntervention rdf:resource="#ChronicDialysis_Instance"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No chronic dialysis</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Absolute</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I do not want to be placed on long-term maintenance dialysis.</originalText>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_JaneDoe_InotropeConditional">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#InotropeEscalation_Instance"/>
+  <hasActivationCondition rdf:resource="#AC_LVADTransplantPlan"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Escalate inotropes only if LVAD or transplant evaluation planned</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Escalate inotropes only if there is a plan for LVAD or transplant evaluation.</originalText>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_NYHAIV_NoReversible">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <requiresFunctionalStatus rdf:resource="#NYHAIV_Status"/>
+  <requiresCondition rdf:resource="#CardiacArrest_Instance"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NYHA IV with no reversible cause</rdfs:label>
+  <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</hasReversibleCause>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#TemporaryVentilation_Instance">
+  <rdf:type rdf:resource="#TemporaryVentilation"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_ReversibleCause">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reversible cause present</rdfs:label>
+  <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</hasReversibleCause>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#ICDDeactivation_Instance">
+  <rdf:type rdf:resource="#ICDDeactivation"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_HospiceEnrolled">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Patient enrolled in hospice</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#ChronicDialysis_Instance">
+  <rdf:type rdf:resource="#ChronicDialysis"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#InotropeEscalation_Instance">
+  <rdf:type rdf:resource="#InotropeEscalation"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_LVADTransplantPlan">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">LVAD or transplant evaluation is planned</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#NYHAIV_Status">
+  <rdf:type rdf:resource="#NYHA_ClassIV"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#CardiacArrest_Instance">
+  <rdf:type rdf:resource="#CardiacArrest"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Scenario_CardiacArrest_NYHAIV">
+  <rdf:type rdf:resource="#ClinicalScenario"/>
+  <hasCurrentCondition rdf:resource="#CardiacArrest_Instance"/>
+  <hasCurrentFunctionalStatus rdf:resource="#NYHAIV_Status"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cardiac arrest in NYHA IV patient, no reversible cause identified</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Patient_demo_llm_001">
+  <rdf:type rdf:resource="#Patient"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_1"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_2"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_3"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_4"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_5"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_6"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_7"/>
+  <hasPreference rdf:resource="#Pref_demo_llm_001_8"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Demo (LLM-extracted)</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Doc_demo_llm_001_living_will">
+  <rdf:type rdf:resource="#LivingWill"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">LLM-extracted from free-text AD</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_1">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_cpr"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_1"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No CPR if NYHA IV with no reversible cause</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I have advanced heart failure (NYHA Class IV) and my heart stops with no reversible cause, I do not want CPR.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_demo_llm_001_cpr">
+  <rdf:type rdf:resource="#CPR"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_1">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <requiresFunctionalStatus rdf:resource="#NYHA_IV_for_Pref_demo_llm_001_1"/>
+  <requiresCondition rdf:resource="#Cond_demo_llm_001_advanced_heart_failure"/>
+  <requiresCondition rdf:resource="#Cond_demo_llm_001_cardiac_arrest"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: No CPR if NYHA IV with no reversible cause</rdfs:label>
+  <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</hasReversibleCause>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#NYHA_IV_for_Pref_demo_llm_001_1">
+  <rdf:type rdf:resource="#NYHA_ClassIV"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Cond_demo_llm_001_advanced_heart_failure">
+  <rdf:type rdf:resource="#AdvancedHeartFailure"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Cond_demo_llm_001_cardiac_arrest">
+  <rdf:type rdf:resource="#CardiacArrest"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_2">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_temporary_ventilation"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_2"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Accept temporary ventilation if reversible cause</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept being placed on a breathing machine temporarily if there is a reversible cause and reasonable hope of recovery</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_demo_llm_001_temporary_ventilation">
+  <rdf:type rdf:resource="#TemporaryVentilation"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_2">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Accept temporary ventilation if reversible cause</rdfs:label>
+  <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</hasReversibleCause>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_3">
+  <rdf:type rdf:resource="#ClearPreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_indefinite_ventilation"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No indefinite ventilation</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I do not want to be kept on a ventilator indefinitely.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_demo_llm_001_indefinite_ventilation">
+  <rdf:type rdf:resource="#IndefiniteVentilation"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_4">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_vasopressor_withdrawal"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_4"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Withdraw vasopressors after 3 days without improvement</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I have been on vasopressors for more than three days with no improvement, I want them withdrawn.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_demo_llm_001_vasopressor_withdrawal">
+  <rdf:type rdf:resource="#VasopressorWithdrawal"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_4">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Withdraw vasopressors after 3 days without improvement</rdfs:label>
+  <hasTimeBound rdf:datatype="http://www.w3.org/2001/XMLSchema#string">more than three days with no improvement</hasTimeBound>
+  <hasTimeBoundHours rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">72</hasTimeBoundHours>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_5">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_icd_deactivation"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_5"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Deactivate ICD if in hospice</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I am ever enrolled in hospice, please deactivate my implanted defibrillator.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_demo_llm_001_icd_deactivation">
+  <rdf:type rdf:resource="#ICDDeactivation"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_5">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <requiresCareContext rdf:resource="#Ctx_demo_llm_001_hospice"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Deactivate ICD if in hospice</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Ctx_demo_llm_001_hospice">
+  <rdf:type rdf:resource="#HospiceEnrollment"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_6">
+  <rdf:type rdf:resource="#ClearPreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_chronic_dialysis"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No long-term dialysis</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I do not want long-term dialysis.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_demo_llm_001_chronic_dialysis">
+  <rdf:type rdf:resource="#ChronicDialysis"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_7">
+  <rdf:type rdf:resource="#ConditionalPreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_acute_dialysis"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_7"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Accept short-term dialysis if kidney recovery expected</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept short-term dialysis if my kidney function is expected to recover.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Interv_demo_llm_001_acute_dialysis">
+  <rdf:type rdf:resource="#AcuteDialysis"/>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_7">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Accept short-term dialysis if kidney recovery expected</rdfs:label>
+  <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</hasReversibleCause>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Pref_demo_llm_001_8">
+  <rdf:type rdf:resource="#VaguePreference"/>
+  <specifiesIntervention rdf:resource="#Interv_demo_llm_001_cpr"/>
+  <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
+  <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_8"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No heroic measures if dying</rdfs:label>
+  <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
+  <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Weak</hasPreferenceStrength>
+  <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Above all, no heroic measures if I am dying.</originalText>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_8">
+  <rdf:type rdf:resource="#ActivationCondition"/>
+  <requiresCondition rdf:resource="#Cond_demo_llm_001_terminal_condition"/>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: No heroic measures if dying</rdfs:label>
+</owl:NamedIndividual>
+
+<owl:NamedIndividual rdf:about="#Cond_demo_llm_001_terminal_condition">
+  <rdf:type rdf:resource="#TerminalCondition"/>
+</owl:NamedIndividual>
+
+<owl:AllDisjointClasses>
+  <owl:members rdf:parseType="Collection">
+    <rdf:Description rdf:about="#ClearMatch"/>
+    <rdf:Description rdf:about="#PartialMatch"/>
+    <rdf:Description rdf:about="#NoCoverage"/>
+    <rdf:Description rdf:about="#VagueMatch"/>
+  </owl:members>
+</owl:AllDisjointClasses>
+
+<owl:AllDisjointClasses>
+  <owl:members rdf:parseType="Collection">
+    <rdf:Description rdf:about="#NYHA_ClassI"/>
+    <rdf:Description rdf:about="#NYHA_ClassII"/>
+    <rdf:Description rdf:about="#NYHA_ClassIII"/>
+    <rdf:Description rdf:about="#NYHA_ClassIV"/>
+  </owl:members>
+</owl:AllDisjointClasses>
+
+
+</rdf:RDF>

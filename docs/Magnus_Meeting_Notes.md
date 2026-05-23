@@ -75,8 +75,20 @@ The `--pause` flag stops between scenarios. Hit Enter to advance.
 
 ### Scenario 6 — Full pipeline: free-text AD → LLM extraction → ontology → reasoner ⭐
 - **Setup line:** "We give Claude (claude-opus-4-7) a verbatim paragraph from an advance directive. It converts it into the same JSON schema our pipeline already accepts. We pipe that into a fresh ontology and ask: should we attempt CPR for this patient in cardiac arrest at NYHA IV?"
-- **System:** LLM extracts ~7 preferences with original language preserved; reasoner returns `no / clear` from the LLM-populated ontology
+- **System:** LLM extracts 8 preferences with original language preserved; reasoner returns `no / clear` from the LLM-populated ontology with all four activation conditions matching (NYHA IV ✓ CardiacArrest ✓ AdvancedHeartFailure ✓ Reversible cause: False ✓).
 - **Talking point (this is the one that matters most for Dr. Magnus):** "Our position is not ontology *versus* LLM. It is ontology *with* LLMs at the boundaries. The LLM extracts; the ontology is the auditable, closed-world source of truth; the reasoner produces the defensible 4-category output. The system prompt instructs the LLM to encode ONLY what the patient explicitly stated — never to extrapolate — because the reasoner's 'no coverage' behavior depends on that discipline. In high-stakes EOL care, a pure LLM is medico-legally terrifying — non-deterministic, non-reproducible, prone to false confidence. An ontology + reasoner is auditable, closed-world, and honestly says 'no coverage' when the AD does not speak to a scenario. The LLM is the right glue at the edges, not the right core."
+
+**The discovery story (have this ready — it's the most concrete illustration of the auditability argument):**
+
+> "The first time we ran this pipeline, the system did something unexpected — and the way we resolved it is exactly the kind of behavior we think makes this architecture defensible.
+>
+> Claude extracted *two* CPR-relevant preferences from the paragraph: the specific one (`no CPR if NYHA IV with no reversible cause`), and a vague one mapped to CPR (`above all, no heroic measures if I am dying`). Critically, Claude faithfully captured the *if I am dying* qualifier as an explicit `TerminalCondition` activation rather than silently dropping it. The reasoner then returned `vague / vague`, because we had not written a precedence rule for *clear specific preference vs. vague preference with explicit but unmet conditions*. We named the rule that afternoon — a vague preference whose own activation conditions are explicitly unmet does not fire — wrote it into the code with a comment pointing at this exact case, and re-ran.
+>
+> Then it returned `partial`, because Claude had also extracted `advanced_heart_failure` as a separate activation condition for the specific preference, and our scenario state didn't include it. The LLM was right; our scenario was under-specified. We added `AdvancedHeartFailure` to the scenario representation — because a NYHA IV cardiac-arrest patient with HF is, by definition, in advanced HF — and the third run returned `no / clear`.
+>
+> That's the audit trail you don't get with an LLM-only system. The LLM surfaced two real design questions; the structured layer forced us to name and codify the rules; we now have explicit, defensible behavior in places where we'd previously had implicit assumptions. A pure-LLM system would have produced confident prose in all three runs and we'd never have known."
+
+This is the story to use if Magnus pushes on Q1 ("4-category output") or Q3 ("liability and defensibility"). It demonstrates the auditability argument with concrete artifacts.
 
 **Demo length budget:** ~6 minutes. If running long, skip Scenario 5 and shorten talking points on 1–4 to spend more time on Scenario 6.
 

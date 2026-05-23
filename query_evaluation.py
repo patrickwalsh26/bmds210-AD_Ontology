@@ -421,10 +421,17 @@ def find_matching_preferences(onto, patient, query_intervention, scenario_state)
             match_type = "partial"
             detail = "Unmet: " + "; ".join(conditions_unmet)
 
-        # VaguePreference always carries forward as 'vague' regardless of activation logic,
-        # because the underlying preference language is irreducibly imprecise. The original
-        # text is surfaced so a human can interpret rather than the reasoner forcing an answer.
+        # VaguePreference: fires as 'vague' ONLY when its activation conditions are
+        # met (or absent). A vague preference with explicitly unmet conditions is
+        # not applicable to this scenario and should not fire — closed-world honesty
+        # applies to vague preferences too. Discovered via the LLM-extraction demo:
+        # Claude correctly bound "if I am dying" to a TerminalCondition activation;
+        # without this gate, that vague preference was overriding more specific
+        # clear preferences whose conditions DID match.
         if is_vague:
+            if conditions_unmet:
+                # Vague preference's own conditions not met → skip, do not fire.
+                continue
             orig = pref.originalText[0] if pref.originalText else "(no original text recorded)"
             detail = f"VAGUE preference — original language: \"{orig}\". " + detail
             match_type = "vague"
