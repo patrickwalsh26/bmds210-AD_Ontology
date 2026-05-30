@@ -20,7 +20,7 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 | Vasopressor / Inotrope | 4 | Almost never addressed in standard ADs |
 | Dialysis | 3 | ADs don't distinguish acute from chronic |
 
-**Current results:** 92% decision accuracy and 100% match-type accuracy across 12 clinical vignettes (see [Progress Report](docs/Progress_Report.tex)).
+**Current results:** 100% decision and match-type accuracy across 16 clinical vignettes; 97% field agreement (Cohen's κ 1.00/1.00/0.88) on code-status / POLST mapping over 12 directive profiles; and F1 0.97 (0 out-of-scope hallucinations) on LLM preference extraction from real directive text. See the [Final Report](docs/Final_Report.tex) and [Quantitative Evaluation Plan](docs/Quantitative_Evaluation_Plan.md).
 
 ---
 
@@ -28,9 +28,14 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 
 ```
 .
-├── advanced_directives.owl          # Base OWL ontology (67 classes, 20 properties)
-├── preference_input.py              # Structured preference input pipeline
-├── query_evaluation.py              # Scenario-based query evaluation (12 vignettes)
+├── advanced_directives.owl          # Base OWL ontology (67 classes, 22 properties)
+├── preference_input.py              # Structured JSON → populated patient ontology pipeline
+├── query_evaluation.py              # Scenario-based reasoner (16 clinical vignettes)
+├── code_status.py                   # Aggregates preferences → hospital code status + POLST orders
+├── track3_evaluation.py             # Code-status / POLST mapping evaluation (12 profiles)
+├── llm_extraction.py                # Closed-world free-text directive → structured JSON (Claude)
+├── extraction_evaluation.py         # LLM extraction precision/recall on real directive text
+├── demo.py                          # Six-scenario live demonstration
 │
 ├── populated_ontologies/            # Output: populated patient ontologies
 │   ├── example_input.json           #   Example patient preferences (JSON)
@@ -40,13 +45,13 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 │   └── CA Advanced Directive.pdf
 │
 └── docs/                            # Project documentation and reports
-    ├── Progress_Report.tex          #   Progress report (LaTeX)
-    ├── Progress_Report.md           #   Progress report (Markdown)
-    ├── project_pipeline.md          #   Full pipeline design and architecture
+    ├── Final_Report.tex             #   Final report — AMIA format (LaTeX)
+    ├── Presentation.tex             #   Final presentation (Beamer)
+    ├── Quantitative_Evaluation_Plan.md          # Eval plan + results (Tracks 1–3)
+    ├── Magnus_Expert_Review_2026-05-27.md       # Expert review (Dr. Magnus)
+    ├── Progress_Report.tex / .md    #   Earlier progress report
+    ├── project_pipeline.md          #   Pipeline design and architecture
     ├── Advanced_Directive_Concept_Inventory.md  # 50-template concept inventory
-    ├── BMDS210_proposal.docx        #   Original project proposal
-    ├── CS 270 Project Proposal.pdf  #   Project proposal (PDF)
-    ├── Project_Progress_Report_Template-2.pdf   # Report template
     └── ontology_draft_v1.owl        #   Earlier ontology draft
 ```
 
@@ -104,14 +109,24 @@ python preference_input.py --interactive
 
 Walks through each of the 5 decision points and prompts for preferences interactively. Saves both the input JSON and populated ontology.
 
-### 4. Run the scenario-based evaluation
+### 4. Run the evaluations
 
 ```bash
-python query_evaluation.py
-python query_evaluation.py --owl path/to/populated_ontology.owl
+python query_evaluation.py          # Track 1: 16 clinical vignettes (reasoner accuracy)
+python track3_evaluation.py         # Track 3: code-status / POLST mapping over 12 profiles
+python code_status.py --eval        # derive code status for the example patient vs. gold
+python extraction_evaluation.py     # Track 2: LLM extraction precision/recall (needs API key)
 ```
 
-Runs 12 clinical vignettes against the populated ontology and reports decision accuracy and match-type accuracy. Each vignette tests whether the system correctly infers what care is indicated given the patient's encoded preferences and a clinical scenario.
+Track 1 reports decision and match-type accuracy across 16 clinical vignettes. Track 3 derives a hospital code status and POLST orders from each profile and scores them against a POLST-semantics gold standard. Track 2 runs the closed-world LLM extraction over real directive text and reports precision/recall plus an out-of-scope hallucination count.
+
+### 5. Free-text extraction and live demo
+
+```bash
+pip install anthropic pydantic      # required for the LLM pipeline
+export ANTHROPIC_API_KEY=...        # your Anthropic API key
+python demo.py --pause              # walk through the 6 demonstration scenarios
+```
 
 ---
 

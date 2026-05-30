@@ -1,0 +1,199 @@
+%=============================================================================
+% ADO — 8-minute presentation (BMDS 210 / CS 270, June 1, 2026)
+% Beamer, pdfLaTeX-compatible (uploads cleanly to Overleaf).
+% ~10 content frames; target ~45-50s each to leave buffer + 2 min Q&A.
+%=============================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{whale}
+\useinnertheme{circles}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+\setbeamerfont{footline}{size=\tiny}
+
+\usepackage[T1]{fontenc}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+\definecolor{adoblue}{RGB}{30,70,120}
+\newcommand{\hl}[1]{\textcolor{adoblue}{\textbf{#1}}}
+
+\title[ADO]{The Advance Directive Ontology (ADO)}
+\subtitle{A Computable Representation of End-of-Life Care Preferences in Advanced Heart Failure}
+\author[Walsh \& Chan]{Patrick Walsh \and Darren Chan}
+\institute[Stanford]{Stanford University \quad | \quad BMDS 210 / CS 270}
+\date{June 1, 2026}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+%--- 2. The problem ---------------------------------------------------------
+\begin{frame}{The problem: directives that fail at the bedside}
+  \begin{itemize}
+    \item \textbf{67\%} of ICU patients lack decision-making capacity at end of life; fewer than \textbf{37\%} of US adults have any directive on file.
+    \item The usual story --- ``directives are unreadable free text'' --- is \emph{only partly true}: the good forms (California, University of California) are mostly \hl{checkboxes}.
+  \end{itemize}
+  \vspace{0.4em}
+  \begin{block}{The real problem}
+    Existing instruments are \hl{low-resolution and disease-blind}:
+    \begin{itemize}
+      \item they collapse \emph{conditional, graded} preferences into a few boxes;
+      \item they ignore the HF-specific decisions --- \textbf{ICD, LVAD, inotropes};
+      \item and at 2\,a.m.\ it is \hl{POLST and code-status orders}, not the directive, that get acted on.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+%--- 3. What we built -------------------------------------------------------
+\begin{frame}{What we built}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      \textbf{ADO} --- an OWL\,2 ontology of EOL preferences:
+      \begin{itemize}
+        \item \textbf{67 classes, 22 properties}; \textbf{5} HF decision points; \textbf{21} interventions.
+        \item Encodes \hl{conditional, graded, negatable} preferences + the patient's \hl{verbatim language}.
+        \item A reasoner returns one of \hl{four honest outputs}.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{block}{Our stance}
+        ADO is a \hl{decision-support aid} that helps pre-populate an advance-care-planning note.
+        \medskip
+
+        It is \textbf{not} a legal directive --- and complements POLST and the code-status system.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%--- 4. Architecture --------------------------------------------------------
+\begin{frame}{Architecture: ontology \emph{with} LLMs at the boundaries}
+  \begin{center}
+  \footnotesize
+  \fbox{Free-text directive} $\rightarrow$ \fbox{LLM extraction} $\rightarrow$ \fbox{OWL ontology} $\rightarrow$ \fbox{Reasoner} $\rightarrow$ \fbox{Decision + code status}
+  \end{center}
+  \vspace{0.6em}
+  \begin{itemize}
+    \item The LLM \hl{extracts} (closed-world: encode \emph{only} what the patient stated).
+    \item The ontology is the \hl{auditable, closed-world source of truth}.
+    \item The reasoner produces the \hl{defensible four-category output}.
+  \end{itemize}
+  \vspace{0.3em}
+  \begin{center}
+    \emph{A pure LLM is non-deterministic and over-confident; an auditable reasoner can honestly say ``the directive is silent.''}
+  \end{center}
+\end{frame}
+
+%--- 5. The four-category output --------------------------------------------
+\begin{frame}{The honest four-category output}
+  \begin{itemize}
+    \item \hl{Clear} --- activation conditions met; preference unambiguous.
+    \item \hl{Partial} --- some conditions unmet $\rightarrow$ defer to surrogate.
+    \item \hl{No coverage} --- the directive is silent $\rightarrow$ escalate, do \emph{not} presume.
+    \item \hl{Vague} --- surface the patient's own words (``no heroic measures'').
+  \end{itemize}
+  \vspace{0.6em}
+  \begin{center}
+    A checkbox --- or a confident LLM --- \textbf{cannot say ``I don't know.''}\\ ADO can, and that is the point.
+  \end{center}
+\end{frame}
+
+%--- 6. Results 1 -----------------------------------------------------------
+\begin{frame}{Results I: reasoning + extraction}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Scenario-based reasoning}
+      \begin{itemize}
+        \item 16 clinical vignettes, all 5 decision points, all 4 preference types.
+        \item \hl{16/16} decision \emph{and} match-type accuracy.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{LLM extraction (real directive text)}
+      \begin{itemize}
+        \item Precision \hl{0.94} / Recall \hl{1.00} / F1 \hl{0.97}.
+        \item Negation, type, conditionality: \hl{15/15}.
+        \item \hl{0} hallucinations on out-of-scope text (nutrition, antibiotics).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.6em}
+  \begin{center}
+    \emph{The zero-hallucination result is the evidence behind ``no coverage.''}
+  \end{center}
+\end{frame}
+
+%--- 7. Results 2 (flagship) ------------------------------------------------
+\begin{frame}{Results II (flagship): can ADO produce what governs the bedside?}
+  12 preference profiles from \hl{real templates} (CA AHCD, Texas OOH-DNR, NHS Wales ADRT, Five Wishes, VA, dementia directive). Gold standard = \hl{POLST's own semantics} (independent of ADO).
+  \vspace{0.4em}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \begin{tabular}{lc}
+        \toprule
+        \textbf{Field} & \textbf{Agreement} \\
+        \midrule
+        Hospital code status & 12/12 \\
+        POLST Section A & 12/12 \\
+        POLST Section B & 11/12 \\
+        \textbf{Overall} & \hl{35/36 (97\%)} \\
+        \bottomrule
+      \end{tabular}
+      \\[0.4em]
+      {\footnotesize Cohen's $\kappa = 1.00 / 1.00 / 0.88$}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{The value-add}
+        Same directive, two scenarios: \hl{DNR $\leftrightarrow$ Full code} as the condition is met or not.
+        \medskip
+
+        ADO carries the \hl{conditionality} a flat POLST checkbox throws away.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%--- 8. Expert review -------------------------------------------------------
+\begin{frame}{Expert review: Dr.\ David Magnus (Stanford Biomedical Ethics)}
+  \begin{itemize}
+    \item Reframed the project: \emph{``You can't think of these as AHCDs\,\dots\ This is more like a progress note.''}
+    \item On our premise: \emph{``It isn't largely a problem of free text''} --- the good forms are checkboxes.
+    \item Deepest critique: \emph{``This system is one-dimensional. Patient preferences are often two or more dimensional''} --- what they want \emph{and} who decides.
+  \end{itemize}
+  \vspace{0.4em}
+  \begin{block}{What we changed in response}
+    Repositioned ADO as an ACP-note aid; \hl{built the code-status / POLST output}; scoped the who-decides axis as the next step.
+  \end{block}
+\end{frame}
+
+%--- 9. Limitations & future work -------------------------------------------
+\begin{frame}{Limitations \& future work}
+  \begin{itemize}
+    \item \textbf{No legal force} --- ADO is one structured input into a relational, evidence-weighed process, not an oracle.
+    \item \textbf{One-dimensional today} --- add the \hl{who-decides / surrogate-override} axis (highest priority; $\sim$54\% of patients would let family override).
+    \item Add \hl{artificial hydration/nutrition} and the POLST \hl{time-limited trial}.
+    \item Validate against \hl{real EHR code-status data} (MIMIC-IV) --- credentialing in progress.
+  \end{itemize}
+\end{frame}
+
+%--- 10. Conclusion ---------------------------------------------------------
+\begin{frame}{Conclusion}
+  \begin{itemize}
+    \item ADO is the missing \hl{inference layer} above POLST and the code-status system.
+    \item A clinically honest \hl{four-category output} --- including the honest non-answers.
+    \item \hl{16/16} reasoning, \hl{F1 0.97} extraction with zero out-of-scope hallucinations, \hl{97\%} code-status mapping.
+    \item Ontology \hl{with} LLMs at the boundaries --- not ontology \emph{versus} LLM.
+  \end{itemize}
+  \vspace{0.8em}
+  \begin{center}
+    \large Thank you --- questions?\\
+    \footnotesize \url{https://github.com/patrickwalsh26/bmds210-AD_Ontology}
+  \end{center}
+\end{frame}
+
+\end{document}

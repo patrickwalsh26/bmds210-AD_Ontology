@@ -31,7 +31,7 @@
 {\large Patrick Walsh \quad Darren Chan}\\[0.5em]
 Stanford University --- Spring 2026\\[0.3em]
 \url{https://github.com/patrickwalsh26/bmds210-AD_Ontology}\\[0.3em]
-May 6, 2026
+May 6, 2026 \quad (revised May 29, 2026)
 \end{center}
 \vspace{1.5em}
 
@@ -41,9 +41,9 @@ May 6, 2026
 
 \subsection{Introduction / Background}
 
-Advance directives (ADs) are legal documents in which patients specify their end-of-life (EOL) care preferences. Despite their importance, current ADs are almost entirely free-text documents that cannot be queried, reasoned over, or transferred reliably across care settings. Clinicians frequently encounter ADs at moments of acute crisis and must interpret ambiguous natural language under time pressure. An estimated 67\% of ICU patients lack decision-making capacity at end of life~\cite{silveira2010}, yet fewer than 37\% of US adults have any form of advance directive on file~\cite{yadav2017}, and those that exist are rarely interoperable with EHR systems~\cite{hl7adi2024}.
+Patients document end-of-life (EOL) care preferences through several distinct instruments: advance health care directives (AHCDs), portable medical orders (POLST), and clinician-entered code-status orders. Contrary to a common assumption, the difficulty is not primarily that these documents are unstructured free text---the better AHCDs, such as the California statutory form and the University of California directive, are largely \emph{checkbox} instruments. The difficulty is that they are \textbf{low-resolution and disease-blind}: checkbox forms collapse conditional, graded preferences into a few coarse options, and they omit almost entirely the device- and disease-specific decisions that dominate advanced heart failure (ICD deactivation, LVAD management, inotrope escalation). Compounding this, at the bedside in an acute crisis it is \textbf{POLST and code-status orders---not the AHCD---that clinicians act on}~\cite{polst}. An estimated 67\% of ICU patients lack decision-making capacity at EOL~\cite{silveira2010}, yet fewer than 37\% of US adults have any directive on file~\cite{yadav2017}, and the structured forms that do exist are rarely interoperable with EHR systems~\cite{hl7adi2024} and cannot be queried or reasoned over.
 
-This project builds an OWL ontology~\cite{owl2primer} of EOL care preferences---an Advance Directive Ontology (ADO)---that enables a reasoner to match a patient's documented preferences to their current clinical situation and infer appropriate care decisions. We scope the ontology to \textbf{advanced heart failure (HF)}, specifically the five most common clinical decision points where advance directives are consulted:
+This project builds an OWL ontology~\cite{owl2primer} of EOL care preferences---the Advance Directive Ontology (ADO)---that enables a reasoner to match a patient's documented preferences to their current clinical situation and infer the implied care decision. We emphasize at the outset that ADO is a \textbf{decision-support and documentation aid}---concretely, a tool to help \emph{pre-populate} an advance-care-planning (ACP) progress note---and is \textbf{not} a legal advance directive: its output carries no statutory force and is not a substitute for an AHCD, POLST, or code-status order. This framing, and several of the scope decisions below, follow directly from expert review (Section~\ref{sec:expert}). We scope the ontology to \textbf{advanced heart failure (HF)}, specifically five common clinical decision points where these preferences are consulted:
 
 \begin{enumerate}[nosep]
     \item \textbf{CPR / Resuscitation}---most time-critical; HF patients frequently arrest, yet free-text ADs use vague language (``no heroic measures'')
@@ -223,7 +223,7 @@ ICD / Device Mgmt & Full (5 subclasses) & ICD deactivation, shock therapy, LVAD,
 Vasopressor / Inotrope & Full (4 subclasses) & Escalation and withdrawal for both \\
 Dialysis & Full (3 subclasses) & Acute, chronic, withdrawal \\
 \midrule
-Nutrition / Hydration & Not covered & Deferred to future work \\
+Nutrition / Hydration & Not covered & Flagged by expert review (\S\ref{sec:expert}) as a priority gap; addressed by POLST \\
 Antibiotics & Not covered & Deferred to future work \\
 Pain Mgmt / Comfort & Not covered & Deferred to future work \\
 Organ / Tissue Donation & Not covered & Deferred to future work \\
@@ -232,6 +232,26 @@ Organ / Tissue Donation & Not covered & Deferred to future work \\
 \end{table}
 
 For the 5 in-scope decision points, the ontology provides 21 specific intervention classes---significantly more granular than any single AD template in the inventory. Standard ADs typically offer a binary yes/no on ``mechanical ventilation,'' while the ontology distinguishes 6 ventilation-related interventions capturing clinically meaningful distinctions.
+
+\subsection{Expert Review}
+\label{sec:expert}
+
+We circulated a two-page review packet to Dr.\ David Magnus (Director, Stanford Center for Biomedical Ethics; co-chair, Stanford Hospital Ethics Committee) and met to discuss it on May 27, 2026. His feedback materially reframed the project, and several findings have already changed the framing above and our remaining plan.
+
+\paragraph{ADO is a documentation aid, not a legal directive.}
+Dr.\ Magnus's central point was that the system's output ``can't [be thought of] as AHCDs from a legal perspective. The patient has not signed anything and it likely does not meet the regulatory requirements. This is more like a progress note.'' A legally operative directive requires a deliberate, reviewed, and notarized process. We have accordingly reframed ADO as a tool to \emph{pre-populate an advance-care-planning progress note}---a real artifact in the EHR following, e.g., a family meeting---rather than as a computable directive. On liability he was reassuring: ``liability exists no matter what you do. This will not have the legal force of an actual AHCD, but suits are rare anyway.''
+
+\paragraph{The problem is resolution, not free text.}
+He pushed back on the ``free-text'' framing directly: ``many (most?) AHCD directives---especially the good ones, e.g.\ the UC designed one---have more or less designed them as check boxes\,\dots\ but it isn't largely a problem of free text.'' This sharpens our motivation to what the inventory already showed: existing forms are too coarse and omit HF-specific decisions. Section~\ref{sec:gaps} and the introduction now reflect this.
+
+\paragraph{Preferences are multidimensional.}
+The deepest critique: ``one problem with this system is that it is one dimensional. But patient preferences are often two or more dimensional. E.g., I don't want to be intubated, but I want my family to be comfortable with what happens so do what they say. The letter project and the UC AHCD directive add that level of dimensionality.'' Under the law a capacitous patient's preferences govern, ``but [studies] show that [the] vast majority of patients say ignore my wishes and do what my family says.'' This identifies a concrete next addition: a second \emph{who-decides} / surrogate-override axis layered on the existing \emph{what-intervention} axis, so that a clear interventional preference paired with an explicit delegation of authority does not resolve to a hard decision.
+
+\paragraph{Missing decision points and a missing construct.}
+He flagged two specific gaps: \textbf{artificial hydration/nutrition} (a decision point absent from our five; addressed by POLST), and the absence of the POLST concept of a \textbf{``time-limited trial''}---a prospectively agreed, bounded trial of an intervention to resolve prognostic uncertainty, distinct from our existing withdrawal time-bounds. He also noted that the actionable bedside taxonomy is the code-status system (full-code / DNR / DNI / do-not-escalate-to-ICU), motivating an explicit \emph{no-escalation} output. These are itemized as planned additions in Section~\ref{sec:revised-eval}.
+
+\paragraph{Net assessment.}
+Dr.\ Magnus did not dispute the value of the reasoning engine or the conditional, negatable, graded encoding; he relocated where it sits in the clinical workflow---a pre-population aid that complements POLST and the code-status system, not a replacement for any legal instrument. He cautioned, finally, that ``no formal system will capture everything'' and that the evidence shows ``limits to the value of AHCD in end of life decision making'' regardless---a framing we adopt in our limitations. The full annotated record is in \texttt{docs/Magnus\_Expert\_Review\_2026-05-27.md}.
 
 %=============================================================================
 \section{Updates / Changes to Original Proposal}
@@ -314,6 +334,15 @@ Per teaching-team guidance (Section~\ref{sec:revised-eval}), the fidelity study 
 
 \paragraph{Reasoning layer complexity.}
 Writing SWRL rules that correctly handle conditional preferences, negation, preference strength, and vagueness simultaneously is the most technically challenging remaining task.
+
+\paragraph{No legal force; ADO is decision support only.}
+Per expert review (Section~\ref{sec:expert}), ADO output is not a legal advance directive and must not be presented as one; it is an aid for pre-populating an advance-care-planning progress note. The literature also documents real limits to the value of AHCDs in actual EOL decision making, so the honest framing is that ADO surfaces one structured input into a relational, evidence-weighed process---not an oracle.
+
+\paragraph{One-dimensional preference model.}
+The current model represents only the \emph{what-intervention} axis. As Dr.\ Magnus noted, real preferences are multidimensional---patients frequently delegate \emph{who decides} (e.g., ``do what my family says'') alongside, or in override of, their stated content preferences. Modeling this surrogate-override axis is our highest-priority next addition and is not yet implemented.
+
+\paragraph{Decision-point and construct coverage gaps.}
+Expert review identified concrete omissions: artificial hydration/nutrition (a sixth decision point), the POLST ``time-limited trial'' construct, and an explicit ``no-escalation'' output aligned to the real code-status taxonomy. These are scoped as planned additions rather than design limitations.
 
 %=============================================================================
 \section{Questions for the Teaching Team}

@@ -704,11 +704,11 @@
   <specifiesIntervention rdf:resource="#Interv_demo_llm_001_cpr"/>
   <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
   <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_1"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No CPR if NYHA IV with no reversible cause</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">No CPR if NYHA IV with cardiac arrest and no reversible cause</rdfs:label>
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I have advanced heart failure (NYHA Class IV) and my heart stops with no reversible cause, I do not want CPR.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_demo_llm_001_cpr">
@@ -720,7 +720,7 @@
   <requiresFunctionalStatus rdf:resource="#NYHA_IV_for_Pref_demo_llm_001_1"/>
   <requiresCondition rdf:resource="#Cond_demo_llm_001_advanced_heart_failure"/>
   <requiresCondition rdf:resource="#Cond_demo_llm_001_cardiac_arrest"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: No CPR if NYHA IV with no reversible cause</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: No CPR if NYHA IV with cardiac arrest and no reversible cause</rdfs:label>
   <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</hasReversibleCause>
 </owl:NamedIndividual>
 
@@ -741,11 +741,11 @@
   <specifiesIntervention rdf:resource="#Interv_demo_llm_001_temporary_ventilation"/>
   <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
   <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_2"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Accept temporary ventilation if reversible cause</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Accept temporary ventilation if reversible cause with hope of recovery</rdfs:label>
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept being placed on a breathing machine temporarily if there is a reversible cause and reasonable hope of recovery</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_demo_llm_001_temporary_ventilation">
@@ -754,7 +754,7 @@
 
 <owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_2">
   <rdf:type rdf:resource="#ActivationCondition"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Accept temporary ventilation if reversible cause</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Accept temporary ventilation if reversible cause with hope of recovery</rdfs:label>
   <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</hasReversibleCause>
 </owl:NamedIndividual>
 
@@ -766,7 +766,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I do not want to be kept on a ventilator indefinitely.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_demo_llm_001_indefinite_ventilation">
@@ -782,7 +782,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I have been on vasopressors for more than three days with no improvement, I want them withdrawn.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_demo_llm_001_vasopressor_withdrawal">
@@ -801,11 +801,11 @@
   <specifiesIntervention rdf:resource="#Interv_demo_llm_001_icd_deactivation"/>
   <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
   <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_5"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Deactivate ICD if in hospice</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Deactivate ICD if enrolled in hospice</rdfs:label>
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">If I am ever enrolled in hospice, please deactivate my implanted defibrillator.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_demo_llm_001_icd_deactivation">
@@ -815,7 +815,7 @@
 <owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_5">
   <rdf:type rdf:resource="#ActivationCondition"/>
   <requiresCareContext rdf:resource="#Ctx_demo_llm_001_hospice"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Deactivate ICD if in hospice</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Deactivate ICD if enrolled in hospice</rdfs:label>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Ctx_demo_llm_001_hospice">
@@ -830,7 +830,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Strong</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I do not want long-term dialysis.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_demo_llm_001_chronic_dialysis">
@@ -842,11 +842,11 @@
   <specifiesIntervention rdf:resource="#Interv_demo_llm_001_acute_dialysis"/>
   <sourceDocument rdf:resource="#Doc_demo_llm_001_living_will"/>
   <hasActivationCondition rdf:resource="#AC_Pref_demo_llm_001_7"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Accept short-term dialysis if kidney recovery expected</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Accept short-term dialysis if kidney function expected to recover</rdfs:label>
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Conditional</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">I would accept short-term dialysis if my kidney function is expected to recover.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#Interv_demo_llm_001_acute_dialysis">
@@ -855,7 +855,7 @@
 
 <owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_7">
   <rdf:type rdf:resource="#ActivationCondition"/>
-  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Accept short-term dialysis if kidney recovery expected</rdfs:label>
+  <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Activation conditions for: Accept short-term dialysis if kidney function expected to recover</rdfs:label>
   <hasReversibleCause rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</hasReversibleCause>
 </owl:NamedIndividual>
 
@@ -868,7 +868,7 @@
   <isNegated rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</isNegated>
   <hasPreferenceStrength rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Weak</hasPreferenceStrength>
   <originalText rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Above all, no heroic measures if I am dying.</originalText>
-  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-23</dateDocumented>
+  <dateDocumented rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2026-05-27</dateDocumented>
 </owl:NamedIndividual>
 
 <owl:NamedIndividual rdf:about="#AC_Pref_demo_llm_001_8">
