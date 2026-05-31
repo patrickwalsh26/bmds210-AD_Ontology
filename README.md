@@ -36,6 +36,7 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 ├── llm_extraction.py                # Closed-world free-text directive → structured JSON (Claude)
 ├── extraction_evaluation.py         # LLM extraction precision/recall on real directive text
 ├── demo.py                          # Six-scenario live demonstration
+├── ADO_powerpoint_presentation.pptx # Class PowerPoint deck (with speaker notes)
 │
 ├── populated_ontologies/            # Output: populated patient ontologies
 │   ├── example_input.json           #   Example patient preferences (JSON)

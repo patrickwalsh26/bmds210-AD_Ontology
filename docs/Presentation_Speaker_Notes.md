@@ -1,182 +1,198 @@
 # ADO Presentation — Speaker Notes (June 1, 2026)
 
-**Target:** ~8 minutes of content + ~2 minutes Q&A (13 slides ≈ 35–50 s each; title and closing shorter).
-
-**Split suggestion:** Patrick — slides 1–4, 8–9; Darren — slides 5–7, 10–13 (swap as you prefer).
-
-**Numbers source of truth:** `query_evaluation.py`, `track3_evaluation.py`, `extraction_evaluation.py`, `docs/Quantitative_Evaluation_Plan.md`, `docs/Final_Report.tex`.
+**Runtime:** ~8 minutes + ~2 minutes Q&A · **13 slides** · Figures in `docs/presentation_figures/`
 
 ---
 
-## Slide 1 — Title (~30 s)
+## The narrative arc (read this once, then present)
 
-**Say:** Good morning/afternoon. We are Patrick Walsh and Darren Chan. Today we present the **Advance Directive Ontology (ADO)**: a computable representation of end-of-life care preferences scoped to **advanced heart failure**. ADO is not a legal advance directive—it is a **decision-support layer** that helps clinicians reason over what patients actually said and pre-populate advance care planning documentation.
+| Act | Slides | Story beat |
+|-----|--------|------------|
+| **I — The gap** | 1–3 | At 2 a.m. clinicians act on code status, not the AD. Directives, POLST, and orders are three layers—and conditional, HF-specific wishes get lost between them. |
+| **II — The idea** | 4–7 | ADO encodes *what the patient said* as testable preference objects, refuses false confidence with four honest outputs, and uses LLMs only to *enter* the system—not to *decide*. |
+| **III — The evidence** | 8–10 (+ figs) | We evaluated reasoning, extraction discipline, and whether ADO can populate what actually governs the bedside—then show conditionality is the value-add. |
+| **IV — The placement** | 11–13 | Expert review placed ADO in the real workflow (ACP note, not legal AD). Limitations are explicit; the contribution is an auditable inference layer. |
 
-**Transition:** Start with why the current workflow breaks down at 2 a.m.
+**One-sentence pitch:** *ADO is the missing inference layer between what patients document and what teams act on—honest enough to say “the directive is silent” when it is.*
 
-**If asked:** “Computable” means OWL 2 + a reasoner, not just NLP paraphrase.
+**Handoff split (suggested):** Patrick — Acts I–II (slides 1–7); Darren — Act III–IV (slides 8–13). Swap freely; use the **TRANSITION** lines to pass the mic.
+
+**Live demo option:** If you have 2–3 extra minutes, skip deep-diving slide 10 and run `python demo.py --pause --scenario 1` after slide 7 or 9. See `docs/Live_Demo_Guide.md`.
+
+**Figures slide:** After running `scripts/insert_presentation_figures.py`, a slide titled **EVALUATION FIGURES** is appended (often slide 14). **Drag it to position 10** (right after Quantitative evaluation) so the flow is: results → charts → conditional example.
+
+---
+
+## Slide 1 — Title (~25 s)
+
+**ROLE:** Hook + frame expectations.
+
+**SAY:** We’re Patrick Walsh and Darren Chan. We built the **Advance Directive Ontology**—a computable layer for end-of-life preferences in **advanced heart failure**. Before we show numbers: ADO is **not** a legal advance directive. It’s decision support that helps teams reason over what patients actually said and pre-populate advance care planning notes.
+
+**TRANSITION → 2:** *“To see why that matters, start where clinicians actually live—the acute crisis.”*
 
 ---
 
 ## Slide 2 — Clinical problem (~45 s)
 
-**Say:** End-of-life preferences move through **three different instruments**: the advance directive captures values and wishes; POLST turns some of that into portable medical orders; **code status** is what the team acts on in an acute crisis. The loss is in the middle—conditional, graded wishes get flattened.
+**ROLE:** Act I — name the workflow failure.
 
-**Point to diagram:** Directive → POLST → code status, then “acute crisis: what do we do?”
+**SAY:** Preferences flow through **three instruments**: the advance directive (values), POLST (portable orders), and **code status** (what you act on at 2 a.m.). The tragedy isn’t only missing documents—it’s **translation loss**: a patient’s *conditional* wish becomes a coarse checkbox or an order that can’t carry “only if.”
 
-**Say:** The usual story—that directives are unreadable free text—is **only partly true**. California and UC forms are mostly checkboxes. The deeper problem is **low resolution** and **disease blindness**: a checkbox can say ventilator yes/no but not “temporary if reversible, never indefinitely.”
+**POINT AT:** The ventilator quote—temporary-if-reversible vs never-indefinitely.
 
-**Transition:** We chose advanced HF because those gaps are impossible to ignore.
+**SAY:** The cliché that “directives are unreadable free text” is only half right. California and UC forms are mostly **checkboxes**. The deeper problem is **low resolution** and **disease blindness**.
+
+**TRANSITION → 3:** *“Heart failure is where that blindness hurts most.”*
 
 ---
 
-## Slide 3 — Why HF scope (~40 s)
+## Slide 3 — Why HF (~35 s)
 
-**Say:** Heart failure is unpredictable, device-heavy, and patients cycle through the ED and ICU repeatedly—so preference interpretation is **time-pressured** and recurring. We model **five decision points**: CPR, ventilation, ICD/device management, vasopressors/inotropes, and dialysis.
+**ROLE:** Justify scope; make HF feel inevitable, not arbitrary.
 
-**Say:** Generic templates rarely mention **ICD deactivation, LVAD decisions, or inotrope escalation**—yet roughly 200,000 HF patients have ICDs. That is why HF is the right stress test for a new ontology.
+**SAY:** HF is unpredictable, device-heavy, and patients bounce through the ED and ICU—so teams repeatedly face **time-pressured interpretation**. We model five decision points on the slide. Generic templates rarely mention **ICD deactivation, LVAD, or inotropes**—yet hundreds of thousands of HF patients have ICDs.
+
+**TRANSITION → 4:** *“So we asked: what’s the smallest object that preserves the patient’s logic?”*
 
 ---
 
 ## Slide 4 — Approach (~45 s)
 
-**Say:** The core unit is a **PreferenceStatement**: intervention + activation conditions + strength + negation + the patient’s **verbatim text**. The reasoner asks: “Given *this* clinical scenario, does this preference actually apply?”
+**ROLE:** Act II — introduce PreferenceStatement.
 
-**Walk the example:** “Do not continue vasopressors if no improvement after 72 hours” → vasopressor withdrawal, time bound 72h, strong/conditional, not negated, original quote preserved.
+**SAY:** A **PreferenceStatement** links an intervention to **activation conditions**, strength, negation, and the patient’s **verbatim words**. The reasoner’s question is always: *given this scenario, does this preference actually apply?*
 
-**Say:** Preserving original language keeps the system **auditable**—clinicians see the patient’s words behind the inference.
+**WALK:** The 72-hour vasopressor example on the slide.
 
----
+**SAY:** Auditable means you never lose the quote behind the inference.
 
-## Slide 5 — Ontology scope (~40 s)
-
-**Say:** ADO has **67 classes, 22 properties, 21 intervention subclasses** across those five decision points—more granular than any single template in our 50-form inventory. Concepts are grounded in **SNOMED CT** where possible for interoperability.
-
-**Quick pass:** ventilation distinguishes temporary vs indefinite; devices include ICD/LVAD/pacemaker; dialysis acute vs chronic vs withdrawal.
+**TRANSITION → 5:** *“Here’s how much structure we built around that idea.”*
 
 ---
 
-## Slide 6 — Four outputs (~45 s)
+## Slide 5 — Ontology scope (~35 s)
 
-**Say:** We deliberately refuse to force a binary answer. The reasoner returns one of four **honest** outputs:
+**ROLE:** Credibility — this is real ontology engineering, not a prompt.
 
-| Output | Meaning |
-|--------|---------|
-| **Clear** | Conditions met; preference applies unambiguously |
-| **Partial** | Some conditions unmet or uncertain → defer to surrogate |
-| **No coverage** | Directive silent for this scenario—do not presume |
-| **Vague** | Surface imprecise language (“no heroic measures”) |
+**SAY:** **67 classes, 22 properties, 21 interventions**—finer than any single template in our 50-form inventory. SNOMED grounding where we can. Ventilation alone distinguishes temporary vs indefinite; devices cover ICD/LVAD; dialysis is acute vs chronic vs withdrawal.
 
-**Say:** A checkbox—or an overconfident LLM—cannot say “I don’t know.” **That visibility is the safety feature.**
+**TRANSITION → 6:** *“Granularity only helps if the system knows when not to answer.”*
+
+---
+
+## Slide 6 — Four outputs (~40 s)
+
+**ROLE:** Safety thesis — honest non-answers.
+
+**SAY:** Four outputs: **Clear, Partial, No coverage, Vague.** Partial means defer; no coverage means **do not presume**; vague means show the patient’s imprecise language back.
+
+**PUNCHLINE:** A checkbox—or an overconfident LLM—can’t say **“I don’t know.”** ADO can. That’s the safety feature.
+
+**TRANSITION → 7:** *“Here’s how we wired that into a pipeline.”*
 
 ---
 
 ## Slide 7 — Architecture (~45 s)
 
-**Say:** **LLMs only at the boundary.** Closed-world extraction turns structured or free-text directives into validated JSON; we populate OWL individuals; a **deterministic** scenario reasoner produces the four-category output plus **code status and POLST mapping** for bedside alignment.
+**ROLE:** Architecture slide — LLM at boundary only.
 
-**Emphasize closed-world rule:** Extract only what the patient explicitly stated—do not map out-of-scope content (nutrition, antibiotics) to the nearest covered class. That discipline is what makes “no coverage” trustworthy.
+**SAY:** **LLMs extract; the ontology owns truth; the reasoner decides.** Closed-world extraction: only what the patient stated. Out-of-scope lines—nutrition, antibiotics—must extract as **nothing**, or “no coverage” is meaningless.
 
-**Tagline:** Ontology **with** LLMs, not ontology **versus** LLMs.
+**TAGLINE:** Ontology **with** LLMs, not versus LLMs.
 
----
+**TRANSITION → 8:** *“We tested that claim three ways.”*
 
-## Slide 8 — Study design (~50 s)
-
-**Say:** We asked two questions: does the reasoner decide correctly on clinical vignettes, and can ADO **derive what actually governs the bedside**—code status and POLST—from realistic preference profiles?
-
-**Walk the five bullets:**
-
-1. **Pipeline validation** — example patient populates end-to-end (9 preferences, 50 individuals, no errors).
-2. **16 vignettes** — all five decision points, all four output types; gold = team-adjudicated expected decisions.
-3. **Ablation (post-hoc)** — same 16 vignettes re-scored **as if activation conditions were ignored**: 12/16 (75%) vs 16/16 (100%). All four errors are on **partial/conditional** cases—false confidence without condition modeling. *(Not a separate SWRL run; document as sensitivity analysis.)*
-4. **LLM extraction** — 12 real-template statements, 15 in-scope gold preferences, **2 deliberately out-of-scope** statements.
-5. **Track 3 + expert review** — 12 inventory-grounded profiles vs **POLST published semantics** (gold independent of ADO logic); Dr. David Magnus (Stanford Biomedical Ethics).
-
-**Caveat to state if asked:** Gold standards are team-authored but grounded in real templates and POLST definitions; blind second-rater sheets exist in the repo.
+**OPTIONAL DEMO TEASE:** *“We can show this live in thirty seconds after the results—scenario 1 is CPR in NYHA IV arrest.”*
 
 ---
 
-## Slide 9 — Quantitative results (~60 s) — **FLAGSHIP SLIDE**
+## Slide 8 — Study design (~45 s)
 
-**Say:** On **16 vignettes**, we achieved **16/16 decision accuracy and 16/16 match-type accuracy**—including temporal bounds (72h vasopressor), care-context gating (hospice vs ICU), and vague-vs-clear precedence.
+**ROLE:** Act III — earn trust before numbers.
 
-**LLM extraction:** **Precision 0.94, recall 1.00, F1 0.97**; negation, preference type, and conditionality **15/15** on matched preferences. Critically: **zero hallucinations** on out-of-scope nutrition and antibiotics text—the model extracted nothing.
+**SAY:** Five strands: pipeline sanity check; **16 vignettes** with team gold; **ablation** re-scoring the same vignettes without activation conditions; **LLM extraction** on real template language plus two out-of-scope traps; **12 profiles → code status/POLST** against **POLST’s own semantics**; plus **Dr. Magnus** expert review.
 
-**Track 3 (bedside mapping):** Over **12 real-world template profiles** (CA AHCD, Texas OOH-DNR, NHS Wales ADRT, Five Wishes, VA, dementia directive, etc.), ADO agreed with POLST-semantics gold on **35/36 fields (97%)**:
+**CAVEAT (one breath):** Gold is team-adjudicated but grounded in real templates and independent POLST definitions.
 
-- Hospital code status: **12/12**
-- POLST Section A: **12/12**
-- POLST Section B: **11/12**
-- Exact profile (all three fields): **11/12**
-- Cohen’s κ: **1.00 / 1.00 / 0.88** (code status / POLST A / POLST B)
+**TRANSITION → 9:** *“Here’s what we found—and the figures make the pattern obvious.”*
 
-**Ablation punchline:** Ignoring activation conditions drops accuracy to **75%**—exactly the four conditional vignettes—showing conditionality is doing real work, not decoration.
-
-**Optional depth if time:** Profile **P9 vs P10**—same directive, condition met vs unmet → **DNR ↔ Full code**. Profile **P5** divergence: when “permanent unconsciousness” is not met, ADO returns POLST B **Not specified** rather than presuming Full Treatment—honest non-presumption, not a bug.
+**POINT AT FIGURES** (if inserted): overview bars + field agreement.
 
 ---
 
-## Slide 10 — Conditional example (~50 s)
+## Slide 9 — Quantitative results (~55 s)
 
-**Say:** “No CPR if NYHA IV and no reversible cause.” In **Scenario A** (NYHA IV, no reversible cause), ADO → **DNR, clear match**. In **Scenario B** (NYHA III, reversible cause), conditions fail → **Full code, partial match**.
+**ROLE:** Flagship — three tracks in one breath, then ablation.
 
-**Say:** A flat checkbox must either over-apply the refusal or throw the condition away. ADO carries the **if/then** structure that POLST and code status alone cannot represent—and flags when the condition applies.
+**SAY — Track 1:** **16/16** decisions and match types across clear, partial, no coverage, and vague—including time bounds and care-context gating.
+
+**SAY — Track 2:** Extraction **F1 0.97**; **zero** hallucinations on out-of-scope nutrition and antibiotics.
+
+**SAY — Track 3:** **35/36** fields (**97%**) against POLST-semantics gold; code status and POLST A perfect; POLST B **11/12**; κ **1.00 / 1.00 / 0.88**.
+
+**SAY — Ablation:** Ignore conditions → **75%**—exactly the four conditional vignettes. Conditionality isn’t decoration; it prevents false confidence.
+
+**POINT AT:** `eval_overview.png`, `track3_field_agreement.png`, `ablation_conditions.png` (or embedded charts).
+
+**TRANSITION → 10:** *“One pair of profiles shows why that matters clinically.”*
+
+**IF SHORT ON TIME:** Mention P9/P10 flip verbally; skip slide 10.
+
+---
+
+## Slide 10 — Conditional example (~40 s)
+
+**ROLE:** Clinical “aha” — same words, different scenario.
+
+**SAY:** *“No CPR if NYHA IV and no reversible cause.”* Scenario A → **DNR, clear**. Scenario B → **Full code, partial**. A flat checkbox must over-apply or discard the condition.
+
+**POINT AT:** `conditional_p9_p10.png` if on slide.
+
+**TRANSITION → 11:** *“An ethicist helped us place this in the real workflow.”*
 
 ---
 
 ## Slide 11 — Clinical integration (~40 s)
 
-**Say:** Expert review with **Dr. Magnus** reframed the product: *“You can’t think of these as AHCDs… This is more like a progress note.”* ADO’s near-term fit is **pre-populating an Epic-style ACP note** after a family meeting—not replacing a signed legal directive or POLST.
+**ROLE:** Act IV — Magnus reframe.
 
-**Walk workflow:** Existing AD → ADO structured preferences → ACP note pre-population → **provider conversation** (can clarify or override) → final ACP + POLST/code status.
+**SAY:** Dr. Magnus: you can’t treat this as a signed AHCD—it’s closer to an **ACP progress note**. Workflow: directive → ADO → pre-populated ACP note → **conversation** → POLST/code status. Conversation can override; when it doesn’t happen, structured preferences are the best record of what the patient said.
 
-**Say:** Source-of-truth priority matters: conversation can supersede the document, but when nobody reopens the question, structured preferences are the best record of what the patient said.
-
-**Magnus quotes if asked:**
-
-- Free text: *“It isn’t largely a problem of free text.”*
-- Dimensionality: preferences are **two-dimensional**—what intervention **and** who decides (surrogate override ~54% in studies).
+**TRANSITION → 12:** *“We’re explicit about what we did not solve.”*
 
 ---
 
-## Slide 12 — Limits + priorities (~40 s)
+## Slide 12 — Limits (~35 s)
 
-**Say:** Limitations are honest:
+**ROLE:** Mature science — limits without apologizing away the contribution.
 
-- **No legal force** — decision support only.
-- **One-dimensional today** — models *what*, not yet *who decides* (highest-priority extension).
-- **Coverage gaps** — artificial hydration/nutrition, antibiotics, comfort care not in ontology yet.
-- **Temporal limits** — numeric hour bounds, not full temporal logic.
-- **Validation** — team gold standards; MIMIC-IV / real EHR validation in progress.
+**SAY:** No legal force; **one-dimensional** today (what, not who decides); coverage gaps (nutrition, antibiotics); temporal workarounds; team gold standards; EHR validation future work.
 
-**Design principle:** Surface uncertainty; do not replace clinicians or surrogates.
+**TRANSITION → 13:** *“Four sentences to leave you with.”*
 
 ---
 
-## Slide 13 — Takeaways (~30 s)
+## Slide 13 — Takeaways (~25 s)
 
-**Say:**
+**ROLE:** Close + invite questions.
 
-1. ADO makes **conditional, graded, negatable** EOL preferences computable in HF.
-2. The safest outputs include **honest non-answers**—no coverage, partial, vague.
-3. **LLMs extract; the ontology and reasoner own inference.**
-4. Near-term product: **ACP documentation support**, not a legal directive.
+**SAY:** Read the four bullets on the slide. Offer repo URL. Invite questions.
 
-**Close:** Questions welcome. Repo: `https://github.com/patrickwalsh26/bmds210-AD_Ontology`
+**IF DEMO:** *“Happy to run one live scenario at the podium—CPR in arrest, or the free-text pipeline if we have API access.”*
 
 ---
 
 ## Q&A cheat sheet
 
-| Question | Short answer |
-|----------|----------------|
-| Is this a legal AD? | No — ACP note pre-population; complements POLST/code status. |
-| Why not just use an LLM? | Non-deterministic; over-confident; can’t audibly say “silent.” |
-| Weakest result? | Team-authored gold; single POLST B miss (P5 principled). |
-| Precision &lt; 1? | One over-split: “no heroic measures” → two vague interventions. |
-| What’s next? | Who-decides axis; artificial nutrition; time-limited trial; EHR validation. |
+| Question | Answer |
+|----------|--------|
+| Legal AD? | No — ACP documentation support. |
+| Why not ChatGPT end-to-end? | Non-deterministic; over-confident; no auditable “silent.” |
+| Weakest evidence? | Team gold; one principled POLST B divergence (P5). |
+| Precision &lt; 1? | One over-split of “no heroic measures” into two vague prefs. |
+| What’s next? | Who-decides axis; nutrition; time-limited trial; MIMIC/EHR. |
 
 ---
 
-*Speaker notes are also embedded in `ADO_powerpoint_presentation.pptx` (Notes pane).*
+*Embedded notes in `ADO_powerpoint_presentation.pptx` are synced via `scripts/update_presentation_notes.py`.*

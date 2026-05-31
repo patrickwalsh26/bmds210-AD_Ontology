@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Embed speaker notes and refresh slide 9 metrics in ADO_powerpoint_presentation.pptx."""
+"""Embed cohesive narrative speaker notes in ADO_powerpoint_presentation.pptx."""
 
 from pathlib import Path
 
@@ -9,130 +9,77 @@ from pptx.util import Inches, Pt
 ROOT = Path(__file__).resolve().parents[1]
 PPTX = ROOT / "ADO_powerpoint_presentation.pptx"
 
+# Synced with docs/Presentation_Speaker_Notes.md — narrative arc in header of each note.
 NOTES = [
-    # Slide 1
-    """[~30s] Good morning. Patrick Walsh and Darren Chan, Stanford BMDS 210 / CS 270.
+    """NARRATIVE: Act I opens — frame the talk.
+SAY: Patrick Walsh & Darren Chan. ADO = computable EOL preferences in advanced HF. Not a legal AD — decision support for ACP documentation.
+TRANSITION: "Start where clinicians live—the 2 a.m. crisis."
+[~25s]""",
 
-Hook: ADO is a computable OWL 2 representation of end-of-life preferences in advanced heart failure—not a legal advance directive, but a decision-support layer that helps clinicians reason over what patients said and pre-populate ACP documentation.
+    """NARRATIVE: Act I — three instruments, translation loss.
+SAY: AD → POLST → code status. Loss = conditional wishes → coarse boxes. "Free text" cliché is half wrong—CA/UC forms are checkboxes. Real problem: low resolution + disease blindness.
+POINT AT: ventilator example on slide.
+TRANSITION: "HF is where that blindness hurts most."
+[~45s]""",
 
-Transition → why the bedside workflow breaks down.""",
+    """NARRATIVE: Act I — why HF scope.
+SAY: Unpredictable, device-heavy, repeated ED/ICU visits. Five decision points. ICD/LVAD/inotropes missing from generic templates.
+TRANSITION: "What's the smallest object that preserves patient logic?"
+[~35s]""",
 
-    # Slide 2
-    """[~45s] Three instruments, three jobs: advance directive (values/wishes), POLST (portable orders), code status (what we act on at 2 a.m.).
+    """NARRATIVE: Act II begins — PreferenceStatement.
+SAY: Intervention + activation conditions + strength + negation + verbatim text. Reasoner asks: does this apply in THIS scenario? Walk 72h vasopressor example.
+TRANSITION: "How much structure we built around that."
+[~45s]""",
 
-The loss is in the middle—conditional wishes become coarse checkboxes or bedside orders.
+    """NARRATIVE: Act II — ontology credibility.
+SAY: 67 classes, 22 properties, 21 interventions—finer than our 50-form inventory. SNOMED where possible.
+TRANSITION: "Granularity only helps if we know when NOT to answer."
+[~35s]""",
 
-Important reframe (Magnus): the problem is NOT mainly “unreadable free text.” CA and UC forms are mostly checkboxes. They are low-resolution and disease-blind.
+    """NARRATIVE: Act II — safety thesis (four honest outputs).
+SAY: Clear / Partial / No coverage / Vague. Punchline: checkbox or LLM can't say "I don't know." ADO can.
+TRANSITION: "How we wired that into a pipeline."
+[~40s]""",
 
-Point to the ventilator example: temporary-if-reversible vs never-indefinitely cannot fit a yes/no box.
+    """NARRATIVE: Act II — architecture.
+SAY: LLMs extract ONLY. Ontology = auditable truth. Reasoner decides. Closed-world: out-of-scope → extract nothing. Tagline: WITH LLMs, not vs.
+OPTIONAL: "We can demo scenario 1 live after results."
+TRANSITION: "We tested that three ways."
+[~45s]""",
 
-Transition → why we scoped to advanced HF.""",
+    """NARRATIVE: Act III — earn trust before numbers.
+SAY: 5 evaluation strands on slide. Caveat: team gold, grounded in real templates + POLST semantics. Ablation = same 16 vignettes without conditions → 75%.
+POINT AT: vignette pie chart (if visible).
+TRANSITION: "Here's what we found."
+[~45s]""",
 
-    # Slide 3
-    """[~40s] HF is unpredictable, device-dependent, and patients revisit the ED/ICU—preference interpretation is time-pressured and repeated.
+    """NARRATIVE: Act III — flagship results.
+SAY: Track 1: 16/16. Track 2: F1 0.97, 0 hallucinations on nutrition/antibiotics. Track 3: 35/36 (97%), κ 1.00/1.00/0.88. Ablation: 75% without conditions = 4 false-confident conditional errors.
+POINT AT: bar charts on right of slide.
+TRANSITION: "One profile pair shows the clinical payoff."
+[~55s]""",
 
-Five decision points on slide: CPR, ventilation, devices, vasopressors/inotropes, dialysis.
+    """NARRATIVE: Act III — clinical "aha."
+SAY: Same directive, two scenarios → DNR vs Full code. Flat POLST can't carry if/then.
+POINT AT: P9/P10 figure if on slide.
+TRANSITION: "An ethicist placed this in workflow."
+[~40s]""",
 
-~200K HF patients have ICDs; generic ADs rarely mention ICD/LVAD/inotropes—that gap motivates our scope.
+    """NARRATIVE: Act IV — Magnus reframe.
+SAY: Not a signed AHCD — ACP progress note. Directive → ADO → ACP pre-pop → conversation → POLST/code status.
+TRANSITION: "What we didn't solve."
+[~40s]""",
 
-Transition → how we represent a preference computationally.""",
+    """NARRATIVE: Act IV — limits without retreating.
+SAY: No legal force; one-dimensional (who-decides next); coverage gaps; team gold; EHR validation future.
+TRANSITION: "Four takeaways."
+[~35s]""",
 
-    # Slide 4
-    """[~45s] Core unit: PreferenceStatement = intervention + activation conditions + strength + negation + verbatim originalText.
-
-Walk the vasopressor example: 72h “no improvement” becomes a structured activation condition the reasoner can test.
-
-Why verbatim text? Auditable—clinicians see patient language behind the inference.
-
-Transition → ontology size and granularity.""",
-
-    # Slide 5
-    """[~40s] 67 classes, 22 properties, 21 intervention subclasses—finer than any single template in our 50-form inventory (e.g., six ventilation types vs one checkbox).
-
-SNOMED CT grounding where possible for interoperability.
-
-Transition → we don’t force binary answers.""",
-
-    # Slide 6
-    """[~45s] Four honest outputs:
-• Clear — conditions met, unambiguous
-• Partial — some conditions unmet → defer to surrogate
-• No coverage — directive silent; do NOT presume
-• Vague — surface imprecise language (“no heroic measures”)
-
-Safety feature: uncertainty is visible. A checkbox or overconfident LLM cannot say “I don’t know.”
-
-Transition → end-to-end pipeline.""",
-
-    # Slide 7
-    """[~45s] LLMs ONLY at the boundary. Closed-world extraction → validated JSON → OWL individuals → deterministic scenario reasoner → four-category output + code status/POLST.
-
-Closed-world rule: extract only what the patient stated; out-of-scope text (nutrition, antibiotics) must NOT map to nearest class—that enables trustworthy “no coverage.”
-
-Tagline: ontology WITH LLMs, not versus LLMs.
-
-Transition → how we evaluated.""",
-
-    # Slide 8
-    """[~50s] Five evaluation strands:
-1) Pipeline: example patient populates end-to-end (9 prefs, 50 individuals).
-2) 16 vignettes, all decision points & output types; gold = team-adjudicated expected answers.
-3) Ablation (post-hoc sensitivity): re-score vignettes ignoring activation conditions → 12/16 (75%) vs 16/16 (100%). All four errors are conditional/partial cases—shows condition modeling matters. (Document as sensitivity analysis, not a separate SWRL experiment.)
-4) LLM extraction: 12 real-template statements + 2 out-of-scope tests.
-5) Track 3: 12 profiles → code status/POLST vs POLST semantics gold + Magnus expert review.
-
-Caveat if asked: gold is team-authored but grounded in real templates and independent POLST definitions; blind rater sheets in repo.""",
-
-    # Slide 9
-    """[~60s — FLAGSHIP] Track 1: 16/16 decision AND match-type accuracy on vignettes.
-
-Track 2: Precision 0.94, recall 1.00, F1 0.97; negation/type/conditionality 15/15; ZERO hallucinations on out-of-scope nutrition & antibiotics.
-
-Track 3: 12 real template profiles → 35/36 field agreement (97%): code status 12/12, POLST A 12/12, POLST B 11/12, exact profile 11/12; κ = 1.00 / 1.00 / 0.88.
-
-Ablation: ignoring conditions → 75% (4 false-confident errors on conditional vignettes).
-
-If time: P9 vs P10 same directive flips DNR↔Full code; P5 “miss” is principled (Not specified vs presuming Full Treatment).
-
-Transition → concrete if/then example.""",
-
-    # Slide 10
-    """[~50s] Same directive, two scenarios:
-A: NYHA IV + no reversible cause → DNR, clear.
-B: NYHA III + reversible cause → Full code, partial.
-
-Flat POLST/checkbox must over-apply or discard the condition. ADO preserves if/then and flags when it applies.
-
-Transition → where this lives clinically.""",
-
-    # Slide 11
-    """[~40s] Dr. David Magnus (Stanford Biomedical Ethics): “You can’t think of these as AHCDs… more like a progress note.”
-
-Near-term product: pre-populate Epic-style ACP note → provider conversation can clarify/override → final ACP + POLST/code status.
-
-Not a legal directive; complements POLST and code status.
-
-If asked: next modeling gap is WHO decides (surrogate override), not just WHAT intervention.
-
-Transition → limitations.""",
-
-    # Slide 12
-    """[~40s] Honest limits:
-• No legal force
-• One-dimensional (what, not who decides) — top priority extension
-• Coverage gaps: artificial nutrition, antibiotics, comfort care
-• Temporal: numeric hour bounds, not full temporal logic
-• Gold standards team-authored; real EHR validation (MIMIC-IV) future
-
-Principle: surface uncertainty; don’t replace clinicians/surrogates.""",
-
-    # Slide 13
-    """[~30s] Four takeaways on slide—read them, don’t rush.
-
-Close: Questions welcome.
-Repo: https://github.com/patrickwalsh26/bmds210-AD_Ontology
-
-Q&A prep: legal AD? No. Why not LLM only? Over-confident, not auditable. Weakest point? Team gold + P5 principled divergence.""",
+    """NARRATIVE: Close.
+SAY: Read four bullets. Repo URL. Questions welcome.
+OFFER: "Happy to run demo scenario 1 live."
+[~25s]""",
 ]
 
 
@@ -140,49 +87,29 @@ def set_notes(prs: Presentation) -> None:
     for i, slide in enumerate(prs.slides):
         if i >= len(NOTES):
             break
-        notes_frame = slide.notes_slide.notes_text_frame
-        notes_frame.clear()
-        notes_frame.text = NOTES[i]
+        tf = slide.notes_slide.notes_text_frame
+        tf.clear()
+        tf.text = NOTES[i]
 
 
-def update_slide_9(prs: Presentation) -> None:
+def update_slide_9_metrics(prs: Presentation) -> None:
     slide = prs.slides[8]
     for shape in slide.shapes:
         if not shape.has_text_frame:
             continue
         t = shape.text_frame.text.strip()
-        if t == "κ=1.00":
+        if t == "κ=1.00" or t.startswith("κ=1.00"):
             shape.text_frame.text = "κ=1.00 / 1.00 / 0.88"
-            for p in shape.text_frame.paragraphs:
-                for run in p.runs:
-                    run.font.size = Pt(14)
         elif t == "code status + POLST A":
             shape.text_frame.text = "code / POLST A / POLST B"
-        elif "Ignoring activation conditions" in t:
-            shape.text_frame.text = (
-                "Post-hoc ablation: ignore activation conditions on the same 16 vignettes → 12/16 (75%). "
-                "All four errors are conditional/partial cases."
-            )
-
-    # Footnote metrics box
-    left, top, width, height = Inches(0.45), Inches(6.55), Inches(12.4), Inches(0.55)
-    box = slide.shapes.add_textbox(left, top, width, height)
-    tf = box.text_frame
-    tf.word_wrap = True
-    p = tf.paragraphs[0]
-    p.text = (
-        "Also: extraction P/R = 0.94 / 1.00 • 0 out-of-scope hallucinations • "
-        "11/12 profiles exact match on all three bedside fields"
-    )
-    p.font.size = Pt(11)
 
 
 def main() -> None:
     prs = Presentation(str(PPTX))
     set_notes(prs)
-    update_slide_9(prs)
+    update_slide_9_metrics(prs)
     prs.save(str(PPTX))
-    print(f"Updated {PPTX} ({len(prs.slides)} slides)")
+    print(f"Updated speaker notes in {PPTX} ({len(prs.slides)} slides)")
 
 
 if __name__ == "__main__":
