@@ -23,15 +23,49 @@ def _style():
     })
 
 
+
+def fig_cohort_messy():
+    """Cohort simulation accuracy by messy_level (vs independent reference oracle)."""
+    import json
+    results_path = Path(__file__).resolve().parents[1] / "docs" / "cohort_simulation_results.json"
+    if results_path.exists():
+        data = json.loads(results_path.read_text())
+        by = data.get("by_messy_level", {})
+        levels = list(by.keys())
+        ado = [by[l]["ado_decision_pct"] for l in levels]
+        blind = [by[l]["blind_pct"] for l in levels]
+    else:
+        levels = ["clean", "typical", "minimal", "contradictory", "incomplete_encoding"]
+        ado = [56, 43, 37, 46, 42]
+        blind = [50, 41, 44, 46, 42]
+
+    x = np.arange(len(levels))
+    w = 0.35
+    fig, ax = plt.subplots(figsize=(8.5, 4.5))
+    ax.bar(x - w / 2, ado, w, label="ADO (full)", color=ADO_BLUE)
+    ax.bar(x + w / 2, blind, w, label="Condition-blind", color=ADO_ACCENT)
+    ax.set_xticks(x)
+    ax.set_xticklabels([l.replace("_", "\n") for l in levels], fontsize=9)
+    ax.set_ylabel("Decision agreement vs ref. oracle (%)")
+    ax.set_ylim(0, 75)
+    ax.set_title("520-cell cohort stress test (20 patients x 12 scenarios)")
+    ax.legend(loc="upper right", fontsize=9)
+    ax.text(0.02, 0.02, "Reference = simplified rules, not OWL matcher",
+            transform=ax.transAxes, fontsize=8.5, color="#555555")
+    fig.tight_layout()
+    fig.savefig(OUT / "cohort_messy_breakdown.png", dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
 def fig_eval_overview():
     """Headline metrics for slide 9."""
     labels = [
-        "Vignette\ndecisions",
-        "Match\ntypes",
-        "LLM\nF1",
-        "Code/POLST\nfields",
+        "Vignette\n(dev)",
+        "Ablation\n(dev)",
+        "Cohort\n520 cells",
+        "POLST\nfields",
     ]
-    values = [100, 100, 97, 97]
+    values = [100, 69, 47, 97]
     colors = [ADO_BLUE, ADO_BLUE, ADO_LIGHT, ADO_LIGHT]
 
     fig, ax = plt.subplots(figsize=(8, 4.2))
@@ -42,7 +76,7 @@ def fig_eval_overview():
     ax.axhline(100, color="#cccccc", linestyle="--", linewidth=0.8)
     for bar, v in zip(bars, values):
         ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%", ha="center", fontweight="bold")
-    ax.text(0.02, 0.02, "Dev 16/16 + hold-out 10/10 (single patient) • F1 n=12 real-template statements • 35/36 POLST-semantics fields",
+    ax.text(0.02, 0.02, "Vignettes = spec test; cohort = 20 messy profiles vs simplified oracle • F1 n=12 real-template statements • 35/36 POLST-semantics fields",
             transform=ax.transAxes, fontsize=9, color="#555555")
     fig.tight_layout()
     fig.savefig(OUT / "eval_overview.png", dpi=180, bbox_inches="tight")
@@ -219,6 +253,7 @@ def main():
     fig_eval_overview()
     fig_track3_fields()
     fig_confusion_matrix()
+    fig_cohort_messy()
     fig_ablation()
     fig_vignette_outputs()
     fig_conditional_flip()

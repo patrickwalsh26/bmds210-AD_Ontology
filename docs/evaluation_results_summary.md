@@ -83,6 +83,45 @@ Generated: 2026-05-31
   Failures: V2, V6, V11, V13, V14
 ```
 
+## Track 1b — Multi-patient cohort simulation
+
+```
+========================================================================
+  MULTI-PATIENT COHORT SIMULATION (realistic / messy profiles)
+========================================================================
+  Cells evaluated     : 520 (20 patients × 12 scenarios × queried interventions)
+
+  ADO decision vs ref : 46.9%
+  ADO match-type vs ref: 48.7%
+  Condition-blind     : 44.6%
+  Checkbox (flat POLST, silent→full code): 19.0%
+  Checkbox (silent→no coverage)          : 85.6%
+  ADO on cells WITH directive coverage   : 24.1% (174/520 cells)
+  Checkbox overconfident (nuanced gold → flat yes/no): 421 cells
+
+  By messy_level tag:
+    clean                  n=182  ADO dec  56.0%  match  58.8%  blind  49.5%  checkbox  22.5%
+    contradictory          n= 26  ADO dec  46.2%  match  50.0%  blind  46.2%  checkbox  26.9%
+    incomplete_encoding    n= 26  ADO dec  42.3%  match  42.3%  blind  42.3%  checkbox   7.7%
+    minimal                n= 52  ADO dec  36.5%  match  36.5%  blind  44.2%  checkbox  19.2%
+    typical                n=234  ADO dec  42.7%  match  44.0%  blind  41.0%  checkbox  16.7%
+
+  Sample ADO≠reference cells (up to 25):
+    cohort_01_jane S01 Defibrillation: ref no/clear → ADO no_coverage/no_coverage
+    cohort_01_jane S01 ICDShockTherapy: ref partial/partial → ADO no_coverage/no_coverage
+    cohort_01_jane S02 Defibrillation: ref partial/partial → ADO no_coverage/no_coverage
+    cohort_01_jane S06 ICDShockTherapy: ref partial/partial → ADO no_coverage/no_coverage
+    cohort_02_texas_dnr S01 Defibrillation: ref no/clear → ADO no_coverage/no_coverage
+    cohort_02_texas_dnr S02 CPR: ref no/clear → ADO partial/partial
+    cohort_02_texas_dnr S02 Defibrillation: ref no/clear → ADO no_coverage/no_coverage
+    cohort_02_texas_dnr S03 TemporaryVentilation: ref no/clear → ADO yes/clear
+    cohort_02_texas_dnr S03 NonInvasiveVentilation: ref no/clear → ADO no_coverage/no_coverage
+    cohort_02_texas_dnr S03 Intubation: ref no/clear → ADO no_coverage/no_coverage
+    cohort_02_texas_dnr S04 VentilationWithdrawal: ref no/clear → ADO no_coverage/no_coverage
+    cohort_02_texas_dnr S05 ICDDeactivation: ref no_coverage/no_coverage → ADO yes/clear
+
+```
+
 ## Track 3 — Code status / POLST
 
 ```

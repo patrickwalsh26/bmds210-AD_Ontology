@@ -26,6 +26,8 @@ def main():
         capture([sys.executable, "vignette_eval.py", "--suite", "all"]),
         "```\n\n## Track 1 — Ablation (condition-blind, development only)\n\n```\n",
         capture([sys.executable, "vignette_eval.py", "--suite", "dev", "--baseline", "condition-blind"]),
+        "```\n\n## Track 1b — Multi-patient cohort simulation\n\n```\n",
+        capture([sys.executable, "realistic_simulation.py"]),
         "```\n\n## Track 3 — Code status / POLST\n\n```\n",
         capture([sys.executable, "track3_evaluation.py"]),
         "```\n\n## Coverage (30 inventory clauses)\n\n```\n",

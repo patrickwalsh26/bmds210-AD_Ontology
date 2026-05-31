@@ -442,9 +442,13 @@ def find_matching_preferences(onto, patient, query_intervention, scenario_state)
 
 
 def evaluate_vignette(onto, patient, vignette, matcher=None):
-    """Evaluate a single clinical vignette and return the result."""
-    matcher = matcher or find_matching_preferences
-    matches = matcher(
+    """Evaluate a single clinical vignette and return the result.
+
+    matcher: optional callable(onto, patient, query_intervention, scenario_state)
+             with the same return type as find_matching_preferences (for baselines).
+    """
+    match_fn = matcher or find_matching_preferences
+    matches = match_fn(
         onto, patient,
         vignette["query_intervention"],
         vignette["scenario_state"],
@@ -498,7 +502,7 @@ def evaluate_vignette(onto, patient, vignette, matcher=None):
         "expected_match_type": expected["match_type"],
         "match_type_correct": match_type_correct,
         "detail": detail,
-        "expected_reasoning": expected["reasoning"],
+        "expected_reasoning": expected.get("reasoning", ""),
     }
 
 

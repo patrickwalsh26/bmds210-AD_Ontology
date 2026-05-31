@@ -125,3 +125,9 @@ kappa = 0.88 intervention, 0.74 negation on 10 items (complete blind dual pass b
 Run: `python eval_inter_annotator.py`
 
 Full summary: `python evaluation_suite.py` writes `docs/evaluation_results_summary.md`
+
+
+## Track 1b — Multi-patient cohort simulation (2026-05-31)
+
+- Script: `realistic_simulation.py` — 20 profiles (`eval_data/patient_cohort.py`), 12 scenarios (`eval_data/scenario_battery.py`), independent oracle (`oracle_gold.py`).
+- Honest interpretation: `docs/Honest_Evaluation_Report.md`.

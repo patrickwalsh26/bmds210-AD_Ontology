@@ -20,7 +20,7 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 | Vasopressor / Inotrope | 4 | Almost never addressed in standard ADs |
 | Dialysis | 3 | ADs don't distinguish acute from chronic |
 
-**Current results:** 100% decision and match-type accuracy across 16 clinical vignettes; 97% field agreement (Cohen's κ 1.00/1.00/0.88) on code-status / POLST mapping over 12 directive profiles; and F1 0.97 (0 out-of-scope hallucinations) on LLM preference extraction from real directive text. See the [Final Report](docs/Final_Report.tex) and [Quantitative Evaluation Plan](docs/Quantitative_Evaluation_Plan.md).
+**Current results (honest summary):** See [Honest Evaluation Report](docs/Honest_Evaluation_Report.md). Curated vignettes 16/16 dev + 10/10 held-out (single patient); condition-blind ablation 69%; multi-patient cohort stress test (~520 cells) ~47% vs independent reference oracle; Track 3 97% on 12 profiles; extraction F1 0.97 (n=12); inventory coverage 47%. See [Final Report](docs/Final_Report.tex) and [Quantitative Evaluation Plan](docs/Quantitative_Evaluation_Plan.md).
 
 ---
 
