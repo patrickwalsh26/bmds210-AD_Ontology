@@ -42,7 +42,7 @@ def fig_eval_overview():
     ax.axhline(100, color="#cccccc", linestyle="--", linewidth=0.8)
     for bar, v in zip(bars, values):
         ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%", ha="center", fontweight="bold")
-    ax.text(0.02, 0.02, "16/16 vignettes • F1 from 12 real-template statements • 35/36 POLST-semantics fields",
+    ax.text(0.02, 0.02, "Dev 16/16 + hold-out 10/10 (single patient) • F1 n=12 real-template statements • 35/36 POLST-semantics fields",
             transform=ax.transAxes, fontsize=9, color="#555555")
     fig.tight_layout()
     fig.savefig(OUT / "eval_overview.png", dpi=180, bbox_inches="tight")
@@ -110,7 +110,7 @@ def fig_confusion_matrix():
 def fig_ablation():
     """Full reasoner vs condition-blind sensitivity."""
     labels = ["Full reasoner\n(activation conditions)", "Condition-blind\n(ignore conditions)"]
-    acc = [100, 75]
+    acc = [100, 69]
     fig, ax = plt.subplots(figsize=(6, 4))
     bars = ax.bar(labels, acc, color=[ADO_BLUE, ADO_ACCENT], width=0.5)
     ax.set_ylim(0, 108)
@@ -118,7 +118,7 @@ def fig_ablation():
     ax.set_title("Why conditionality matters (16 vignettes)")
     for bar, v in zip(bars, acc):
         ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%", ha="center", fontweight="bold")
-    ax.text(0.5, 0.04, "12/16 vs 16/16 — all four errors are conditional/partial cases",
+    ax.text(0.5, 0.04, "11/16 vs 16/16 when activation conditions ignored (5 partial-case failures) are conditional/partial cases",
             transform=ax.transAxes, ha="center", fontsize=9, color="#555555")
     fig.tight_layout()
     fig.savefig(OUT / "ablation_conditions.png", dpi=180, bbox_inches="tight")
@@ -163,6 +163,56 @@ def fig_conditional_flip():
     plt.close(fig)
 
 
+
+def fig_vignette_splits():
+    labels = ["Development\n(n=16)", "Held-out\n(n=10)"]
+    acc = [100, 100]
+    fig, ax = plt.subplots(figsize=(5.5, 4))
+    bars = ax.bar(labels, acc, color=[ADO_BLUE, ADO_LIGHT], width=0.45)
+    ax.set_ylim(0, 108)
+    ax.set_ylabel("Decision + match-type accuracy (%)")
+    ax.set_title("Track 1: vignette splits (same patient ontology)")
+    for bar, v in zip(bars, acc):
+        ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%", ha="center", fontweight="bold")
+    fig.tight_layout()
+    fig.savefig(OUT / "vignette_splits.png", dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
+def fig_coverage():
+    labels = ["Fully\nrepresentable", "Vague\nonly", "Partial\nloss", "Who-decides\ngap", "OWL\ngap", "Out of\nscope"]
+    counts = [14, 3, 3, 3, 1, 6]
+    colors = [ADO_BLUE, ADO_LIGHT, "#7ba3d0", ADO_ACCENT, "#d4a574", "#aaaaaa"]
+    fig, ax = plt.subplots(figsize=(8, 4.2))
+    x = np.arange(len(labels))
+    bars = ax.bar(x, counts, color=colors, width=0.6)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=9)
+    ax.set_ylabel("Clauses (of 30)")
+    ax.set_title("Inventory coverage (30 clauses from 50-template inventory)")
+    for bar, c in zip(bars, counts):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.15, str(c), ha="center", fontweight="bold")
+    fig.tight_layout()
+    fig.savefig(OUT / "coverage_inventory.png", dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
+def fig_extraction_metrics():
+    fig, ax = plt.subplots(figsize=(6, 3.8))
+    metrics = ["Precision", "Recall", "F1"]
+    vals = [0.94, 1.00, 0.97]
+    bars = ax.bar(metrics, vals, color=ADO_BLUE, width=0.5)
+    ax.set_ylim(0, 1.08)
+    ax.set_ylabel("Score")
+    ax.set_title("LLM extraction (n=12 template clauses)")
+    for bar, v in zip(bars, vals):
+        ax.text(bar.get_x() + bar.get_width() / 2, v + 0.02, f"{v:.2f}", ha="center", fontweight="bold")
+    ax.text(0.5, 0.02, "0 hallucinations on out-of-scope nutrition & antibiotics", transform=ax.transAxes, ha="center", fontsize=9, color="#555555")
+    fig.tight_layout()
+    fig.savefig(OUT / "extraction_f1.png", dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     _style()
     OUT.mkdir(parents=True, exist_ok=True)
@@ -172,6 +222,9 @@ def main():
     fig_ablation()
     fig_vignette_outputs()
     fig_conditional_flip()
+    fig_vignette_splits()
+    fig_coverage()
+    fig_extraction_metrics()
     print(f"Wrote figures to {OUT}/")
 
 
