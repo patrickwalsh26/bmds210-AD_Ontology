@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Generate high-resolution evaluation figures for the ADO presentation.
+Publication-quality figures for ADO presentation (Nature-style layout).
 
-Output: docs/presentation_figures/*.png at 300 DPI (suitable for 16:9 slides).
+Outputs:
+  - docs/presentation_figures/*.png  (300 DPI, PNG)
+  - docs/presentation_figures/FIGURE_CAPTIONS.md  (slide captions)
 
-Regenerate: python3 scripts/generate_presentation_figures.py
+Regenerate:
+  python3 scripts/generate_presentation_figures.py
 """
 
 from __future__ import annotations
@@ -12,6 +15,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
@@ -19,39 +23,54 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "presentation_figures"
 COHORT_JSON = ROOT / "docs" / "cohort_simulation_results.json"
-
-# Stanford-adjacent palette (accessible, print-safe)
-ADO_BLUE = "#1e4678"
-ADO_LIGHT = "#4a7ab0"
-ADO_MID = "#7ba3d0"
-ADO_ACCENT = "#c45c3e"
-ADO_GREEN = "#2d6a4f"
-ADO_GRAY = "#6c757d"
-ADO_GOLD = "#b8860b"
+CAPTIONS_MD = OUT / "FIGURE_CAPTIONS.md"
 
 DPI = 300
 
+# Nature Communications–inspired, colorblind-friendly palette
+C = {
+    "primary": "#0072B2",      # blue
+    "secondary": "#E69F00",    # amber
+    "tertiary": "#009E73",     # green
+    "accent": "#CC79A7",       # rose
+    "neutral": "#56B4E9",      # sky
+    "dark": "#2F2F2F",
+    "muted": "#7A7A7A",
+    "grid": "#E6E6E6",
+    "fill_a": "#D5E8F0",
+    "fill_b": "#FDF2E3",
+    "fill_c": "#E8F5F0",
+}
+
+# Populated after each figure is built
+CAPTIONS: dict[str, str] = {}
+
 
 def _style():
-    plt.rcParams.update({
+    mpl.rcParams.update({
         "font.family": "sans-serif",
-        "font.sans-serif": ["DejaVu Sans", "Helvetica", "Arial"],
-        "font.size": 11,
-        "axes.titlesize": 14,
-        "axes.titleweight": "bold",
-        "axes.labelsize": 11,
-        "axes.labelweight": "medium",
+        "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+        "font.size": 10,
+        "axes.titlesize": 11,
+        "axes.titleweight": "600",
+        "axes.labelsize": 10,
+        "axes.labelcolor": C["dark"],
+        "axes.edgecolor": "#CCCCCC",
+        "axes.linewidth": 0.8,
         "axes.spines.top": False,
         "axes.spines.right": False,
+        "xtick.color": C["dark"],
+        "ytick.color": C["dark"],
+        "xtick.labelsize": 9,
+        "ytick.labelsize": 9,
+        "legend.fontsize": 9,
+        "legend.frameon": False,
         "figure.facecolor": "white",
-        "savefig.facecolor": "white",
+        "axes.facecolor": "white",
         "savefig.dpi": DPI,
+        "savefig.bbox": "tight",
+        "savefig.pad_inches": 0.12,
     })
-
-
-def _footnote(ax, text: str, y: float = 0.02):
-    ax.text(0.5, y, text, transform=ax.transAxes, ha="center", fontsize=8.5,
-            color="#444444", wrap=True)
 
 
 def _load_cohort() -> dict:
@@ -60,268 +79,355 @@ def _load_cohort() -> dict:
     return {}
 
 
+def _save(fig: plt.Figure, name: str) -> None:
+    path = OUT / name
+    fig.savefig(path, dpi=DPI, facecolor="white", edgecolor="none")
+    plt.close(fig)
+
+
+def _annotate_bars(ax, bars, values, y_max: float, fmt=None, inside_min: float = 55):
+    """Place value labels above or inside bars without clipping."""
+    fmt = fmt or (lambda v: f"{v:.0f}%")
+    for bar, v in zip(bars, values):
+        x = bar.get_x() + bar.get_width() / 2
+        h = bar.get_height()
+        if h >= inside_min:
+            ax.text(x, h - y_max * 0.06, fmt(v), ha="center", va="top",
+                    fontsize=9, fontweight="600", color="white")
+        else:
+            ax.text(x, h + y_max * 0.03, fmt(v), ha="center", va="bottom",
+                    fontsize=9, fontweight="600", color=C["dark"])
+
+
+def _annotate_bars_frac(ax, bars, values, y_max: float = 1.0):
+    for bar, v in zip(bars, values):
+        x = bar.get_x() + bar.get_width() / 2
+        h = bar.get_height()
+        ax.text(x, h + y_max * 0.04, f"{v:.2f}", ha="center", va="bottom",
+                fontsize=9, fontweight="600", color=C["dark"])
+
+
+def _panel_label(ax, letter: str):
+    ax.text(-0.12, 1.06, letter, transform=ax.transAxes, fontsize=12,
+            fontweight="700", color=C["dark"], va="top", ha="left")
+
+
+def _format_messy_label(key: str) -> str:
+    return {
+        "clean": "Clean",
+        "typical": "Typical",
+        "minimal": "Minimal",
+        "contradictory": "Contradictory",
+        "incomplete_encoding": "Incomplete\nencoding",
+    }.get(key, key.replace("_", " ").title())
+
+
+# ── Figures ───────────────────────────────────────────────────────────────────
+
+
 def fig_eval_two_layer():
-    """Primary honest results slide: curated spec test vs cohort stress test."""
     cohort = _load_cohort()
     ado_pct = round(cohort.get("ado_decision_accuracy", 0.47) * 100)
     blind_pct = round(cohort.get("condition_blind_accuracy", 0.45) * 100)
+    cb_pct = round(cohort.get("checkbox_accuracy", 0.19) * 100)
 
-    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.2), gridspec_kw={"wspace": 0.28})
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), constrained_layout=True)
 
-    # Left: curated vignettes
     ax = axes[0]
-    cats = ["Dev\n(n=16)", "Held-out\n(n=10)", "Ablation\n(condition-blind)"]
+    _panel_label(ax, "a")
+    cats = ["Development", "Held-out", "Ablation"]
     vals = [100, 100, 69]
-    colors = [ADO_BLUE, ADO_LIGHT, ADO_ACCENT]
-    bars = ax.bar(cats, vals, color=colors, width=0.52, edgecolor="white", linewidth=1.5)
-    ax.set_ylim(0, 108)
+    colors = [C["primary"], C["neutral"], C["secondary"]]
+    x = np.arange(len(cats))
+    bars = ax.bar(x, vals, color=colors, width=0.58, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{c}\n(n={n})" for c, n in zip(cats, [16, 10, 16])])
+    ax.set_ylim(0, 118)
     ax.set_ylabel("Accuracy (%)")
-    ax.set_title("Layer 1 — Curated vignettes\n(single patient, team gold)")
-    for bar, v in zip(bars, vals):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 2.5, f"{v}%",
-                ha="center", fontweight="bold", fontsize=12)
-    _footnote(ax, "Spec test: proves reasoner matches ontology design")
+    ax.set_title("Curated vignettes (single patient)")
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _annotate_bars(ax, bars, vals, 118)
 
-    # Right: cohort stress
     ax = axes[1]
-    cats = ["ADO\n(full)", "Condition-\nblind", "Flat checkbox\n(vs ref.)"]
-    vals = [ado_pct, blind_pct, round(cohort.get("checkbox_accuracy", 0.19) * 100)]
-    colors = [ADO_BLUE, ADO_ACCENT, ADO_GRAY]
-    bars = ax.bar(cats, vals, color=colors, width=0.52, edgecolor="white", linewidth=1.5)
-    ax.set_ylim(0, 108)
-    ax.set_ylabel("Decision agreement (%)")
-    ax.set_title("Layer 2 — Cohort stress test\n(520 cells · 20 patients · 12 scenarios)")
-    for bar, v in zip(bars, vals):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 2.5, f"{v}%",
-                ha="center", fontweight="bold", fontsize=12)
-    _footnote(ax, "Independent simplified oracle — not hand-adjudicated")
+    _panel_label(ax, "b")
+    cats = ["ADO", "Condition-blind", "Flat checkbox"]
+    vals = [ado_pct, blind_pct, cb_pct]
+    colors = [C["primary"], C["secondary"], C["muted"]]
+    bars = ax.bar(np.arange(3), vals, color=colors, width=0.58, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xticks(range(3))
+    ax.set_xticklabels(cats)
+    ax.set_ylim(0, 118)
+    ax.set_ylabel("Agreement with reference oracle (%)")
+    ax.set_title("Cohort stress test (520 cells)")
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _annotate_bars(ax, bars, vals, 118)
 
-    fig.suptitle("Two-layer evaluation: spec test vs. messy real-world stress",
-                 fontsize=15, fontweight="bold", y=1.02)
-    fig.tight_layout()
-    fig.savefig(OUT / "eval_two_layer.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    _save(fig, "eval_two_layer.png")
+    CAPTIONS["eval_two_layer.png"] = (
+        "**Two-layer validation.** (a) Curated vignettes on one encoded patient: "
+        "16/16 development and 10/10 held-out accuracy (spec test); condition-blind "
+        "ablation drops to 69% (11/16), showing activation logic is essential. "
+        "(b) Cohort stress test across 20 template-inspired profiles and 12 clinical "
+        f"scenarios (520 query cells): ADO agrees with an independent simplified oracle "
+        f"on ~{ado_pct}% of decisions—far below vignette scores, reflecting messy real-world "
+        "encoding and granularity gaps, not a deployment-ready error rate."
+    )
 
 
 def fig_eval_overview():
-    """Compact four-metric headline (slide 9 sidebar)."""
     cohort = _load_cohort()
     cohort_pct = round(cohort.get("ado_decision_accuracy", 0.47) * 100)
 
-    labels = ["Vignette\ndev", "Ablation\ndev", "Cohort\n520 cells", "POLST\nfields"]
+    fig, ax = plt.subplots(figsize=(8, 4), constrained_layout=True)
+    labels = ["Vignette\ndev", "Ablation", "Cohort", "POLST\nfields"]
     values = [100, 69, cohort_pct, 97]
-    colors = [ADO_BLUE, ADO_ACCENT, ADO_LIGHT, ADO_BLUE]
-
-    fig, ax = plt.subplots(figsize=(8.2, 4.0))
-    bars = ax.bar(labels, values, color=colors, width=0.55, edgecolor="white", linewidth=1.5)
-    ax.set_ylim(0, 108)
-    ax.set_ylabel("Percent agreement / accuracy")
-    ax.set_title("Evaluation headline metrics")
-    ax.axhline(50, color="#dddddd", linestyle=":", linewidth=1)
-    for bar, v in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%",
-                ha="center", fontweight="bold", fontsize=11)
-    _footnote(ax, "Cohort = 20 template-inspired profiles · F1 on n=12 extraction statements")
-    fig.tight_layout()
-    fig.savefig(OUT / "eval_overview.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    colors = [C["primary"], C["secondary"], C["neutral"], C["tertiary"]]
+    x = np.arange(len(labels))
+    bars = ax.bar(x, values, color=colors, width=0.55, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0, 118)
+    ax.set_ylabel("Agreement / accuracy (%)")
+    ax.set_title("Headline evaluation metrics")
+    ax.axhline(50, color=C["grid"], linestyle="--", linewidth=0.8, zorder=0)
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _annotate_bars(ax, bars, values, 118)
+    _save(fig, "eval_overview.png")
+    CAPTIONS["eval_overview.png"] = (
+        "**Summary metrics** across evaluation tracks: perfect vignette development accuracy "
+        f"contrasts with {cohort_pct}% cohort agreement; 69% under condition-blind ablation; "
+        "97% field agreement mapping 12 directive profiles to hospital code status and POLST "
+        "(35/36 fields)."
+    )
 
 
 def fig_cohort_messy():
-    """Accuracy by messy_level tag."""
     cohort = _load_cohort()
     by = cohort.get("by_messy_level", {})
-    if not by:
-        by = {
-            "clean": {"ado_decision_pct": 56, "blind_pct": 50},
-            "typical": {"ado_decision_pct": 43, "blind_pct": 41},
-            "minimal": {"ado_decision_pct": 37, "blind_pct": 44},
-            "contradictory": {"ado_decision_pct": 46, "blind_pct": 46},
-            "incomplete_encoding": {"ado_decision_pct": 42, "blind_pct": 42},
-        }
-    levels = list(by.keys())
+    order = ["clean", "typical", "minimal", "contradictory", "incomplete_encoding"]
+    levels = [k for k in order if k in by] or list(by.keys())
     ado = [by[l]["ado_decision_pct"] for l in levels]
     blind = [by[l]["blind_pct"] for l in levels]
 
+    fig, ax = plt.subplots(figsize=(9, 4.5), constrained_layout=True)
     x = np.arange(len(levels))
-    w = 0.36
-    fig, ax = plt.subplots(figsize=(9, 4.5))
-    ax.bar(x - w / 2, ado, w, label="ADO (activation-aware)", color=ADO_BLUE, edgecolor="white")
-    ax.bar(x + w / 2, blind, w, label="Condition-blind ablation", color=ADO_ACCENT, edgecolor="white")
+    w = 0.34
+    ax.bar(x - w / 2, ado, w, label="ADO (full reasoner)", color=C["primary"],
+           edgecolor="white", linewidth=1.2, zorder=3)
+    ax.bar(x + w / 2, blind, w, label="Condition-blind", color=C["secondary"],
+           edgecolor="white", linewidth=1.2, zorder=3)
     ax.set_xticks(x)
-    ax.set_xticklabels([l.replace("_", "\n") for l in levels], fontsize=9)
-    ax.set_ylabel("Decision agreement vs ref. oracle (%)")
-    ax.set_ylim(0, 72)
-    ax.set_title("Cohort performance by data quality tag")
-    ax.legend(loc="upper right", frameon=True, fontsize=9)
-    _footnote(ax, "Reference oracle = simplified clinical rules (independent of OWL matcher)")
-    fig.tight_layout()
-    fig.savefig(OUT / "cohort_messy_breakdown.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    ax.set_xticklabels([_format_messy_label(l) for l in levels])
+    ax.set_ylabel("Decision agreement (%)")
+    ax.set_ylim(0, 78)
+    ax.set_title("Cohort accuracy by directive data-quality tag")
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2)
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _save(fig, "cohort_messy_breakdown.png")
+    CAPTIONS["cohort_messy_breakdown.png"] = (
+        "**Cohort performance stratified by messiness.** Profiles tagged clean (well-structured "
+        "encoding) score highest; minimal, contradictory, and incomplete-encoding profiles "
+        "show lower agreement with the reference oracle—highlighting sensitivity to chart "
+        "abstraction quality and template ambiguity."
+    )
 
 
 def fig_cohort_baselines():
-    """ADO vs checkbox overconfidence — value-add chart."""
     cohort = _load_cohort()
     n = cohort.get("n_cells", 520)
     overconf = cohort.get("checkbox_overconfident_cells", 421)
     ado = round(cohort.get("ado_decision_accuracy", 0.47) * 100)
     cb = round(cohort.get("checkbox_accuracy", 0.19) * 100)
-    cb_blank = round(cohort.get("checkbox_blank_accuracy", 0.86) * 100)
+    pct_over = round(overconf / n * 100)
 
-    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.2), gridspec_kw={"width_ratios": [1.1, 1]})
+    fig, axes = plt.subplots(2, 1, figsize=(8, 6.2), gridspec_kw={"height_ratios": [1.2, 1]},
+                             constrained_layout=True)
 
     ax = axes[0]
-    labels = ["ADO", "Checkbox\n(silent→full code)", "Checkbox\n(silent→blank)"]
-    vals = [ado, cb, cb_blank]
-    colors = [ADO_BLUE, ADO_GRAY, ADO_LIGHT]
-    bars = ax.bar(labels, vals, color=colors, width=0.5, edgecolor="white")
-    ax.set_ylim(0, 100)
-    ax.set_ylabel("Agreement with ref. oracle (%)")
-    ax.set_title("Baseline comparison (all 520 cells)")
-    for bar, v in zip(bars, vals):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%", ha="center", fontweight="bold")
+    _panel_label(ax, "a")
+    labels = ["ADO", "Checkbox\n(full code default)", "Checkbox\n(blank if silent)"]
+    vals = [ado, cb, round(cohort.get("checkbox_blank_accuracy", 0.86) * 100)]
+    colors = [C["primary"], C["muted"], C["neutral"]]
+    bars = ax.bar(np.arange(3), vals, color=colors, width=0.5, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xticks(range(3))
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0, 105)
+    ax.set_ylabel("Agreement with oracle (%)")
+    ax.set_title("Baseline comparison (520 cells)")
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _annotate_bars(ax, bars, vals, 105)
 
     ax = axes[1]
-    ax.barh(["Flat checkbox\noverconfident"], [overconf / n * 100], color=ADO_ACCENT, height=0.35)
+    _panel_label(ax, "b")
+    ax.barh([0], [pct_over], color=C["secondary"], height=0.45, edgecolor="white", zorder=3)
+    ax.set_yticks([0])
+    ax.set_yticklabels(["Checkbox overconfident"])
     ax.set_xlim(0, 100)
-    ax.set_xlabel("% of cohort cells")
-    ax.set_title("Nuanced cases collapsed to flat yes/no")
-    ax.text(overconf / n * 100 + 2, 0, f"{overconf}/{n} cells ({round(overconf/n*100)}%)",
-            va="center", fontweight="bold", fontsize=11)
-    _footnote(ax, "Partial / vague / no-coverage gold → checkbox forced clear yes/no")
+    ax.set_xlabel("Share of cohort cells (%)")
+    ax.set_title("Nuanced gold collapsed to flat yes/no")
+    ax.text(pct_over + 1.5, 0, f"{overconf}/{n} cells ({pct_over}%)",
+            va="center", fontsize=10, fontweight="600", color=C["dark"])
+    ax.xaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
 
-    fig.suptitle("Cohort stress test: ADO vs. flat POLST-style forms", fontsize=14, fontweight="bold", y=1.02)
-    fig.tight_layout()
-    fig.savefig(OUT / "cohort_baseline_comparison.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    _save(fig, "cohort_baseline_comparison.png")
+    CAPTIONS["cohort_baseline_comparison.png"] = (
+        f"**(a)** Agreement with the simplified reference oracle: ADO ({ado}%) versus flat "
+        f"checkbox heuristics. **(b)** In {overconf} of {n} cells ({pct_over}%), the reference "
+        "expects partial, vague, or no-coverage answers but a checkbox forces a definitive "
+        "yes/no—illustrating ADO's value in preserving epistemic honesty."
+    )
 
 
 def fig_eval_dashboard():
-    """Six-panel composite for one results slide (300 DPI, ~12×7 in)."""
-    fig = plt.figure(figsize=(12, 7))
-    gs = fig.add_gridspec(2, 3, hspace=0.38, wspace=0.32)
-
     cohort = _load_cohort()
     cohort_pct = round(cohort.get("ado_decision_accuracy", 0.47) * 100)
 
-    # Panel A: vignette splits
-    ax = fig.add_subplot(gs[0, 0])
-    ax.bar(["Dev\n16", "Hold\n10"], [100, 100], color=[ADO_BLUE, ADO_LIGHT], width=0.45)
-    ax.set_ylim(0, 108)
-    ax.set_title("Vignettes", fontsize=11)
-    ax.set_ylabel("%")
-    for i, v in enumerate([100, 100]):
-        ax.text(i, v + 3, f"{v}%", ha="center", fontweight="bold", fontsize=10)
+    fig = plt.figure(figsize=(12, 7.5))
+    gs = fig.add_gridspec(2, 3, hspace=0.42, wspace=0.35, left=0.07, right=0.98, top=0.94, bottom=0.08)
 
-    # Panel B: ablation
-    ax = fig.add_subplot(gs[0, 1])
-    ax.bar(["Full", "Blind"], [100, 69], color=[ADO_BLUE, ADO_ACCENT], width=0.45)
-    ax.set_ylim(0, 108)
-    ax.set_title("Ablation (dev)", fontsize=11)
-    for i, v in enumerate([100, 69]):
-        ax.text(i, v + 3, f"{v}%", ha="center", fontweight="bold", fontsize=10)
+    def mini_bar(ax, labels, vals, colors, ylabel, title, ylim_top, fmt_pct=True):
+        x = np.arange(len(labels))
+        bars = ax.bar(x, vals, color=colors, width=0.55, edgecolor="white", linewidth=1, zorder=3)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=8)
+        ax.set_ylim(0, ylim_top)
+        ax.set_ylabel(ylabel, fontsize=9)
+        ax.set_title(title, fontsize=10, pad=8)
+        ax.yaxis.grid(True, linestyle="-", linewidth=0.5, color=C["grid"], zorder=0)
+        ax.set_axisbelow(True)
+        for bar, v in zip(bars, vals):
+            label = f"{v:.0f}%" if fmt_pct else str(v)
+            h = bar.get_height()
+            yoff = ylim_top * 0.04
+            ax.text(bar.get_x() + bar.get_width() / 2, h + yoff, label,
+                    ha="center", va="bottom", fontsize=8, fontweight="600")
 
-    # Panel C: cohort headline
-    ax = fig.add_subplot(gs[0, 2])
-    ax.bar(["Cohort\n520"], [cohort_pct], color=ADO_LIGHT, width=0.35)
-    ax.set_ylim(0, 108)
-    ax.set_title("Cohort stress", fontsize=11)
-    ax.text(0, cohort_pct + 3, f"{cohort_pct}%", ha="center", fontweight="bold", fontsize=10)
+    mini_bar(fig.add_subplot(gs[0, 0]), ["Dev", "Hold"], [100, 100],
+             [C["primary"], C["neutral"]], "%", "Vignettes", 115)
+    mini_bar(fig.add_subplot(gs[0, 1]), ["Full", "Blind"], [100, 69],
+             [C["primary"], C["secondary"]], "%", "Ablation", 115)
+    mini_bar(fig.add_subplot(gs[0, 2]), ["Cohort"], [cohort_pct],
+             [C["neutral"]], "%", "Stress test", 115)
 
-    # Panel D: coverage
     ax = fig.add_subplot(gs[1, 0])
-    labels = ["Full", "Vague", "Partial", "Who", "OWL", "OOS"]
+    labels = ["Full", "Vague", "Part.", "Who", "OWL", "OOS"]
     counts = [14, 3, 3, 3, 1, 6]
-    colors = [ADO_BLUE, ADO_LIGHT, ADO_MID, ADO_ACCENT, ADO_GOLD, ADO_GRAY]
-    ax.bar(labels, counts, color=colors, width=0.65)
-    ax.set_title("Coverage (n=30)", fontsize=11)
-    ax.set_ylabel("clauses")
+    colors = [C["primary"], C["neutral"], C["tertiary"], C["secondary"], C["accent"], C["muted"]]
+    x = np.arange(len(labels))
+    ax.bar(x, counts, color=colors, width=0.65, edgecolor="white", zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=8)
+    ax.set_ylabel("Clauses", fontsize=9)
+    ax.set_title("Coverage (n=30)", fontsize=10, pad=8)
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.5, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
     for i, c in enumerate(counts):
-        ax.text(i, c + 0.2, str(c), ha="center", fontsize=8, fontweight="bold")
+        ax.text(i, c + 0.35, str(c), ha="center", fontsize=8, fontweight="600")
 
-    # Panel E: extraction
     ax = fig.add_subplot(gs[1, 1])
-    ax.bar(["P", "R", "F1"], [0.94, 1.0, 0.97], color=ADO_BLUE, width=0.5)
-    ax.set_ylim(0, 1.08)
-    ax.set_title("Extraction (n=12)", fontsize=11)
-    for i, v in enumerate([0.94, 1.0, 0.97]):
-        ax.text(i, v + 0.03, f"{v:.2f}", ha="center", fontweight="bold", fontsize=9)
+    bars = ax.bar([0, 1, 2], [0.94, 1.0, 0.97], color=C["primary"], width=0.5, edgecolor="white", zorder=3)
+    ax.set_xticks([0, 1, 2])
+    ax.set_xticklabels(["P", "R", "F1"], fontsize=9)
+    ax.set_ylim(0, 1.12)
+    ax.set_ylabel("Score", fontsize=9)
+    ax.set_title("Extraction (n=12)", fontsize=10, pad=8)
+    _annotate_bars_frac(ax, bars, [0.94, 1.0, 0.97], 1.12)
 
-    # Panel F: track 3
     ax = fig.add_subplot(gs[1, 2])
     fields = ["Code", "A", "B", "All"]
     correct = [12, 12, 11, 11]
-    ax.bar(fields, [c / 12 * 100 for c in correct], color=ADO_BLUE, width=0.55)
-    ax.set_ylim(0, 108)
-    ax.set_title("POLST mapping (n=12)", fontsize=11)
-    for i, c in enumerate(correct):
-        ax.text(i, c / 12 * 100 + 3, f"{c}/12", ha="center", fontsize=8, fontweight="bold")
+    x = np.arange(4)
+    bars = ax.bar(x, [c / 12 * 100 for c in correct], color=C["primary"], width=0.55, edgecolor="white", zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels(fields, fontsize=9)
+    ax.set_ylim(0, 115)
+    ax.set_ylabel("%", fontsize=9)
+    ax.set_title("POLST mapping (n=12)", fontsize=10, pad=8)
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.5, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    for bar, c in zip(bars, correct):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 3,
+                f"{c}/12", ha="center", fontsize=8, fontweight="600")
 
-    fig.suptitle("ADO evaluation dashboard — developmental validation (Spring 2026)",
-                 fontsize=14, fontweight="bold")
-    fig.savefig(OUT / "eval_dashboard.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    _save(fig, "eval_dashboard.png")
+    CAPTIONS["eval_dashboard.png"] = (
+        "**Evaluation dashboard** (developmental validation, Spring 2026): vignette splits, "
+        f"ablation, cohort stress ({cohort_pct}%), inventory coverage (47% fully representable), "
+        "LLM extraction F1 0.97, and POLST/code-status field agreement (35/36)."
+    )
 
 
 def fig_study_design():
-    """Six evaluation strands diagram."""
-    fig, ax = plt.subplots(figsize=(9, 4.8))
+    fig, ax = plt.subplots(figsize=(10, 5.2), constrained_layout=True)
     ax.set_xlim(0, 10)
-    ax.set_ylim(0, 6)
+    ax.set_ylim(0, 6.2)
     ax.axis("off")
 
     strands = [
-        (1, 4.5, "Vignettes", "16 dev + 10 held-out\n(single patient)"),
-        (3.5, 4.5, "Ablation", "Condition-blind\n69% on dev"),
-        (6, 4.5, "Cohort sim", "520 cells · 20 profiles\n12 scenarios"),
-        (1, 1.8, "Extraction", "n=12 real templates\nF1 0.97"),
-        (3.5, 1.8, "Code / POLST", "12 profiles → orders\n35/36 fields"),
-        (6, 1.8, "Coverage", "30 inventory clauses\n47% representable"),
+        (1.2, 4.6, "Vignettes", "16 dev + 10 held-out"),
+        (5.0, 4.6, "Ablation", "69% if blind"),
+        (8.2, 4.6, "Cohort", "520 cells"),
+        (1.2, 1.6, "Extraction", "n=12, F1 0.97"),
+        (5.0, 1.6, "Code / POLST", "35/36 fields"),
+        (8.2, 1.6, "Coverage", "47% full"),
     ]
     for x, y, title, sub in strands:
-        rect = mpatches.FancyBboxPatch((x - 0.85, y - 0.55), 1.7, 1.1,
-                                       boxstyle="round,pad=0.05,rounding_size=0.08",
-                                       facecolor=ADO_LIGHT if "Cohort" in title else "#e8eef5",
-                                       edgecolor=ADO_BLUE, linewidth=1.5)
+        face = C["fill_a"] if title == "Cohort" else "#F4F6F8"
+        rect = mpatches.FancyBboxPatch(
+            (x - 1.05, y - 0.72), 2.1, 1.35,
+            boxstyle="round,pad=0.02,rounding_size=0.12",
+            facecolor=face, edgecolor=C["primary"], linewidth=1.2,
+        )
         ax.add_patch(rect)
-        ax.text(x, y + 0.15, title, ha="center", fontweight="bold", fontsize=10, color=ADO_BLUE)
-        ax.text(x, y - 0.25, sub, ha="center", fontsize=8, color="#333333")
+        ax.text(x, y + 0.22, title, ha="center", fontweight="700", fontsize=11, color=C["primary"])
+        ax.text(x, y - 0.28, sub, ha="center", fontsize=9, color=C["muted"])
 
-    ax.annotate("", xy=(5, 3.2), xytext=(5, 3.55),
-                arrowprops=dict(arrowstyle="->", color=ADO_ACCENT, lw=2))
-    ax.text(5, 3.35, "Developmental — not clinical trial", ha="center", fontsize=10,
-            fontweight="bold", color=ADO_ACCENT)
-    ax.set_title("Evaluation design: six complementary strands", fontsize=14, fontweight="bold", pad=12)
-    fig.tight_layout()
-    fig.savefig(OUT / "study_design_strands.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    ax.text(5.0, 3.05, "Developmental validation (not a clinical trial)",
+            ha="center", fontsize=10, fontstyle="italic", color=C["secondary"])
+
+    _save(fig, "study_design_strands.png")
+    CAPTIONS["study_design_strands.png"] = (
+        "**Evaluation design:** six complementary strands—curated vignettes, condition-blind "
+        "ablation, large cohort simulation, LLM extraction on real template language, "
+        "POLST-semantics mapping, and systematic inventory coverage analysis."
+    )
 
 
 def fig_track3_fields():
-    fields = ["Code status", "POLST A", "POLST B", "Exact profile\n(all 3)"]
+    fields = ["Code status", "POLST A", "POLST B", "Exact profile"]
     correct = [12, 12, 11, 11]
     n = 12
 
-    fig, ax = plt.subplots(figsize=(7.8, 4.2))
+    fig, ax = plt.subplots(figsize=(8, 4.5), constrained_layout=True)
     x = np.arange(len(fields))
-    bars = ax.bar(x, [c / n * 100 for c in correct], color=ADO_BLUE, width=0.55, edgecolor="white")
+    heights = [c / n * 100 for c in correct]
+    bars = ax.bar(x, heights, color=C["primary"], width=0.52, edgecolor="white", linewidth=1.2, zorder=3)
     ax.set_xticks(x)
     ax.set_xticklabels(fields)
-    ax.set_ylim(0, 108)
-    ax.set_ylabel(f"Agreement (of {n} profiles)")
-    ax.set_title("Track 3: directive profiles → bedside orders")
+    ax.set_ylim(0, 115)
+    ax.set_ylabel(f"Agreement (of {n} profiles, %)")
+    ax.set_title("Directive profiles mapped to bedside orders")
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
     for bar, c in zip(bars, correct):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 2,
-                f"{c}/{n}", ha="center", fontweight="bold")
-    _footnote(ax, "Gold = POLST published semantics (independent of ADO)")
-    fig.tight_layout()
-    fig.savefig(OUT / "track3_field_agreement.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 3,
+                f"{c}/{n}", ha="center", fontsize=9, fontweight="600")
+    _save(fig, "track3_field_agreement.png")
+    CAPTIONS["track3_field_agreement.png"] = (
+        "**Track 3:** Agreement between ADO-derived hospital code status and POLST sections "
+        "versus gold labels from published POLST semantics (12 inventory-grounded profiles). "
+        "One principled divergence on profile P5 (POLST B not specified vs default full treatment)."
+    )
 
 
 def fig_confusion_matrix():
-    short = ["Full", "DNR", "DNI", "DNR/\nDNI", "DNE", "DNR/DNI\n+DNE"]
+    short = ["Full", "DNR", "DNI", "DNR/DNI", "DNE", "DNR/DNI+DNE"]
     matrix = np.array([
         [4, 0, 0, 0, 0, 0],
         [0, 2, 0, 0, 0, 0],
@@ -331,124 +437,220 @@ def fig_confusion_matrix():
         [0, 0, 0, 0, 0, 2],
     ])
 
-    fig, ax = plt.subplots(figsize=(7.5, 5.8))
-    im = ax.imshow(matrix, cmap="Blues", vmin=0, vmax=4)
+    fig, ax = plt.subplots(figsize=(7.8, 6.2), constrained_layout=True)
+    cmap = mpl.colors.LinearSegmentedColormap.from_list("ado_blues", ["#FFFFFF", C["primary"]])
+    im = ax.imshow(matrix, cmap=cmap, vmin=0, vmax=4, aspect="equal")
     ax.set_xticks(range(6))
     ax.set_yticks(range(6))
-    ax.set_xticklabels(short, fontsize=9)
+    ax.set_xticklabels(short, fontsize=9, rotation=35, ha="right")
     ax.set_yticklabels(short, fontsize=9)
-    ax.set_xlabel("ADO derived", fontweight="medium")
-    ax.set_ylabel("Gold (POLST semantics)", fontweight="medium")
-    ax.set_title("Code-status confusion matrix (12 profiles)")
+    ax.set_xlabel("ADO derived code status", labelpad=10)
+    ax.set_ylabel("Gold (POLST semantics)", labelpad=10)
+    ax.set_title("Code-status confusion matrix")
     for i in range(6):
         for j in range(6):
             if matrix[i, j] > 0:
                 ax.text(j, i, int(matrix[i, j]), ha="center", va="center",
-                        color="white" if matrix[i, j] > 2 else ADO_BLUE, fontweight="bold")
-    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="Count")
-    fig.tight_layout()
-    fig.savefig(OUT / "code_status_confusion.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+                        fontsize=11, fontweight="600",
+                        color="white" if matrix[i, j] >= 2 else C["primary"])
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, shrink=0.85)
+    cbar.set_label("Profile count", fontsize=9)
+    cbar.ax.tick_params(labelsize=8)
+    _save(fig, "code_status_confusion.png")
+    CAPTIONS["code_status_confusion.png"] = (
+        "**Code-status confusion matrix** (n=12 profiles): perfect diagonal agreement—no "
+        "profile-level misclassification across six observed code-status categories."
+    )
 
 
 def fig_ablation():
+    fig, ax = plt.subplots(figsize=(6.5, 4.5), constrained_layout=True)
     labels = ["Full reasoner", "Condition-blind"]
     acc = [100, 69]
-    fig, ax = plt.subplots(figsize=(6.2, 4.2))
-    bars = ax.bar(labels, acc, color=[ADO_BLUE, ADO_ACCENT], width=0.48, edgecolor="white")
-    ax.set_ylim(0, 108)
+    x = np.arange(2)
+    bars = ax.bar(x, acc, color=[C["primary"], C["secondary"]], width=0.48,
+                  edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.set_ylim(0, 118)
     ax.set_ylabel("Vignette accuracy (%)")
-    ax.set_title("Activation conditions prevent false confidence")
-    for bar, v in zip(bars, acc):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%", ha="center", fontweight="bold")
-    _footnote(ax, "11/16 vs 16/16 · failures on partial / vague / conditional vignettes")
-    fig.tight_layout()
-    fig.savefig(OUT / "ablation_conditions.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    ax.set_title("Effect of ignoring activation conditions")
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _annotate_bars(ax, bars, acc, 118)
+    _save(fig, "ablation_conditions.png")
+    CAPTIONS["ablation_conditions.png"] = (
+        "**Ablation:** Re-scoring the same 16 development vignettes while treating every matched "
+        "preference as unconditionally applicable drops accuracy from 100% to 69% (11/16)—"
+        "failures align with partial, vague, and conditional cases."
+    )
 
 
 def fig_vignette_outputs():
     types = ["Clear", "Partial", "No coverage", "Vague"]
     counts = [9, 4, 2, 1]
-    colors = [ADO_BLUE, ADO_LIGHT, ADO_MID, "#a8c4e8"]
+    colors = [C["primary"], C["neutral"], C["tertiary"], C["accent"]]
 
-    fig, ax = plt.subplots(figsize=(6.2, 4.2))
+    fig, ax = plt.subplots(figsize=(6.5, 4.5), constrained_layout=True)
     wedges, _, autotexts = ax.pie(
-        counts, labels=types, autopct="%1.0f%%", colors=colors,
-        startangle=90, textprops={"fontsize": 10},
-        wedgeprops={"edgecolor": "white", "linewidth": 1.2},
+        counts, colors=colors, startangle=90, autopct="%1.0f%%",
+        pctdistance=0.72, wedgeprops=dict(edgecolor="white", linewidth=1.5, width=0.55),
+        textprops={"fontsize": 9, "fontweight": "600", "color": C["dark"]},
     )
-    for t in autotexts:
-        t.set_fontweight("bold")
-    ax.set_title("16 vignettes: expected match-type mix")
-    fig.tight_layout()
-    fig.savefig(OUT / "vignette_match_types.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    ax.legend(wedges, [f"{t} (n={c})" for t, c in zip(types, counts)],
+              loc="center left", bbox_to_anchor=(1.02, 0.5), fontsize=9)
+    ax.set_title("Expected match-type distribution (16 vignettes)")
+    _save(fig, "vignette_match_types.png")
+    CAPTIONS["vignette_match_types.png"] = (
+        "**Vignette suite composition:** Most gold labels expect clear or partial matches; "
+        "the suite deliberately includes no-coverage and vague cases to test honest non-answers."
+    )
 
 
 def fig_conditional_flip():
-    scenarios = ["Condition met\n(NYHA IV, no reversible)", "Condition not met\n(NYHA III, reversible)"]
-    fig, ax = plt.subplots(figsize=(7.2, 3.8))
-    bars = ax.barh(scenarios, [1, 1], color=[ADO_ACCENT, ADO_BLUE], height=0.42, edgecolor="white")
-    ax.set_xlim(0, 1.4)
+    fig, ax = plt.subplots(figsize=(8, 3.8), constrained_layout=True)
+    scenarios = ["Condition met", "Condition not met"]
+    codes = ["DNR", "Full code"]
+    y = np.arange(2)
+    bars = ax.barh(y, [1, 1], color=[C["secondary"], C["primary"]], height=0.5,
+                   edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_yticks(y)
+    ax.set_yticklabels([
+        "NYHA IV, no reversible cause",
+        "NYHA III, reversible cause present",
+    ], fontsize=9)
+    ax.set_xlim(0, 1.35)
     ax.set_xticks([])
-    ax.set_title('"No CPR if NYHA IV and no reversible cause"')
-    for bar, code in zip(bars, ["DNR", "Full code"]):
+    ax.set_title('Same directive: "No CPR if NYHA IV and no reversible cause"')
+    for bar, code in zip(bars, codes):
         ax.text(0.5, bar.get_y() + bar.get_height() / 2, code,
-                ha="center", va="center", fontsize=14, fontweight="bold", color="white")
-    _footnote(ax, "ADO preserves if/then — flat POLST cannot")
-    fig.tight_layout()
-    fig.savefig(OUT / "conditional_p9_p10.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+                ha="center", va="center", fontsize=13, fontweight="700", color="white")
+    _save(fig, "conditional_p9_p10.png")
+    CAPTIONS["conditional_p9_p10.png"] = (
+        "**Conditional value-add (profiles P9 vs P10):** Identical preference text yields "
+        "DNR when activation conditions are met versus full code when they are not—logic "
+        "a flat POLST checkbox cannot represent."
+    )
 
 
 def fig_vignette_splits():
-    fig, ax = plt.subplots(figsize=(5.8, 4.2))
-    bars = ax.bar(["Development\n(n=16)", "Held-out\n(n=10)"], [100, 100],
-                  color=[ADO_BLUE, ADO_LIGHT], width=0.45, edgecolor="white")
-    ax.set_ylim(0, 108)
-    ax.set_ylabel("Decision + match-type accuracy (%)")
-    ax.set_title("Track 1: vignette splits")
-    for bar, v in zip(bars, [100, 100]):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 2, f"{v}%", ha="center", fontweight="bold")
-    _footnote(ax, "Same patient ontology (Jane Doe)")
-    fig.tight_layout()
-    fig.savefig(OUT / "vignette_splits.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    fig, ax = plt.subplots(figsize=(6, 4.5), constrained_layout=True)
+    labels = ["Development", "Held-out"]
+    vals = [100, 100]
+    x = np.arange(2)
+    bars = ax.bar(x, vals, color=[C["primary"], C["neutral"]], width=0.45,
+                  edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"{l}\n(n={n})" for l, n in zip(labels, [16, 10])])
+    ax.set_ylim(0, 118)
+    ax.set_ylabel("Accuracy (%)")
+    ax.set_title("Vignette splits (Jane Doe ontology)")
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _annotate_bars(ax, bars, vals, 118)
+    _save(fig, "vignette_splits.png")
+    CAPTIONS["vignette_splits.png"] = (
+        "**Vignette splits:** 100% decision and match-type accuracy on both development (n=16) "
+        "and held-out (n=10) sets using the same encoded patient—developmental spec test, not "
+        "multi-patient generalization."
+    )
 
 
 def fig_coverage():
-    labels = ["Fully\nrepresentable", "Vague", "Partial\nloss", "Who-\ndecides", "OWL\ngap", "Out of\nscope"]
+    labels = ["Fully\nrepresentable", "Vague", "Partial\nloss", "Who\ndecides", "OWL\ngap", "Out of\nscope"]
     counts = [14, 3, 3, 3, 1, 6]
-    colors = [ADO_BLUE, ADO_LIGHT, ADO_MID, ADO_ACCENT, ADO_GOLD, ADO_GRAY]
-    fig, ax = plt.subplots(figsize=(8.5, 4.4))
+    colors = [C["primary"], C["neutral"], C["tertiary"], C["secondary"], C["accent"], C["muted"]]
+
+    fig, ax = plt.subplots(figsize=(9, 4.8), constrained_layout=True)
     x = np.arange(len(labels))
-    bars = ax.bar(x, counts, color=colors, width=0.62, edgecolor="white")
+    bars = ax.bar(x, counts, color=colors, width=0.62, edgecolor="white", linewidth=1.2, zorder=3)
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=9)
-    ax.set_ylabel("Clauses (of 30)")
-    ax.set_title("Inventory coverage — 47% fully representable")
+    ax.set_ylabel("Clauses (of 30 sampled)")
+    ax.set_title("Advance directive inventory coverage")
+    ax.set_ylim(0, max(counts) + 2.5)
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
     for bar, c in zip(bars, counts):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.15,
-                str(c), ha="center", fontweight="bold")
-    fig.tight_layout()
-    fig.savefig(OUT / "coverage_inventory.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.25,
+                str(c), ha="center", fontsize=9, fontweight="600")
+    _save(fig, "coverage_inventory.png")
+    CAPTIONS["coverage_inventory.png"] = (
+        "**Coverage analysis** of 30 stratified clauses from a 50-template inventory: 14 (47%) "
+        "fully representable in the HF-focused ontology; six out of scope (e.g., nutrition, "
+        "antibiotics); gaps include surrogate-override and time-limited trials."
+    )
 
 
 def fig_extraction_metrics():
-    fig, ax = plt.subplots(figsize=(6.2, 4.0))
-    bars = ax.bar(["Precision", "Recall", "F1"], [0.94, 1.00, 0.97],
-                  color=ADO_BLUE, width=0.5, edgecolor="white")
-    ax.set_ylim(0, 1.08)
+    fig, ax = plt.subplots(figsize=(6.5, 4.5), constrained_layout=True)
+    metrics = ["Precision", "Recall", "F1"]
+    vals = [0.94, 1.00, 0.97]
+    x = np.arange(3)
+    bars = ax.bar(x, vals, color=C["primary"], width=0.5, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.set_xticks(x)
+    ax.set_xticklabels(metrics)
+    ax.set_ylim(0, 1.15)
     ax.set_ylabel("Score")
-    ax.set_title("LLM extraction (n=12 template clauses)")
-    for bar, v in zip(bars, [0.94, 1.00, 0.97]):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 0.02, f"{v:.2f}", ha="center", fontweight="bold")
-    _footnote(ax, "0 hallucinations on out-of-scope nutrition & antibiotics")
-    fig.tight_layout()
-    fig.savefig(OUT / "extraction_f1.png", dpi=DPI, bbox_inches="tight")
-    plt.close(fig)
+    ax.set_title("LLM preference extraction (n=12 clauses)")
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.6, color=C["grid"], zorder=0)
+    ax.set_axisbelow(True)
+    _annotate_bars_frac(ax, bars, vals, 1.15)
+    _save(fig, "extraction_f1.png")
+    CAPTIONS["extraction_f1.png"] = (
+        "**Track 2 extraction** on 12 verbatim clauses from real template families: F1 0.97 with "
+        "zero hallucinated preferences on out-of-scope artificial nutrition and antibiotics "
+        "statements (closed-world discipline)."
+    )
+
+
+def write_captions_md():
+    lines = [
+        "# Figure captions for ADO presentation",
+        "",
+        "Copy each caption below the corresponding figure on your slide, or into the speaker notes.",
+        "Figures are in `docs/presentation_figures/` at **300 DPI**.",
+        "",
+        "---",
+        "",
+    ]
+    order = [
+        "eval_two_layer.png",
+        "eval_overview.png",
+        "study_design_strands.png",
+        "ablation_conditions.png",
+        "conditional_p9_p10.png",
+        "cohort_messy_breakdown.png",
+        "cohort_baseline_comparison.png",
+        "eval_dashboard.png",
+        "vignette_splits.png",
+        "vignette_match_types.png",
+        "coverage_inventory.png",
+        "extraction_f1.png",
+        "track3_field_agreement.png",
+        "code_status_confusion.png",
+    ]
+    for i, name in enumerate(order, 1):
+        cap = CAPTIONS.get(name, "")
+        title = name.replace("_", " ").replace(".png", "").title()
+        lines.append(f"## Figure {i}. `{name}`")
+        lines.append("")
+        lines.append(cap)
+        lines.append("")
+        lines.append("---")
+        lines.append("")
+
+  # Short slide captions (one line)
+    lines.append("## One-line slide captions (bullets)")
+    lines.append("")
+    for name in order:
+        cap = CAPTIONS.get(name, "")
+        short = cap.split(".")[0].replace("**", "") + "." if cap else ""
+        lines.append(f"- **{name}:** {short}")
+        lines.append("")
+
+    CAPTIONS_MD.write_text("\n".join(lines), encoding="utf-8")
+    (OUT / "figure_captions.json").write_text(json.dumps(CAPTIONS, indent=2), encoding="utf-8")
 
 
 def main():
@@ -468,7 +670,8 @@ def main():
     fig_vignette_splits()
     fig_coverage()
     fig_extraction_metrics()
-    print(f"Wrote {len(list(OUT.glob('*.png')))} figures to {OUT}/ at {DPI} DPI")
+    write_captions_md()
+    print(f"Wrote {len(list(OUT.glob('*.png')))} figures + {CAPTIONS_MD.name} at {DPI} DPI")
 
 
 if __name__ == "__main__":

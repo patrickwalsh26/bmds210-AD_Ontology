@@ -121,3 +121,27 @@ Drag appended slides into this order after running `insert_presentation_figures.
 - Cohort oracle = ground truth (it is simplified rules)
 - Multi-patient generalization from vignette 100%
 - Legal directive status
+
+---
+
+## Figure captions (for slides)
+
+Full captions: **`docs/presentation_figures/FIGURE_CAPTIONS.md`**
+
+One-line versions to paste under each figure on the slide:
+
+| Figure | Slide caption (one line) |
+|--------|--------------------------|
+| `eval_two_layer.png` | Two-layer validation: curated spec test (100%/69% ablation) vs. 520-cell cohort stress (~47% vs. oracle). |
+| `study_design_strands.png` | Six complementary evaluation strands; developmental validation, not a clinical trial. |
+| `ablation_conditions.png` | Ignoring activation conditions drops vignette accuracy from 100% to 69%. |
+| `conditional_p9_p10.png` | Same directive text → DNR or full code depending on whether clinical conditions are met. |
+| `cohort_messy_breakdown.png` | Cohort agreement falls as directive encoding quality decreases (clean → contradictory). |
+| `cohort_baseline_comparison.png` | Flat checkboxes over-assert treatment on 81% of nuanced cohort cells. |
+| `eval_dashboard.png` | Summary dashboard: vignettes, ablation, cohort, coverage, extraction, POLST mapping. |
+| `coverage_inventory.png` | 47% of sampled inventory clauses fully representable in HF-focused ADO v1. |
+| `extraction_f1.png` | LLM extraction F1 0.97; zero out-of-scope hallucinations (n=12). |
+| `track3_field_agreement.png` | 35/36 fields agree with POLST-semantics gold (12 profiles). |
+| `code_status_confusion.png` | Perfect diagonal code-status agreement across six categories. |
+
+Regenerate captions when figures change: `python3 scripts/generate_presentation_figures.py`
