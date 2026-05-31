@@ -36,7 +36,6 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 ├── llm_extraction.py                # Closed-world free-text directive → structured JSON (Claude)
 ├── extraction_evaluation.py         # LLM extraction precision/recall on real directive text
 ├── demo.py                          # Six-scenario live demonstration
-├── ADO_powerpoint_presentation.pptx # Class PowerPoint deck (with speaker notes)
 │
 ├── populated_ontologies/            # Output: populated patient ontologies
 │   ├── example_input.json           #   Example patient preferences (JSON)
@@ -128,6 +127,16 @@ pip install anthropic pydantic      # required for the LLM pipeline
 export ANTHROPIC_API_KEY=...        # your Anthropic API key
 python demo.py --pause              # walk through the 6 demonstration scenarios
 ```
+
+### 6. Class presentation deck
+
+Open `ADO_powerpoint_presentation.pptx` (View → Notes for the narrative script). Regenerate figures and embedded charts:
+
+```bash
+./scripts/build_presentation_assets.sh
+```
+
+See `docs/Live_Demo_Guide.md` for a 2-minute live `demo.py` walkthrough during the talk.
 
 ---
 
