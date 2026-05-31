@@ -1,95 +1,123 @@
-# PowerPoint — exact figures & numbers to use
+# PowerPoint — figures, slide order, and exact numbers
 
-Regenerate all PNGs and embed in the deck:
+Regenerate all figures (300 DPI) and embed in the deck:
 
 ```bash
 ./scripts/build_presentation_assets.sh
-python scripts/generate_presentation_figures.py
-python scripts/insert_presentation_figures.py
 ```
 
-Pull latest: `git pull origin main`
+Or step by step:
+
+```bash
+python3 scripts/generate_presentation_figures.py
+python3 scripts/generate_ontology_overview_figure.py
+python3 scripts/insert_presentation_figures.py
+python3 scripts/update_presentation_notes.py
+```
+
+Pull latest: `git pull origin cursor/realistic-evaluation-b880` (or `main` after merge).
 
 ---
 
-## Slide-by-slide map (13 core + 2 appendix slides)
+## Recommended slide order (17 slides + optional appendix)
 
-| Slide # | Title (approx.) | Figure file(s) | Exact text to say / show |
-|---------|-----------------|----------------|---------------------------|
-| **5** | Ontology scope | `ontology_class_hierarchy.png` (right) | 67 classes, 22 properties, 21 interventions |
-| **8** | Study design | `vignette_match_types.png` (right, optional) | 5 evaluation strands; developmental validation |
-| **9** | Quantitative results | `eval_overview.png` + `ablation_conditions.png` (right) | See headline table below |
-| **10** | Conditional example | `conditional_p9_p10.png` (right) | P9 vs P10: DNR ↔ Full code |
-| **15** | **STRENGTHENED EVALUATION** (new) | 6-panel slide | **Use this as your main results slide for tomorrow** |
-| **16** | Track 3 detail (optional) | `track3_field_agreement.png` + `code_status_confusion.png` | 35/36 fields; diagonal confusion matrix |
+Drag appended slides into this order after running `insert_presentation_figures.py`.
 
-**Tip:** Drag slide **STRENGTHENED EVALUATION** to position **10** (right after slide 9). Hide or shorten old slide 9 bullets if redundant.
+| # | Slide title (approx.) | Figure file(s) | What to emphasize |
+|---|------------------------|----------------|-------------------|
+| **1** | Title | — | Not a legal AD; inference layer |
+| **2** | Clinical problem | — | AD → POLST → code status translation loss |
+| **3** | Why HF | — | Five decision points |
+| **4** | Approach | — | PreferenceStatement |
+| **5** | Ontology scope | `ontology_class_hierarchy.png` (right) | 67 classes · 22 properties · 21 interventions |
+| **6** | Four outputs | — | Clear / Partial / No coverage / Vague |
+| **7** | Architecture | — | LLM extracts; ontology decides |
+| **8** | Study design | `study_design_strands.png` + `vignette_match_types.png` | **Six strands** including 520-cell cohort |
+| **9** | Quantitative results | **`eval_two_layer.png` (full width)** | **Lead with two-layer validation** |
+| **10** | Conditional example | `ablation_conditions.png` + `conditional_p9_p10.png` | 69% ablation + P9/P10 flip |
+| **11** | **COHORT STRESS TEST** (new) | `cohort_messy_breakdown.png` + `cohort_baseline_comparison.png` | ~47% vs oracle; checkbox overconfidence |
+| **12** | **EVALUATION DASHBOARD** (new) | `eval_dashboard.png` | One-slide summary for appendix or backup |
+| **13** | **COVERAGE & EXTRACTION** (new) | `coverage_inventory.png` + `extraction_f1.png` | 47% representable; F1 0.97 |
+| **14** | **TRACK 3** (new) | `track3_field_agreement.png` + `code_status_confusion.png` | 35/36 fields; P5 divergence |
+| **15** | Clinical integration | — | Magnus ACP note framing |
+| **16** | Limits | — | Cohort caveat + team gold |
+| **17** | Takeaways | — | Four bullets |
+
+**Optional / hide:** older slides titled `STRENGTHENED EVALUATION` or `EVALUATION FIGURES — Track 3` if duplicated.
+
+**Sidebar on slide 9 (if crowded):** `eval_overview.png` instead of two-layer (not recommended for June 1).
 
 ---
 
-## Headline numbers (paste on slides or speaker notes)
+## Headline numbers (copy-paste)
 
-### Track 1 — Vignettes
+### Layer 1 — Curated vignettes (spec test)
 | Metric | Value |
 |--------|--------|
-| Development set | **16/16** decision & match-type |
-| Held-out set (frozen gold) | **10/10** |
-| **Ablation** (ignore activation conditions) | **11/16 (69%)** |
+| Development | **16/16** decision & match-type |
+| Held-out | **10/10** |
+| Ablation (condition-blind) | **11/16 (69%)** |
 | Caveat | Single patient (Jane Doe); team gold |
 
-### Track 2 — LLM extraction
+### Layer 2 — Cohort stress test
 | Metric | Value |
 |--------|--------|
-| Precision / Recall / F1 | **0.94 / 1.00 / 0.97** |
-| Out-of-scope hallucinations | **0** (nutrition, antibiotics) |
-| Inter-annotator κ (protocol) | **0.88** intervention, **0.74** negation |
+| Scale | **520 cells** = 20 patients × 12 scenarios |
+| ADO vs ref. oracle | **~47%** decision agreement |
+| Condition-blind | **~45%** |
+| Flat checkbox vs oracle | **~19%** (silent → full code) |
+| Checkbox overconfident | **421/520** nuanced cells |
+| Caveat | Simplified oracle; not blind clinician adjudication |
 
-### Track 3 — Code status / POLST
+### Track 2 — Extraction (n=12)
+| Metric | Value |
+|--------|--------|
+| P / R / F1 | **0.94 / 1.00 / 0.97** |
+| OOS hallucinations | **0** |
+
+### Track 3 — Code status / POLST (n=12)
 | Metric | Value |
 |--------|--------|
 | Field agreement | **35/36 (97%)** |
-| Code status | 12/12 |
-| POLST A | 12/12 |
-| POLST B | 11/12 |
-| Exact profile | 11/12 |
-| Principled divergence | **P5** — Not specified vs Full Treatment |
+| Principled divergence | **P5** |
 
-### Track 4 — Coverage (30 inventory clauses)
-| Label | Count |
-|--------|-------|
+### Coverage (n=30 clauses)
+| Metric | Value |
+|--------|--------|
 | Fully representable | **14 (47%)** |
-| Vague only | 3 |
-| Partial loss | 3 |
-| Who-decides gap | 3 |
-| OWL gap | 1 |
-| Out of scope | 6 |
 
 ---
 
 ## Figure catalog (`docs/presentation_figures/`)
 
-| File | Use |
-|------|-----|
-| `eval_overview.png` | Slide 9 — 4 headline bars (100/100/97/97) |
-| `ablation_conditions.png` | Slide 9 or 15 — **100% vs 69%** |
-| `vignette_splits.png` | Slide 15 — dev vs hold-out |
-| `coverage_inventory.png` | Slide 15 — **most important honesty slide** |
-| `extraction_f1.png` | Slide 15 or slide 7 — F1 bar chart |
-| `track3_field_agreement.png` | Slide 15 or 16 — 12/12, 12/12, 11/12, 11/12 |
-| `code_status_confusion.png` | Slide 16 — confusion matrix |
-| `conditional_p9_p10.png` | Slide 10 — clinical “aha” |
-| `vignette_match_types.png` | Slide 8 — pie of match types |
-| `ontology_class_hierarchy.png` | Slide 5 — Protégé backup |
+| File | Resolution | Primary slide |
+|------|------------|---------------|
+| `eval_two_layer.png` | 300 DPI | **9** — main honest results |
+| `eval_dashboard.png` | 300 DPI | **12** — backup / appendix |
+| `study_design_strands.png` | 300 DPI | **8** |
+| `cohort_messy_breakdown.png` | 300 DPI | **11** |
+| `cohort_baseline_comparison.png` | 300 DPI | **11** |
+| `ablation_conditions.png` | 300 DPI | **10** |
+| `conditional_p9_p10.png` | 300 DPI | **10** |
+| `coverage_inventory.png` | 300 DPI | **13** |
+| `extraction_f1.png` | 300 DPI | **13** |
+| `vignette_splits.png` | 300 DPI | **13** (secondary) |
+| `track3_field_agreement.png` | 300 DPI | **14** |
+| `code_status_confusion.png` | 300 DPI | **14** |
+| `eval_overview.png` | 300 DPI | Optional compact sidebar |
+| `vignette_match_types.png` | 300 DPI | **8** |
+| `ontology_class_hierarchy.png` | 300 DPI | **5** |
 
 ---
 
-## One-line framing (recommended opening for results)
+## Opening line for results (recommended)
 
-> “We report **developmental validation**: perfect scores on small curated vignettes, but the meaningful findings are **ablation to 69% without conditions**, **47% full coverage** on real template language, and a **principled POLST disagreement** on profile P5.”
+> “We use **two layers of validation**: perfect scores on **curated vignettes** are a **spec test** on one patient; a **520-cell cohort stress test** with messy template-inspired profiles shows **~47%** agreement with an independent oracle — and flat checkboxes fail on most nuanced cells. The contribution is **conditionality and honesty about silence**, not solved deployment.”
 
 ---
 
 ## Do NOT claim
-- Clinical trial / bedside validation
-- Multi-patient generalization
+- Clinical trial or bedside validation at scale
+- Cohort oracle = ground truth (it is simplified rules)
+- Multi-patient generalization from vignette 100%
 - Legal directive status

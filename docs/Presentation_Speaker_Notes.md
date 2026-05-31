@@ -1,196 +1,185 @@
 # ADO Presentation — Speaker Notes (June 1, 2026)
 
-**Runtime:** ~8 minutes + ~2 minutes Q&A · **13 slides** · Figures in `docs/presentation_figures/`
+**Runtime:** ~9 minutes + ~2 minutes Q&A · **17 slides recommended** · Figures in `docs/presentation_figures/` (300 DPI)
+
+**Regenerate deck:** `./scripts/build_presentation_assets.sh` · Placement: `docs/PPT_Figures_Guide.md`
 
 ---
 
-## The narrative arc (read this once, then present)
+## Narrative arc
 
 | Act | Slides | Story beat |
 |-----|--------|------------|
-| **I — The gap** | 1–3 | At 2 a.m. clinicians act on code status, not the AD. Directives, POLST, and orders are three layers—and conditional, HF-specific wishes get lost between them. |
-| **II — The idea** | 4–7 | ADO encodes *what the patient said* as testable preference objects, refuses false confidence with four honest outputs, and uses LLMs only to *enter* the system—not to *decide*. |
-| **III — The evidence** | 8–10 (+ figs) | We evaluated reasoning, extraction discipline, and whether ADO can populate what actually governs the bedside—then show conditionality is the value-add. |
-| **IV — The placement** | 11–13 | Expert review placed ADO in the real workflow (ACP note, not legal AD). Limitations are explicit; the contribution is an auditable inference layer. |
+| **I — The gap** | 1–3 | Code status at 2 a.m., not the AD. Three layers; conditional HF wishes get lost. |
+| **II — The idea** | 4–7 | PreferenceStatement; four honest outputs; LLMs at the boundary only. |
+| **III — The evidence** | 8–14 | **Two-layer validation**: spec test + cohort stress; ablation; coverage; POLST. |
+| **IV — The placement** | 15–17 | Magnus workflow; limits; takeaways. |
 
-**One-sentence pitch:** *ADO is the missing inference layer between what patients document and what teams act on—honest enough to say “the directive is silent” when it is.*
+**One-sentence pitch:** *ADO is the auditable inference layer between what patients document and what teams act on—honest enough to say “silent” when the directive is silent.*
 
-**Handoff split (suggested):** Patrick — Acts I–II (slides 1–7); Darren — Act III–IV (slides 8–13). Swap freely; use the **TRANSITION** lines to pass the mic.
-
-**Live showcase options (pick one if you have 2–4 extra minutes):**
-
-| Option | When | Doc |
-|--------|------|-----|
-| **Protégé** — class tree + Jane Doe `originalText` | After slide **5** or **7** | `docs/Protege_Showcase_Guide.md` |
-| **Terminal** — `demo.py --scenario 1` | After slide **7** or **9** | `docs/Live_Demo_Guide.md` |
-| **Combined** — Protégé preference → terminal reasoner | ~5 min total | Both guides |
-
-Skip slide 10 if you demo live. Backup PNG: `ontology_class_hierarchy.png`.
-
-**Figures slide:** After running `scripts/insert_presentation_figures.py`, a slide titled **EVALUATION FIGURES** is appended (often slide 14). **Drag it to position 10** (right after Quantitative evaluation) so the flow is: results → charts → conditional example.
+**Handoff:** Patrick — Acts I–II (1–7); Darren — Act III–IV (8–17).
 
 ---
 
 ## Slide 1 — Title (~25 s)
 
-**ROLE:** Hook + frame expectations.
+**SAY:** Patrick Walsh & Darren Chan. **Advance Directive Ontology** — computable EOL preferences in advanced HF. Not a legal AD; decision support for ACP documentation.
 
-**SAY:** We’re Patrick Walsh and Darren Chan. We built the **Advance Directive Ontology**—a computable layer for end-of-life preferences in **advanced heart failure**. Before we show numbers: ADO is **not** a legal advance directive. It’s decision support that helps teams reason over what patients actually said and pre-populate advance care planning notes.
-
-**TRANSITION → 2:** *“To see why that matters, start where clinicians actually live—the acute crisis.”*
+**TRANSITION:** *“Start where clinicians live—the 2 a.m. crisis.”*
 
 ---
 
 ## Slide 2 — Clinical problem (~45 s)
 
-**ROLE:** Act I — name the workflow failure.
+**SAY:** Three instruments: AD, POLST, **code status**. Translation loss: conditional wishes → coarse boxes. Forms are often checkboxes, not novels—but **low resolution** and **disease blindness**.
 
-**SAY:** Preferences flow through **three instruments**: the advance directive (values), POLST (portable orders), and **code status** (what you act on at 2 a.m.). The tragedy isn’t only missing documents—it’s **translation loss**: a patient’s *conditional* wish becomes a coarse checkbox or an order that can’t carry “only if.”
-
-**POINT AT:** The ventilator quote—temporary-if-reversible vs never-indefinitely.
-
-**SAY:** The cliché that “directives are unreadable free text” is only half right. California and UC forms are mostly **checkboxes**. The deeper problem is **low resolution** and **disease blindness**.
-
-**TRANSITION → 3:** *“Heart failure is where that blindness hurts most.”*
+**TRANSITION:** *“HF is where that hurts most.”*
 
 ---
 
 ## Slide 3 — Why HF (~35 s)
 
-**ROLE:** Justify scope; make HF feel inevitable, not arbitrary.
+**SAY:** Unpredictable, device-heavy, repeated crises. Five decision points. ICD/LVAD/inotropes rarely in generic templates.
 
-**SAY:** HF is unpredictable, device-heavy, and patients bounce through the ED and ICU—so teams repeatedly face **time-pressured interpretation**. We model five decision points on the slide. Generic templates rarely mention **ICD deactivation, LVAD, or inotropes**—yet hundreds of thousands of HF patients have ICDs.
-
-**TRANSITION → 4:** *“So we asked: what’s the smallest object that preserves the patient’s logic?”*
+**TRANSITION:** *“What's the smallest object that preserves patient logic?”*
 
 ---
 
 ## Slide 4 — Approach (~45 s)
 
-**ROLE:** Act II — introduce PreferenceStatement.
+**SAY:** **PreferenceStatement** = intervention + activation conditions + strength + negation + verbatim text. Walk 72-hour vasopressor example.
 
-**SAY:** A **PreferenceStatement** links an intervention to **activation conditions**, strength, negation, and the patient’s **verbatim words**. The reasoner’s question is always: *given this scenario, does this preference actually apply?*
-
-**WALK:** The 72-hour vasopressor example on the slide.
-
-**SAY:** Auditable means you never lose the quote behind the inference.
-
-**TRANSITION → 5:** *“Here’s how much structure we built around that idea.”*
+**TRANSITION:** *“How much structure we built.”*
 
 ---
 
 ## Slide 5 — Ontology scope (~35 s)
-**OPTIONAL LIVE — Protégé:** Open `populated_ontologies/ado_jane_doe_001.owl` → Entities → expand **Intervention** → Individuals → one **ConditionalPreference** with `originalText`. See `docs/Protege_Showcase_Guide.md`.
 
+**OPTIONAL LIVE — Protégé:** `populated_ontologies/ado_jane_doe_001.owl` · see `docs/Protege_Showcase_Guide.md`.
 
+**SAY:** **67 classes, 22 properties, 21 interventions.** POINT AT `ontology_class_hierarchy.png`.
 
-**ROLE:** Credibility — this is real ontology engineering, not a prompt.
-
-**SAY:** **67 classes, 22 properties, 21 interventions**—finer than any single template in our 50-form inventory. SNOMED grounding where we can. Ventilation alone distinguishes temporary vs indefinite; devices cover ICD/LVAD; dialysis is acute vs chronic vs withdrawal.
-
-**TRANSITION → 6:** *“Granularity only helps if the system knows when not to answer.”*
+**TRANSITION:** *“Granularity only helps if we know when NOT to answer.”*
 
 ---
 
 ## Slide 6 — Four outputs (~40 s)
 
-**ROLE:** Safety thesis — honest non-answers.
+**SAY:** Clear / Partial / No coverage / Vague. Punchline: overconfident systems can't say **“I don't know.”**
 
-**SAY:** Four outputs: **Clear, Partial, No coverage, Vague.** Partial means defer; no coverage means **do not presume**; vague means show the patient’s imprecise language back.
-
-**PUNCHLINE:** A checkbox—or an overconfident LLM—can’t say **“I don’t know.”** ADO can. That’s the safety feature.
-
-**TRANSITION → 7:** *“Here’s how we wired that into a pipeline.”*
+**TRANSITION:** *“How we wired the pipeline.”*
 
 ---
 
 ## Slide 7 — Architecture (~45 s)
 
-**ROLE:** Architecture slide — LLM at boundary only.
+**SAY:** LLMs extract ONLY. Ontology owns truth. Reasoner decides. Closed-world on out-of-scope lines.
 
-**SAY:** **LLMs extract; the ontology owns truth; the reasoner decides.** Closed-world extraction: only what the patient stated. Out-of-scope lines—nutrition, antibiotics—must extract as **nothing**, or “no coverage” is meaningless.
-
-**TAGLINE:** Ontology **with** LLMs, not versus LLMs.
-
-**TRANSITION → 8:** *“We tested that claim three ways.”*
-
-**OPTIONAL DEMO TEASE:** *“We can show this live in thirty seconds after the results—scenario 1 is CPR in NYHA IV arrest.”*
+**TRANSITION:** *“We tested that six ways—including a large cohort stress test.”*
 
 ---
 
-## Slide 8 — Study design (~45 s)
+## Slide 8 — Study design (~50 s)
 
-**ROLE:** Act III — earn trust before numbers.
+**ROLE:** Earn trust; name all strands before numbers.
 
-**SAY:** Five strands: pipeline sanity check; **16 vignettes** with team gold; **ablation** re-scoring the same vignettes without activation conditions; **LLM extraction** on real template language plus two out-of-scope traps; **12 profiles → code status/POLST** against **POLST’s own semantics**; plus **Dr. Magnus** expert review.
+**SAY:** Six strands on the figure: (1) **16 dev + 10 held-out vignettes** on one encoded patient; (2) **ablation** without activation conditions; (3) **520-cell cohort** — 20 messy template-inspired profiles × 12 acute scenarios; (4) **extraction** on real template language; (5) **12 profiles → code status/POLST**; (6) **coverage** on 30 inventory clauses. Plus Magnus expert review.
 
-**CAVEAT (one breath):** Gold is team-adjudicated but grounded in real templates and independent POLST definitions.
+**CAVEAT:** Developmental validation — team gold on vignettes; cohort scored vs simplified reference oracle, not blind chart review.
 
-**TRANSITION → 9:** *“Here’s what we found—and the figures make the pattern obvious.”*
+**POINT AT:** `study_design_strands.png`, `vignette_match_types.png`.
 
-**POINT AT FIGURES** (if inserted): overview bars + field agreement.
-
----
-
-## Slide 9 — Quantitative results (~55 s)
-
-**ROLE:** Flagship — three tracks in one breath, then ablation.
-
-**SAY — Track 1:** **16/16** decisions and match types across clear, partial, no coverage, and vague—including time bounds and care-context gating.
-
-**SAY — Track 2:** Extraction **F1 0.97**; **zero** hallucinations on out-of-scope nutrition and antibiotics.
-
-**SAY — Track 3:** **35/36** fields (**97%**) against POLST-semantics gold; code status and POLST A perfect; POLST B **11/12**; κ **1.00 / 1.00 / 0.88**.
-
-**SAY — Ablation:** Ignore conditions → **75%**—exactly the four conditional vignettes. Conditionality isn’t decoration; it prevents false confidence.
-
-**POINT AT:** `eval_overview.png`, `track3_field_agreement.png`, `ablation_conditions.png` (or embedded charts).
-
-**TRANSITION → 10:** *“One pair of profiles shows why that matters clinically.”*
-
-**IF SHORT ON TIME:** Mention P9/P10 flip verbally; skip slide 10.
+**TRANSITION:** *“Here's the honest picture in two layers.”*
 
 ---
 
-## Slide 10 — Conditional example (~40 s)
+## Slide 9 — Quantitative results / two-layer validation (~60 s)
 
-**ROLE:** Clinical “aha” — same words, different scenario.
+**ROLE:** **Main results slide** — do not oversell 100%.
 
-**SAY:** *“No CPR if NYHA IV and no reversible cause.”* Scenario A → **DNR, clear**. Scenario B → **Full code, partial**. A flat checkbox must over-apply or discard the condition.
+**SAY — Layer 1 (left):** **16/16** dev and **10/10** held-out on Jane Doe — that's our **spec test**: does the reasoner match the ontology we designed?
 
-**POINT AT:** `conditional_p9_p10.png` if on slide.
+**SAY — Layer 2 (right):** **520-cell cohort** — 20 profiles from Texas DNR, Five Wishes, dementia directives, contradictory CPR lines, incomplete LVAD encoding. Against an **independent simplified oracle**, ADO is **~47%** — not hand-adjudicated, but an honest stress test. Condition-blind is similar (~45%). A **flat checkbox** is worse on nuanced cells.
 
-**TRANSITION → 11:** *“An ethicist helped us place this in the real workflow.”*
+**SAY — Also:** Track 3 **35/36 (97%)** on POLST semantics; extraction **F1 0.97** on n=12.
 
----
+**POINT AT:** `eval_two_layer.png` (full slide).
 
-## Slide 11 — Clinical integration (~40 s)
-
-**ROLE:** Act IV — Magnus reframe.
-
-**SAY:** Dr. Magnus: you can’t treat this as a signed AHCD—it’s closer to an **ACP progress note**. Workflow: directive → ADO → pre-populated ACP note → **conversation** → POLST/code status. Conversation can override; when it doesn’t happen, structured preferences are the best record of what the patient said.
-
-**TRANSITION → 12:** *“We’re explicit about what we did not solve.”*
+**TRANSITION:** *“Let me show why conditionality matters, then the cohort in detail.”*
 
 ---
 
-## Slide 12 — Limits (~35 s)
+## Slide 10 — Conditional + ablation (~45 s)
 
-**ROLE:** Mature science — limits without apologizing away the contribution.
+**SAY — Ablation:** Drop activation conditions → **11/16 (69%)** — not 75%; failures are exactly the partial/vague/conditional vignettes.
 
-**SAY:** No legal force; **one-dimensional** today (what, not who decides); coverage gaps (nutrition, antibiotics); temporal workarounds; team gold standards; EHR validation future work.
+**SAY — P9/P10:** Same words, two scenarios → **DNR** vs **Full code**. Flat POLST can't carry if/then.
 
-**TRANSITION → 13:** *“Four sentences to leave you with.”*
+**POINT AT:** `ablation_conditions.png`, `conditional_p9_p10.png`.
+
+**TRANSITION:** *“Zoom in on the cohort stress test.”*
 
 ---
 
-## Slide 13 — Takeaways (~25 s)
+## Slide 11 — COHORT STRESS TEST (~50 s)
 
-**ROLE:** Close + invite questions.
+**ROLE:** Honesty slide — embrace the ~47%.
 
-**SAY:** Read the four bullets on the slide. Offer repo URL. Invite questions.
+**SAY:** **20 patients** tagged by messiness: clean, typical, minimal, contradictory, incomplete encoding. **12 scenarios** — arrest, vent, hospice, pressor time trials, dialysis, etc. **520 queried cells.**
 
-**IF DEMO:** *“Happy to run one live scenario at the podium—CPR in arrest, or the free-text pipeline if we have API access.”*
+**SAY:** Clean profiles score higher; minimal and contradictory fall off — encoding quality matters. **421 cells** where a flat checkbox forces yes/no but the reference says partial, vague, or no coverage — that's ADO's value proposition.
+
+**POINT AT:** `cohort_messy_breakdown.png`, `cohort_baseline_comparison.png`.
+
+**TRANSITION:** *“Dashboard and scope in two more slides if you have time; otherwise jump to workflow.”*
+
+---
+
+## Slide 12 — EVALUATION DASHBOARD (~20 s, optional)
+
+**SAY:** One-panel backup: vignettes, ablation, cohort, coverage **47%**, extraction, POLST. Use if asked “give me all numbers.”
+
+**POINT AT:** `eval_dashboard.png`.
+
+**IF SHORT ON TIME:** Hide this slide.
+
+---
+
+## Slide 13 — COVERAGE & EXTRACTION (~35 s)
+
+**SAY:** **14/30 clauses (47%)** fully representable in our HF grammar. Six out of scope (nutrition, antibiotics…). Extraction **F1 0.97**, **zero** hallucinations on out-of-scope traps.
+
+**POINT AT:** `coverage_inventory.png`, `extraction_f1.png`.
+
+**TRANSITION:** *“Bedside mapping detail.”*
+
+---
+
+## Slide 14 — TRACK 3 (~35 s)
+
+**SAY:** **35/36 fields** against POLST semantics. Code status perfect on 12 profiles. **P5:** when activation condition unmet, ADO says POLST B “not specified” vs default full treatment — principled, not a bug.
+
+**POINT AT:** `track3_field_agreement.png`, `code_status_confusion.png`.
+
+**TRANSITION:** *“Magnus placed this in workflow.”*
+
+---
+
+## Slide 15 — Clinical integration (~40 s)
+
+**SAY:** ACP progress note, not signed AHCD. Directive → ADO → ACP pre-pop → conversation → POLST/code status.
+
+---
+
+## Slide 16 — Limits (~40 s)
+
+**SAY:** No legal force; who-decides axis missing; **cohort oracle ≠ clinical ground truth**; team gold on vignettes; no EHR trial. **Do not** claim multi-patient validation from 16/16 alone.
+
+---
+
+## Slide 17 — Takeaways (~25 s)
+
+**SAY:** Read bullets. Repo. Questions. Optional live demo: `python3 demo.py --scenario 1`.
 
 ---
 
@@ -198,12 +187,12 @@ Skip slide 10 if you demo live. Backup PNG: `ontology_class_hierarchy.png`.
 
 | Question | Answer |
 |----------|--------|
+| Why only ~47% on cohort? | Independent simplified oracle; 520 cells mostly “directive silent”; not hand-adjudicated. |
+| Why still show 16/16? | Spec test on one patient — proves reasoner matches design. |
 | Legal AD? | No — ACP documentation support. |
-| Why not ChatGPT end-to-end? | Non-deterministic; over-confident; no auditable “silent.” |
-| Weakest evidence? | Team gold; one principled POLST B divergence (P5). |
-| Precision &lt; 1? | One over-split of “no heroic measures” into two vague prefs. |
-| What’s next? | Who-decides axis; nutrition; time-limited trial; MIMIC/EHR. |
+| Weakest evidence? | Team gold; cohort needs blind clinician subset. |
+| What's next? | Adjudicate 50–100 cohort cells; surrogate axis; MIMIC. |
 
 ---
 
-*Embedded notes in `ADO_powerpoint_presentation.pptx` are synced via `scripts/update_presentation_notes.py`.*
+*Sync embedded notes: `python3 scripts/update_presentation_notes.py`*

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Insert evaluation figures into ADO_powerpoint_presentation.pptx."""
+"""Insert high-resolution evaluation figures into ADO_powerpoint_presentation.pptx."""
 
 from pathlib import Path
 
@@ -24,64 +24,100 @@ def slide_has_title(prs, needle: str) -> bool:
     return False
 
 
+def remove_slides_with_title(prs: Presentation, needle: str) -> int:
+    """Remove slides whose title/body contains needle (for idempotent rebuild)."""
+    removed = 0
+  # python-pptx cannot delete slides easily — we skip re-add if exists
+    return removed
+
+
 def enhance_slide_5(prs: Presentation) -> None:
     slide = prs.slides[4]
     insert_on_slide(slide, FIG / "ontology_class_hierarchy.png", Inches(6.9), Inches(1.15), Inches(5.9))
 
 
 def enhance_slide_8(prs: Presentation) -> None:
+    """Study design — strands diagram + vignette mix."""
     slide = prs.slides[7]
-    insert_on_slide(slide, FIG / "vignette_match_types.png", Inches(8.2), Inches(1.15), Inches(4.3))
+    insert_on_slide(slide, FIG / "study_design_strands.png", Inches(5.8), Inches(1.05), Inches(7.0))
+    insert_on_slide(slide, FIG / "vignette_match_types.png", Inches(0.35), Inches(3.85), Inches(4.8))
 
 
 def enhance_slide_9(prs: Presentation) -> None:
+    """Quantitative results — two-layer validation (primary)."""
     slide = prs.slides[8]
-    insert_on_slide(slide, FIG / "eval_overview.png", Inches(6.7), Inches(1.2), Inches(6.1))
-    insert_on_slide(slide, FIG / "ablation_conditions.png", Inches(6.7), Inches(3.95), Inches(6.1))
+    insert_on_slide(slide, FIG / "eval_two_layer.png", Inches(0.35), Inches(1.05), Inches(12.5))
 
 
 def enhance_slide_10(prs: Presentation) -> None:
     slide = prs.slides[9]
-    insert_on_slide(slide, FIG / "conditional_p9_p10.png", Inches(7.0), Inches(1.45), Inches(5.9))
+    insert_on_slide(slide, FIG / "conditional_p9_p10.png", Inches(6.8), Inches(1.35), Inches(6.0))
+    insert_on_slide(slide, FIG / "ablation_conditions.png", Inches(0.35), Inches(1.35), Inches(5.5))
 
 
-def add_strengthened_eval_slide(prs: Presentation) -> None:
-    """One slide: coverage + ablation + vignette splits + extraction (for tomorrow)."""
-    if slide_has_title(prs, "STRENGTHENED EVALUATION"):
+def add_cohort_stress_slide(prs: Presentation) -> None:
+    if slide_has_title(prs, "COHORT STRESS TEST"):
         return
     slide = prs.slides.add_slide(prs.slide_layouts[0])
-    tb = slide.shapes.add_textbox(Inches(0.4), Inches(0.25), Inches(12.5), Inches(0.55))
-    tb.text_frame.text = "STRENGTHENED EVALUATION — developmental validation (report / June 2026)"
-    p = tb.text_frame.paragraphs[0]
-    p.font.size = Pt(18)
-    p.font.bold = True
+    tb = slide.shapes.add_textbox(Inches(0.4), Inches(0.22), Inches(12.5), Inches(0.55))
+    tb.text_frame.text = "COHORT STRESS TEST — 20 messy profiles × 12 scenarios (520 cells)"
+    tb.text_frame.paragraphs[0].font.size = Pt(17)
+    tb.text_frame.paragraphs[0].font.bold = True
 
-    panels = [
-        (FIG / "vignette_splits.png", Inches(0.35), Inches(0.95), Inches(3.05)),
-        (FIG / "ablation_conditions.png", Inches(3.45), Inches(0.95), Inches(3.05)),
-        (FIG / "coverage_inventory.png", Inches(6.55), Inches(0.95), Inches(6.0)),
-        (FIG / "extraction_f1.png", Inches(0.35), Inches(4.05), Inches(3.05)),
-        (FIG / "track3_field_agreement.png", Inches(3.45), Inches(4.05), Inches(3.05)),
-        (FIG / "code_status_confusion.png", Inches(6.55), Inches(4.05), Inches(6.0)),
-    ]
-    for path, left, top, width in panels:
-        insert_on_slide(slide, path, left, top, width)
+    insert_on_slide(slide, FIG / "cohort_messy_breakdown.png", Inches(0.35), Inches(0.95), Inches(6.2))
+    insert_on_slide(slide, FIG / "cohort_baseline_comparison.png", Inches(6.65), Inches(0.95), Inches(6.2))
 
-    cap = slide.shapes.add_textbox(Inches(0.4), Inches(6.75), Inches(12.3), Inches(0.45))
+    cap = slide.shapes.add_textbox(Inches(0.4), Inches(6.55), Inches(12.3), Inches(0.55))
     cap.text_frame.text = (
-        "Developmental validation — not clinical trial. Team gold; single patient ontology. "
-        "Lead with ablation (69%) + coverage (47% fully representable), not only 100% vignettes."
+        "~47% agreement vs simplified reference oracle (not hand-adjudicated). "
+        "Flat checkbox over-asserts on 421/520 nuanced cells. "
+        "Honest population stress test — complements 16/16 vignette spec test."
     )
+    cap.text_frame.paragraphs[0].font.size = Pt(11)
+
+
+def add_eval_dashboard_slide(prs: Presentation) -> None:
+    """Single composite dashboard slide."""
+    title = "EVALUATION DASHBOARD"
+    if slide_has_title(prs, title):
+        return
+    slide = prs.slides.add_slide(prs.slide_layouts[0])
+    tb = slide.shapes.add_textbox(Inches(0.4), Inches(0.2), Inches(12.5), Inches(0.5))
+    tb.text_frame.text = f"{title} — developmental validation (June 2026)"
+    tb.text_frame.paragraphs[0].font.size = Pt(17)
+    tb.text_frame.paragraphs[0].font.bold = True
+    insert_on_slide(slide, FIG / "eval_dashboard.png", Inches(0.3), Inches(0.75), Inches(12.6))
+
+
+def add_coverage_extraction_slide(prs: Presentation) -> None:
+    if slide_has_title(prs, "COVERAGE & EXTRACTION"):
+        return
+    slide = prs.slides.add_slide(prs.slide_layouts[0])
+    tb = slide.shapes.add_textbox(Inches(0.4), Inches(0.22), Inches(12.5), Inches(0.5))
+    tb.text_frame.text = "COVERAGE & EXTRACTION — scope and closed-world discipline"
+    tb.text_frame.paragraphs[0].font.bold = True
+    tb.text_frame.paragraphs[0].font.size = Pt(17)
+
+    insert_on_slide(slide, FIG / "coverage_inventory.png", Inches(0.35), Inches(0.95), Inches(6.3))
+    insert_on_slide(slide, FIG / "extraction_f1.png", Inches(6.75), Inches(1.1), Inches(5.8))
+    insert_on_slide(slide, FIG / "vignette_splits.png", Inches(6.75), Inches(4.0), Inches(5.8))
 
 
 def add_track3_slide(prs: Presentation) -> None:
-    if slide_has_title(prs, "EVALUATION FIGURES — Track 3"):
+    if slide_has_title(prs, "TRACK 3 — CODE STATUS"):
         return
     slide = prs.slides.add_slide(prs.slide_layouts[0])
-    title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.35), Inches(12), Inches(0.6))
-    title_box.text_frame.text = "EVALUATION FIGURES — Track 3 & code-status fidelity"
-    insert_on_slide(slide, FIG / "track3_field_agreement.png", Inches(0.4), Inches(1.0), Inches(6.2))
-    insert_on_slide(slide, FIG / "code_status_confusion.png", Inches(6.8), Inches(1.0), Inches(6.2))
+    title_box = slide.shapes.add_textbox(Inches(0.4), Inches(0.22), Inches(12), Inches(0.5))
+    title_box.text_frame.text = "TRACK 3 — CODE STATUS & POLST MAPPING"
+    title_box.text_frame.paragraphs[0].font.bold = True
+    title_box.text_frame.paragraphs[0].font.size = Pt(17)
+    insert_on_slide(slide, FIG / "track3_field_agreement.png", Inches(0.35), Inches(0.95), Inches(6.1))
+    insert_on_slide(slide, FIG / "code_status_confusion.png", Inches(6.65), Inches(0.95), Inches(6.1))
+
+
+def deprecate_old_strengthened_slide(prs: Presentation) -> None:
+    """If old STRENGTHENED slide exists, leave it — presenter can hide. New slides supersede."""
+    pass
 
 
 def main():
@@ -92,11 +128,13 @@ def main():
     enhance_slide_8(prs)
     enhance_slide_9(prs)
     enhance_slide_10(prs)
-    add_strengthened_eval_slide(prs)
-    if not slide_has_title(prs, "EVALUATION FIGURES — Track 3"):
-        add_track3_slide(prs)
+    add_cohort_stress_slide(prs)
+    add_eval_dashboard_slide(prs)
+    add_coverage_extraction_slide(prs)
+    add_track3_slide(prs)
     prs.save(str(PPTX))
     print(f"Updated {PPTX} ({len(prs.slides)} slides)")
+    print("Recommended order: slides 1–10 core → COHORT STRESS → EVAL DASHBOARD → COVERAGE → TRACK 3 → integration/limits")
 
 
 if __name__ == "__main__":
