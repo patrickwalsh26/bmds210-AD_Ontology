@@ -128,6 +128,19 @@ export ANTHROPIC_API_KEY=...        # your Anthropic API key
 python demo.py --pause              # walk through the 6 demonstration scenarios
 ```
 
+### 6. Class presentation deck
+
+Open `ADO_powerpoint_presentation.pptx` (View → Notes for the narrative script). Regenerate figures and embedded charts:
+
+```bash
+./scripts/build_presentation_assets.sh
+```
+
+| Live segment | Guide |
+|--------------|-------|
+| Protégé / ontology | [`docs/Protege_Showcase_Guide.md`](docs/Protege_Showcase_Guide.md) |
+| Terminal reasoner | [`docs/Live_Demo_Guide.md`](docs/Live_Demo_Guide.md) |
+
 ---
 
 ## Viewing the Ontology in Protege
@@ -136,6 +149,8 @@ python demo.py --pause              # walk through the 6 demonstration scenarios
 2. Open `advanced_directives.owl` to view the base class hierarchy
 3. Open any file in `populated_ontologies/` to view a populated patient instance
 4. Use **Reasoner > HermiT** to run classification and consistency checking
+
+For a structured in-class walkthrough, see [`docs/Protege_Showcase_Guide.md`](docs/Protege_Showcase_Guide.md).
 
 ---
 
