@@ -128,16 +128,6 @@ export ANTHROPIC_API_KEY=...        # your Anthropic API key
 python demo.py --pause              # walk through the 6 demonstration scenarios
 ```
 
-### 6. Class presentation deck
-
-Open `ADO_powerpoint_presentation.pptx` (View → Notes for the narrative script). Regenerate figures and embedded charts:
-
-```bash
-./scripts/build_presentation_assets.sh
-```
-
-See `docs/Live_Demo_Guide.md` for a 2-minute live `demo.py` walkthrough during the talk.
-
 ---
 
 ## Viewing the Ontology in Protege
@@ -169,3 +159,6 @@ See `docs/Live_Demo_Guide.md` for a 2-minute live `demo.py` walkthrough during t
 | [Pipeline Design](docs/project_pipeline.md) | Full architecture, design decisions, and evaluation plan |
 | [Concept Inventory](docs/Advanced_Directive_Concept_Inventory.md) | 50 advance directive templates across 8 categories |
 | [Original Proposal](docs/BMDS210_proposal.docx) | Initial project proposal |
+| [Presentation Speaker Notes](docs/Presentation_Speaker_Notes.md) | Class deck narrative script |
+| [Protégé Showcase Guide](docs/Protege_Showcase_Guide.md) | Live ontology demo for presentation |
+| [Live Demo Guide](docs/Live_Demo_Guide.md) | Live `demo.py` demo for presentation |

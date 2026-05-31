@@ -1,13 +1,23 @@
 # ADO Live Demo Guide (Class Presentation)
 
-Use this when you have **2–4 extra minutes** after slide 7 (architecture) or slide 9 (results). The demo is more memorable than another bullet slide.
+Use this when you have **2–4 extra minutes** after slide 7 (architecture) or slide 9 (results).
+
+## Pick your showcase
+
+| Path | Guide | Time | Best after slide |
+|------|-------|------|------------------|
+| **Terminal reasoner** | This doc, paths A–C below | 2–5 min | 7 or 9 |
+| **Protégé / ontology** | [`Protege_Showcase_Guide.md`](Protege_Showcase_Guide.md) | 3–4 min | 5 or 7 |
+| **Combined** | Protégé preference individual → `demo.py --scenario 1` | ~5 min | 5 → 7 |
+
+---
 
 ## Prerequisites (do this before class)
 
 ```bash
 cd /path/to/bmds210-AD_Ontology
 pip install owlready2
-# Java JRE required for HermiT (owlready2)
+# Java JRE required for owlready2 and Protégé/HermiT
 
 python preference_input.py --example   # creates populated_ontologies/ado_jane_doe_001.owl
 ```
@@ -19,7 +29,11 @@ pip install anthropic pydantic
 export ANTHROPIC_API_KEY="your-key"
 ```
 
-## Recommended demo paths
+**Optional (Protégé):** Install from https://protege.stanford.edu/ and open `populated_ontologies/ado_jane_doe_001.owl`. See [`Protege_Showcase_Guide.md`](Protege_Showcase_Guide.md).
+
+---
+
+## Terminal demo paths
 
 ### A. Best for 2 minutes — one clear scenario
 
@@ -35,7 +49,6 @@ python demo.py --scenario 1
 
 ```bash
 python demo.py --pause --scenario 1
-# Enter between scenarios; then run 2 and 3 in separate terminals OR re-run with --scenario N
 python demo.py --pause --scenario 2   # partial — reversible cause
 python demo.py --pause --scenario 3   # no coverage — silent on ICD
 ```
@@ -55,33 +68,38 @@ python demo.py --pause --scenario 3   # no coverage — silent on ICD
 python demo.py --pause
 ```
 
-Reserve for office hours or appendix slides.
+---
+
+## Combined Protégé + terminal (~5 min)
+
+1. **Protégé (2 min):** Open `ado_jane_doe_001.owl` → `ConditionalPreference` → show `originalText` + `hasActivationCondition` on the no-CPR preference. ([script](Protege_Showcase_Guide.md))
+2. **Terminal (90 s):** `python demo.py --scenario 1` — *“Same patient, same preference—here’s the reasoner output clinicians would see.”*
+3. **One sentence:** *“Protégé holds the auditable model; Python runs scenario queries at scale.”*
+
+---
 
 ## Presentation-day checklist
 
 - [ ] Laptop has **Java** (`java -version`)
 - [ ] Terminal font size **18pt+** for audience
-- [ ] Run `python preference_input.py --example` once in the room (30 s)
-- [ ] Dry-run `python demo.py --scenario 1` 
-- [ ] **Backup:** show `docs/presentation_figures/conditional_p9_p10.png` if terminal fails
-- [ ] If no Wi‑Fi / no API key: **do not** run scenario 6
+- [ ] `python preference_input.py --example` run once
+- [ ] Dry-run `python demo.py --scenario 1`
+- [ ] **Protégé:** `ado_jane_doe_001.owl` opens; one preference individual bookmarked
+- [ ] **Backup:** `docs/presentation_figures/ontology_class_hierarchy.png` or evaluation charts
 
-## Suggested script (Scenario 1, ~90 seconds)
-
-1. *“Jane Doe encoded her AD in our ontology—nine preferences across five HF decision points.”*
-2. Run command. Point at **Patient said** quote.
-3. Point at **Scenario** line (arrest, NYHA IV, no reversible cause).
-4. Point at **Output: NO / CLEAR** and condition checklist.
-5. *“That’s the audit trail a progress note needs—not a black-box yes/no.”*
+---
 
 ## Tie-back to slides
 
 | Demo moment | Slide it supports |
 |-------------|-------------------|
-| Scenario 1 | Slide 6 (clear), Slide 10 (conditional CPR) |
-| Scenario 3 | Slide 6 (no coverage) |
-| Scenario 4 | Slide 6 (vague) |
-| Scenario 6 | Slide 7 (LLM at boundary only) |
+| Protégé class tree | 5 |
+| `originalText` in Protégé | 4 |
+| `demo.py` scenario 1 | 6, 10 |
+| Scenario 3 | 6 (no coverage) |
+| Scenario 6 | 7 (LLM at boundary only) |
+
+---
 
 ## Troubleshooting
 
@@ -91,13 +109,14 @@ Reserve for office hours or appendix slides.
 | Java error | Install JRE; restart terminal |
 | Ontology missing | `python preference_input.py --example` |
 | LLM scenario fails | Skip scenario 6; use scenarios 1–3 only |
+| Protégé issues | Use backup PNG; see Protege_Showcase_Guide.md |
 
-## Evaluation figures (no terminal)
+---
 
-If you skip the live demo, use slides with images from:
+## Evaluation figures (no live demo)
 
 ```bash
-python scripts/generate_presentation_figures.py
+./scripts/build_presentation_assets.sh
 ```
 
 Figures land in `docs/presentation_figures/`.

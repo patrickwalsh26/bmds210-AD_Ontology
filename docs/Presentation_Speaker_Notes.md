@@ -17,7 +17,15 @@
 
 **Handoff split (suggested):** Patrick — Acts I–II (slides 1–7); Darren — Act III–IV (slides 8–13). Swap freely; use the **TRANSITION** lines to pass the mic.
 
-**Live demo option:** If you have 2–3 extra minutes, skip deep-diving slide 10 and run `python demo.py --pause --scenario 1` after slide 7 or 9. See `docs/Live_Demo_Guide.md`.
+**Live showcase options (pick one if you have 2–4 extra minutes):**
+
+| Option | When | Doc |
+|--------|------|-----|
+| **Protégé** — class tree + Jane Doe `originalText` | After slide **5** or **7** | `docs/Protege_Showcase_Guide.md` |
+| **Terminal** — `demo.py --scenario 1` | After slide **7** or **9** | `docs/Live_Demo_Guide.md` |
+| **Combined** — Protégé preference → terminal reasoner | ~5 min total | Both guides |
+
+Skip slide 10 if you demo live. Backup PNG: `ontology_class_hierarchy.png`.
 
 **Figures slide:** After running `scripts/insert_presentation_figures.py`, a slide titled **EVALUATION FIGURES** is appended (often slide 14). **Drag it to position 10** (right after Quantitative evaluation) so the flow is: results → charts → conditional example.
 
@@ -72,6 +80,9 @@
 ---
 
 ## Slide 5 — Ontology scope (~35 s)
+**OPTIONAL LIVE — Protégé:** Open `populated_ontologies/ado_jane_doe_001.owl` → Entities → expand **Intervention** → Individuals → one **ConditionalPreference** with `originalText`. See `docs/Protege_Showcase_Guide.md`.
+
+
 
 **ROLE:** Credibility — this is real ontology engineering, not a prompt.
 

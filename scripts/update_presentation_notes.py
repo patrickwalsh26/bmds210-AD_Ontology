@@ -34,8 +34,9 @@ TRANSITION: "How much structure we built around that."
 
     """NARRATIVE: Act II — ontology credibility.
 SAY: 67 classes, 22 properties, 21 interventions—finer than our 50-form inventory. SNOMED where possible.
+OPTIONAL LIVE: Open Protégé → ado_jane_doe_001.owl → expand Intervention tree (see Protege_Showcase_Guide.md). POINT AT hierarchy figure on slide.
 TRANSITION: "Granularity only helps if we know when NOT to answer."
-[~35s]""",
+[~35s, +2 min if Protégé live]""",
 
     """NARRATIVE: Act II — safety thesis (four honest outputs).
 SAY: Clear / Partial / No coverage / Vague. Punchline: checkbox or LLM can't say "I don't know." ADO can.

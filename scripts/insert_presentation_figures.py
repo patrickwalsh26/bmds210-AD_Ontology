@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Insert evaluation figures into ADO_powerpoint_presentation.pptx."""
+"""Insert evaluation and ontology figures into ADO_powerpoint_presentation.pptx."""
 
 from pathlib import Path
 
@@ -16,20 +16,34 @@ def insert_on_slide(slide, img_path: Path, left, top, width):
         slide.shapes.add_picture(str(img_path), left, top, width=width)
 
 
-def enhance_slide_9(prs: Presentation) -> None:
-    slide = prs.slides[8]
-    insert_on_slide(slide, FIG / "eval_overview.png", Inches(6.8), Inches(1.35), Inches(6.0))
-    insert_on_slide(slide, FIG / "ablation_conditions.png", Inches(6.8), Inches(4.05), Inches(6.0))
+def count_pictures(slide) -> int:
+    return sum(1 for sh in slide.shapes if sh.shape_type == 13)
+
+
+def enhance_slide_5(prs: Presentation) -> None:
+    """Ontology scope — class hierarchy backup / complement to live Protégé."""
+    slide = prs.slides[4]
+    if count_pictures(slide) == 0:
+        insert_on_slide(slide, FIG / "ontology_class_hierarchy.png", Inches(6.9), Inches(1.15), Inches(5.9))
 
 
 def enhance_slide_8(prs: Presentation) -> None:
     slide = prs.slides[7]
-    insert_on_slide(slide, FIG / "vignette_match_types.png", Inches(8.5), Inches(1.2), Inches(4.5))
+    if count_pictures(slide) == 0:
+        insert_on_slide(slide, FIG / "vignette_match_types.png", Inches(8.5), Inches(1.2), Inches(4.5))
+
+
+def enhance_slide_9(prs: Presentation) -> None:
+    slide = prs.slides[8]
+    if count_pictures(slide) < 2:
+        insert_on_slide(slide, FIG / "eval_overview.png", Inches(6.8), Inches(1.35), Inches(6.0))
+        insert_on_slide(slide, FIG / "ablation_conditions.png", Inches(6.8), Inches(4.05), Inches(6.0))
 
 
 def enhance_slide_10(prs: Presentation) -> None:
     slide = prs.slides[9]
-    insert_on_slide(slide, FIG / "conditional_p9_p10.png", Inches(7.2), Inches(1.5), Inches(5.8))
+    if count_pictures(slide) == 0:
+        insert_on_slide(slide, FIG / "conditional_p9_p10.png", Inches(7.2), Inches(1.5), Inches(5.8))
 
 
 def has_figures_slide(prs: Presentation) -> bool:
@@ -61,6 +75,7 @@ def main():
     if not PPTX.exists():
         raise SystemExit(f"Missing {PPTX}")
     prs = Presentation(str(PPTX))
+    enhance_slide_5(prs)
     enhance_slide_8(prs)
     enhance_slide_9(prs)
     enhance_slide_10(prs)
