@@ -33,6 +33,10 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 ├── query_evaluation.py              # Scenario-based reasoner (16 clinical vignettes)
 ├── code_status.py                   # Aggregates preferences → hospital code status + POLST orders
 ├── track3_evaluation.py             # Code-status / POLST mapping evaluation (12 profiles)
+├── vignette_eval.py                 # Dev + held-out vignettes + condition-blind ablation
+├── coverage_analysis.py             # 30-clause inventory representability analysis
+├── evaluation_suite.py                # Run all tracks → docs/evaluation_results_summary.md
+├── eval_inter_annotator.py          # Dual-annotation κ for extraction gold
 ├── llm_extraction.py                # Closed-world free-text directive → structured JSON (Claude)
 ├── extraction_evaluation.py         # LLM extraction precision/recall on real directive text
 ├── demo.py                          # Six-scenario live demonstration
@@ -128,19 +132,6 @@ export ANTHROPIC_API_KEY=...        # your Anthropic API key
 python demo.py --pause              # walk through the 6 demonstration scenarios
 ```
 
-### 6. Class presentation deck
-
-Open `ADO_powerpoint_presentation.pptx` (View → Notes for the narrative script). Regenerate figures and embedded charts:
-
-```bash
-./scripts/build_presentation_assets.sh
-```
-
-| Live segment | Guide |
-|--------------|-------|
-| Protégé / ontology | [`docs/Protege_Showcase_Guide.md`](docs/Protege_Showcase_Guide.md) |
-| Terminal reasoner | [`docs/Live_Demo_Guide.md`](docs/Live_Demo_Guide.md) |
-
 ---
 
 ## Viewing the Ontology in Protege
@@ -149,8 +140,6 @@ Open `ADO_powerpoint_presentation.pptx` (View → Notes for the narrative script
 2. Open `advanced_directives.owl` to view the base class hierarchy
 3. Open any file in `populated_ontologies/` to view a populated patient instance
 4. Use **Reasoner > HermiT** to run classification and consistency checking
-
-For a structured in-class walkthrough, see [`docs/Protege_Showcase_Guide.md`](docs/Protege_Showcase_Guide.md).
 
 ---
 
@@ -174,6 +163,3 @@ For a structured in-class walkthrough, see [`docs/Protege_Showcase_Guide.md`](do
 | [Pipeline Design](docs/project_pipeline.md) | Full architecture, design decisions, and evaluation plan |
 | [Concept Inventory](docs/Advanced_Directive_Concept_Inventory.md) | 50 advance directive templates across 8 categories |
 | [Original Proposal](docs/BMDS210_proposal.docx) | Initial project proposal |
-| [Presentation Speaker Notes](docs/Presentation_Speaker_Notes.md) | Class deck narrative script |
-| [Protégé Showcase Guide](docs/Protege_Showcase_Guide.md) | Live ontology demo for presentation |
-| [Live Demo Guide](docs/Live_Demo_Guide.md) | Live `demo.py` demo for presentation |
