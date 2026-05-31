@@ -33,6 +33,10 @@ The ontology covers **five clinical decision points** commonly encountered in ad
 ├── query_evaluation.py              # Scenario-based reasoner (16 clinical vignettes)
 ├── code_status.py                   # Aggregates preferences → hospital code status + POLST orders
 ├── track3_evaluation.py             # Code-status / POLST mapping evaluation (12 profiles)
+├── vignette_eval.py                 # Dev + held-out vignettes + condition-blind ablation
+├── coverage_analysis.py             # 30-clause inventory representability analysis
+├── evaluation_suite.py                # Run all tracks → docs/evaluation_results_summary.md
+├── eval_inter_annotator.py          # Dual-annotation κ for extraction gold
 ├── llm_extraction.py                # Closed-world free-text directive → structured JSON (Claude)
 ├── extraction_evaluation.py         # LLM extraction precision/recall on real directive text
 ├── demo.py                          # Six-scenario live demonstration

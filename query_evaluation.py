@@ -441,9 +441,10 @@ def find_matching_preferences(onto, patient, query_intervention, scenario_state)
     return matches
 
 
-def evaluate_vignette(onto, patient, vignette):
+def evaluate_vignette(onto, patient, vignette, matcher=None):
     """Evaluate a single clinical vignette and return the result."""
-    matches = find_matching_preferences(
+    matcher = matcher or find_matching_preferences
+    matches = matcher(
         onto, patient,
         vignette["query_intervention"],
         vignette["scenario_state"],

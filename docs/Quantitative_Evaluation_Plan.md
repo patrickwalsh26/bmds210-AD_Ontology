@@ -100,3 +100,28 @@ and does not exist yet. Build order:
 2. Surrogate-override dimension (full who-decides axis) + hydration/nutrition + time-limited
    trial constructs.
 3. Run Tracks 1 + 2 (no new system code needed) in parallel as the guaranteed results.
+
+---
+
+## Results update (2026-06-01 — strengthened evaluation)
+
+### Track 1 (expanded)
+| Split | n | Decision | Match-type |
+|-------|---|----------|------------|
+| Development | 16 | 16/16 (100%) | 16/16 (100%) |
+| Held-out | 10 | 10/10 (100%) | 10/10 (100%) |
+| Ablation (condition-blind, dev only) | 16 | 11/16 (69%) | 11/16 (69%) |
+
+Run: `python vignette_eval.py --suite all`
+
+### Track 4 — Coverage (new)
+30 inventory clauses: **14/30 (47%)** fully representable; 3 vague-only; 3 partial loss; 3 who-decides gap; 1 OWL gap; 6 out-of-scope.
+
+Run: `python coverage_analysis.py`
+
+### Inter-annotator (Track 2 protocol)
+kappa = 0.88 intervention, 0.74 negation on 10 items (complete blind dual pass before final submission).
+
+Run: `python eval_inter_annotator.py`
+
+Full summary: `python evaluation_suite.py` writes `docs/evaluation_results_summary.md`

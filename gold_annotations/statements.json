@@ -1,0 +1,64 @@
+{
+  "statements": [
+    {
+      "id": "E1",
+      "source": "Living will (terminal-condition CPR clause)",
+      "text": "If I have a terminal condition, I do not want cardiopulmonary resuscitation."
+    },
+    {
+      "id": "E2",
+      "source": "Texas Out-of-Hospital DNR",
+      "text": "I direct that resuscitation not be initiated, including chest compressions, defibrillation, and artificial ventilation."
+    },
+    {
+      "id": "E3",
+      "source": "Living will (temporary vs indefinite ventilation)",
+      "text": "I would accept a breathing machine temporarily if my doctors expect me to recover, but I do not want to be kept on a ventilator indefinitely."
+    },
+    {
+      "id": "E4",
+      "source": "ICD/hospice deactivation clause",
+      "text": "If I enroll in hospice, I want my implantable defibrillator turned off."
+    },
+    {
+      "id": "E5",
+      "source": "Five Wishes-style comfort language (vague)",
+      "text": "I do not want any heroic measures or to be kept alive by machines if I am dying."
+    },
+    {
+      "id": "E6",
+      "source": "VA full-treatment language",
+      "text": "I want to receive all treatments necessary to keep me alive, including CPR and a breathing machine."
+    },
+    {
+      "id": "E7",
+      "source": "Living will (chronic dialysis clause)",
+      "text": "If my kidneys fail and recovery is not expected, I do not want long-term dialysis."
+    },
+    {
+      "id": "E8",
+      "source": "HF-specific escalation clause",
+      "text": "Do not escalate medications to support my blood pressure if I would need to be transferred to the intensive care unit."
+    },
+    {
+      "id": "E9",
+      "source": "OUT OF SCOPE \u2014 artificial nutrition/hydration",
+      "text": "I do not want artificial nutrition or hydration through tubes if I am permanently unconscious."
+    },
+    {
+      "id": "E10",
+      "source": "OUT OF SCOPE \u2014 antibiotics",
+      "text": "I do not wish to receive antibiotics if I am in the final stage of dying."
+    },
+    {
+      "id": "E11",
+      "source": "NIV-accept / intubation-refuse clause",
+      "text": "I am willing to try BiPAP, but I never want a tube down my throat."
+    },
+    {
+      "id": "E12",
+      "source": "HF conditional-CPR clause",
+      "text": "If my heart stops while I am in advanced heart failure with no reversible cause, do not attempt CPR."
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "annotator": "A (primary gold)",
+  "annotations": [
+    {
+      "id": "E1",
+      "intervention": "cpr",
+      "negated": true,
+      "type": "conditional"
+    },
+    {
+      "id": "E2",
+      "intervention": "cpr",
+      "negated": true,
+      "type": "clear"
+    },
+    {
+      "id": "E2",
+      "intervention": "defibrillation",
+      "negated": true,
+      "type": "clear"
+    },
+    {
+      "id": "E2",
+      "intervention": "mechanical_ventilation",
+      "negated": true,
+      "type": "clear"
+    },
+    {
+      "id": "E3",
+      "intervention": "temporary_ventilation",
+      "negated": false,
+      "type": "conditional"
+    },
+    {
+      "id": "E3",
+      "intervention": "indefinite_ventilation",
+      "negated": true,
+      "type": "clear"
+    },
+    {
+      "id": "E4",
+      "intervention": "icd_deactivation",
+      "negated": false,
+      "type": "conditional"
+    },
+    {
+      "id": "E5",
+      "intervention": "vague",
+      "negated": true,
+      "type": "vague"
+    },
+    {
+      "id": "E6",
+      "intervention": "cpr",
+      "negated": false,
+      "type": "clear"
+    },
+    {
+      "id": "E6",
+      "intervention": "intubation",
+      "negated": false,
+      "type": "clear"
+    },
+    {
+      "id": "E7",
+      "intervention": "chronic_dialysis",
+      "negated": true,
+      "type": "conditional"
+    },
+    {
+      "id": "E8",
+      "intervention": "vasopressor_escalation",
+      "negated": true,
+      "type": "conditional"
+    },
+    {
+      "id": "E11",
+      "intervention": "non_invasive_ventilation",
+      "negated": false,
+      "type": "clear"
+    },
+    {
+      "id": "E11",
+      "intervention": "intubation",
+      "negated": true,
+      "type": "clear"
+    },
+    {
+      "id": "E12",
+      "intervention": "cpr",
+      "negated": true,
+      "type": "conditional"
+    }
+  ]
+}
