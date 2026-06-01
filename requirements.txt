@@ -1,0 +1,13 @@
+# Core ontology pipeline
+owlready2>=0.46
+
+# Evaluation figure generation & PowerPoint tooling
+matplotlib>=3.8
+python-pptx>=0.6.23
+
+# Track 2 — LLM extraction (Claude)
+anthropic>=0.40
+pydantic>=2.0
+
+# Optional — Gemini ablation arms (ablation_evaluation.py, gemini_extraction.py)
+# google-generativeai>=0.8

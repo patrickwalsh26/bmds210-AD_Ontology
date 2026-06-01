@@ -31,3 +31,6 @@ env/
 
 # Overleaf upload bundles (regenerable from the .tex)
 docs/*_overleaf.zip
+
+# Local experiment outputs
+ado-local-backup/
