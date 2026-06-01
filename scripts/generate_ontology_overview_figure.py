@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 """Render a simplified ADO class hierarchy figure for presentations."""
 
+import sys
+from pathlib import Path as _Path
+_ADO_ROOT = _Path(__file__).resolve().parents[1]
+if str(_ADO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ADO_ROOT))
+
+import sys
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
 from pathlib import Path
 
 import matplotlib.pyplot as plt

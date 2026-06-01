@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""Embed cohesive narrative speaker notes in ADO_powerpoint_presentation.pptx."""
+"""Embed cohesive narrative speaker notes in docs/presentation/ADO_powerpoint_presentation.pptx."""
+
+import sys
+from pathlib import Path as _Path
+_ADO_ROOT = _Path(__file__).resolve().parents[1]
+if str(_ADO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ADO_ROOT))
+
+import sys
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 from pathlib import Path
 
@@ -7,7 +19,7 @@ from pptx import Presentation
 from pptx.util import Pt
 
 ROOT = Path(__file__).resolve().parents[1]
-PPTX = ROOT / "ADO_powerpoint_presentation.pptx"
+PPTX = ROOT / "docs/presentation/ADO_powerpoint_presentation.pptx"
 
 # Core slides 1–13 (0-indexed 0–12) + appended evaluation slides
 NOTES = [
