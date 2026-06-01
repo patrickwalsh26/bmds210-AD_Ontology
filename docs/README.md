@@ -1,81 +1,56 @@
 # Documentation index
 
-Navigation for the **Advance Directive Ontology (ADO)** repository. Start with the [root README](../README.md) for setup and commands.
+Start with the [repository README](../README.md) for install and commands.
 
 ---
 
-## Evaluation & results
+## Evaluation
 
-| Document | Description |
-|----------|-------------|
-| [Honest Evaluation Report](Honest_Evaluation_Report.md) | **Primary results narrative** — what we claim, cohort stress test, limitations |
-| [Quantitative Evaluation Plan](Quantitative_Evaluation_Plan.md) | Tracks 1–3 design, metrics, and recorded numbers |
-| [Evaluation Roadmap](Evaluation_Roadmap.md) | Completed vs. planned validation steps |
-| [evaluation_results_summary.md](evaluation_results_summary.md) | Auto-generated output of `python evaluation_suite.py` |
-| [cohort_simulation_results.json](cohort_simulation_results.json) | Machine-readable cohort simulation summary |
-
-**Figures:** [presentation_figures/](presentation_figures/) · Captions: [FIGURE_CAPTIONS.md](presentation_figures/FIGURE_CAPTIONS.md) · Slide map: [PPT_Figures_Guide.md](PPT_Figures_Guide.md)
+| File | Description |
+|------|-------------|
+| [Honest_Evaluation_Report.md](evaluation/Honest_Evaluation_Report.md) | Primary results narrative |
+| [Quantitative_Evaluation_Plan.md](evaluation/Quantitative_Evaluation_Plan.md) | Tracks 1–3 design & numbers |
+| [Evaluation_Roadmap.md](evaluation/Evaluation_Roadmap.md) | Completed & planned validation |
+| [evaluation_results_summary.md](evaluation/evaluation_results_summary.md) | Auto-generated (`evaluation/evaluation_suite.py`) |
+| [cohort_simulation_results.json](evaluation/cohort_simulation_results.json) | Cohort simulation metrics |
 
 ---
 
-## Presentations & demos
+## Presentation (June 2026)
 
-| Document | Description |
-|----------|-------------|
-| [Presentation Speaker Notes](Presentation_Speaker_Notes.md) | June 2026 talk script (~9 min) |
-| [Live Demo Guide](Live_Demo_Guide.md) | Terminal `demo.py` walkthrough |
-| [Protégé Showcase Guide](Protege_Showcase_Guide.md) | Ontology browser live demo |
+| File | Description |
+|------|-------------|
+| [ADO_powerpoint_presentation.pptx](presentation/ADO_powerpoint_presentation.pptx) | Slide deck |
+| [Presentation_Speaker_Notes.md](presentation/Presentation_Speaker_Notes.md) | Talk script |
+| [PPT_Figures_Guide.md](presentation/PPT_Figures_Guide.md) | Slide ↔ figure map |
+| [presentation_figures/](presentation/presentation_figures/) | 300 DPI PNGs + [FIGURE_CAPTIONS.md](presentation/presentation_figures/FIGURE_CAPTIONS.md) |
 
-Root deck: `ADO_powerpoint_presentation.pptx` (regenerate via `scripts/build_presentation_assets.sh`).
-
----
-
-## Architecture & design
-
-| Document | Description |
-|----------|-------------|
-| [project_pipeline.md](project_pipeline.md) | End-to-end pipeline, design decisions, evaluation history |
-| [Advanced Directive Concept Inventory](Advanced_Directive_Concept_Inventory.md) | 50 real-world template families (scope analysis) |
+Regenerate: `../scripts/build_presentation_assets.sh`
 
 ---
 
-## Reports (course / submission)
+## Guides
 
-| Document | Format |
-|----------|--------|
-| [Final_Report.tex](Final_Report.tex) | LaTeX — AMIA-style final report |
-| [Presentation.tex](Presentation.tex) | LaTeX Beamer |
-| [Progress_Report.tex](Progress_Report.tex) | Earlier progress report |
-| [Progress_Report.md](Progress_Report.md) | Markdown progress notes |
-
-Prebuilt PDFs: `Final_Report.pdf`, `Presentation.pdf` (if present in clone).
+| File | Description |
+|------|-------------|
+| [Live_Demo_Guide.md](guides/Live_Demo_Guide.md) | Terminal demo checklist |
+| [Protege_Showcase_Guide.md](guides/Protege_Showcase_Guide.md) | Ontology browser demo |
 
 ---
 
-## Expert review (Magnus)
+## Reports & reference
 
-| Document | Description |
-|----------|-------------|
-| [Magnus_Expert_Review_2026-05-27.md](Magnus_Expert_Review_2026-05-27.md) | Written expert feedback |
-| [Magnus_Meeting_Notes.md](Magnus_Meeting_Notes.md) | Meeting synthesis |
-| [Magnus_Review_Packet.tex](Magnus_Review_Packet.tex) | Short review packet |
-
----
-
-## Archive & reference materials
-
-| Location | Contents |
-|----------|----------|
-| [archive/](archive/) | Superseded drafts, templates, one-off build scripts |
-| [../reference_ads/](../reference_ads/) | Source advance directive PDFs |
-| [../gold_annotations/](../gold_annotations/) | Track 2 dual-annotation JSON templates |
+| File | Description |
+|------|-------------|
+| [Final_Report.tex](reports/Final_Report.tex) | AMIA-format final report |
+| [Presentation.tex](reports/Presentation.tex) | Beamer slides (LaTeX source) |
+| [Progress_Report.tex](reports/Progress_Report.tex) | Mid-quarter report |
+| [project_pipeline.md](reference/project_pipeline.md) | Pipeline architecture |
+| [Advanced_Directive_Concept_Inventory.md](reference/Advanced_Directive_Concept_Inventory.md) | 50-template inventory |
+| [Magnus_Expert_Review_2026-05-27.md](reference/Magnus_Expert_Review_2026-05-27.md) | Expert feedback |
 
 ---
 
-## Regenerating assets
+## Archive
 
-```bash
-python evaluation_suite.py
-python realistic_simulation.py --json docs/cohort_simulation_results.json
-./scripts/build_presentation_assets.sh
-```
+[archive/](archive/) — Superseded ontology draft, submission templates, experimental scripts.

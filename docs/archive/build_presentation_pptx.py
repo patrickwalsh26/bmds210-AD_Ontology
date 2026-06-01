@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build ADO_powerpoint_presentation.pptx from the slide outline in Presentation.tex."""
+"""Build docs/presentation/ADO_powerpoint_presentation.pptx from the slide outline in Presentation.tex."""
 
 from pathlib import Path
 
@@ -9,7 +9,7 @@ from pptx.enum.text import PP_ALIGN
 from pptx.util import Inches, Pt
 
 ADO_BLUE = RGBColor(30, 70, 120)
-OUTPUT = Path(__file__).resolve().parent / "ADO_powerpoint_presentation.pptx"
+OUTPUT = Path(__file__).resolve().parent / "docs/presentation/ADO_powerpoint_presentation.pptx"
 
 
 def add_bullets(text_frame, lines, level=0, bold_first=False):

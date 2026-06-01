@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""Insert publication-quality figures and captions into ADO_powerpoint_presentation.pptx."""
+"""Insert publication-quality figures and captions into docs/presentation/ADO_powerpoint_presentation.pptx."""
+
+import sys
+from pathlib import Path as _Path
+_ADO_ROOT = _Path(__file__).resolve().parents[1]
+if str(_ADO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ADO_ROOT))
+
+import sys
+from pathlib import Path
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import json
 import re
@@ -9,8 +21,8 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parents[1]
-PPTX = ROOT / "ADO_powerpoint_presentation.pptx"
-FIG = ROOT / "docs" / "presentation_figures"
+PPTX = ROOT / "docs/presentation/ADO_powerpoint_presentation.pptx"
+FIG = ROOT / "docs" / "presentation" / "presentation_figures"
 CAPTIONS_JSON = FIG / "figure_captions.json"
 
 
@@ -172,7 +184,7 @@ def main():
     add_track3_slide(prs)
     prs.save(str(PPTX))
     print(f"Updated {PPTX} ({len(prs.slides)} slides)")
-    print("Captions: docs/presentation_figures/FIGURE_CAPTIONS.md")
+    print("Captions: docs/presentation/presentation_figures/FIGURE_CAPTIONS.md")
 
 
 if __name__ == "__main__":

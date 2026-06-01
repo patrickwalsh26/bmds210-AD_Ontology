@@ -3,8 +3,8 @@
 Publication-quality figures for ADO presentation (Nature-style layout).
 
 Outputs:
-  - docs/presentation_figures/*.png  (300 DPI, PNG)
-  - docs/presentation_figures/FIGURE_CAPTIONS.md  (slide captions)
+  - docs/presentation/presentation_figures/*.png  (300 DPI, PNG)
+  - docs/presentation/presentation_figures/FIGURE_CAPTIONS.md  (slide captions)
 
 Regenerate:
   python3 scripts/generate_presentation_figures.py
@@ -13,7 +13,12 @@ Regenerate:
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -21,8 +26,8 @@ import matplotlib.patches as mpatches
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "docs" / "presentation_figures"
-COHORT_JSON = ROOT / "docs" / "cohort_simulation_results.json"
+OUT = ROOT / "docs" / "presentation" / "presentation_figures"
+COHORT_JSON = ROOT / "docs" / "evaluation" / "cohort_simulation_results.json"
 CAPTIONS_MD = OUT / "FIGURE_CAPTIONS.md"
 
 DPI = 300
@@ -609,7 +614,7 @@ def write_captions_md():
         "# Figure captions for ADO presentation",
         "",
         "Copy each caption below the corresponding figure on your slide, or into the speaker notes.",
-        "Figures are in `docs/presentation_figures/` at **300 DPI**.",
+        "Figures are in `docs/presentation/presentation_figures/` at **300 DPI**.",
         "",
         "---",
         "",
