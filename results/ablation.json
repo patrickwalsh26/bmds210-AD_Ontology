@@ -1,0 +1,143 @@
+{
+  "n": 16,
+  "ado_decision": 16,
+  "naive_decision": 12,
+  "ado_match": 16,
+  "naive_match": 12,
+  "naive_wrong": [
+    "V2",
+    "V6",
+    "V13",
+    "V14"
+  ],
+  "rows": [
+    {
+      "id": "V1",
+      "expected": "no",
+      "ado": "no",
+      "ado_ok": true,
+      "naive": "no",
+      "naive_ok": true
+    },
+    {
+      "id": "V2",
+      "expected": "partial",
+      "ado": "partial",
+      "ado_ok": true,
+      "naive": "no",
+      "naive_ok": false
+    },
+    {
+      "id": "V3",
+      "expected": "yes",
+      "ado": "yes",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": true
+    },
+    {
+      "id": "V4",
+      "expected": "no",
+      "ado": "no",
+      "ado_ok": true,
+      "naive": "no",
+      "naive_ok": true
+    },
+    {
+      "id": "V5",
+      "expected": "yes",
+      "ado": "yes",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": true
+    },
+    {
+      "id": "V6",
+      "expected": "partial",
+      "ado": "partial",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": false
+    },
+    {
+      "id": "V7",
+      "expected": "yes",
+      "ado": "yes",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": true
+    },
+    {
+      "id": "V8",
+      "expected": "no",
+      "ado": "no",
+      "ado_ok": true,
+      "naive": "no",
+      "naive_ok": true
+    },
+    {
+      "id": "V9",
+      "expected": "yes",
+      "ado": "yes",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": true
+    },
+    {
+      "id": "V10",
+      "expected": "yes",
+      "ado": "yes",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": true
+    },
+    {
+      "id": "V11",
+      "expected": "vague",
+      "ado": "vague",
+      "ado_ok": true,
+      "naive": "vague",
+      "naive_ok": true
+    },
+    {
+      "id": "V12",
+      "expected": "no_coverage",
+      "ado": "no_coverage",
+      "ado_ok": true,
+      "naive": "no_coverage",
+      "naive_ok": true
+    },
+    {
+      "id": "V13",
+      "expected": "partial",
+      "ado": "partial",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": false
+    },
+    {
+      "id": "V14",
+      "expected": "partial",
+      "ado": "partial",
+      "ado_ok": true,
+      "naive": "yes",
+      "naive_ok": false
+    },
+    {
+      "id": "V15",
+      "expected": "no",
+      "ado": "no",
+      "ado_ok": true,
+      "naive": "no",
+      "naive_ok": true
+    },
+    {
+      "id": "V16",
+      "expected": "no_coverage",
+      "ado": "no_coverage",
+      "ado_ok": true,
+      "naive": "no_coverage",
+      "naive_ok": true
+    }
+  ]
+}

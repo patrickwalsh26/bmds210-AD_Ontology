@@ -1,0 +1,393 @@
+%=============================================================================
+% AMIA Submission format — "Paper - Regular" (10-page maximum, body only;
+% Appendix has no page limit). Single column, Times 10pt, 1in margins,
+% superscript Vancouver-style references.
+%=============================================================================
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{mathptmx}            % Times New Roman
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage[superscript,nospace]{cite}   % superscript numeric citations
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!55!black,urlcolor=blue!55!black,citecolor=blue!55!black}
+
+% ---- AMIA-style section headings: bold, flush left, no numbers ----
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\bfseries}{}{0pt}{}
+\titleformat{\subsection}{\normalfont\bfseries\itshape}{}{0pt}{}
+\titlespacing*{\section}{0pt}{1.2ex plus .2ex}{0.4ex}
+\titlespacing*{\subsection}{0pt}{0.8ex plus .2ex}{0.2ex}
+\setcounter{secnumdepth}{0}     % unnumbered sections (AMIA style)
+
+\newcommand{\onto}[1]{\texttt{\small #1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.32ex}
+
+% Tighten whitespace around floats (figures/tables) to conserve space
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{0pt}
+
+\captionsetup{font=small,labelfont=bf,labelsep=period}
+
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,frame=single,
+        framesep=4pt,columns=fullflexible,keepspaces=true,
+        backgroundcolor=\color{gray!6}}
+
+\pagestyle{plain}
+
+\begin{document}
+
+%=============================================================================
+% TITLE BLOCK (centered)
+%=============================================================================
+\begin{center}
+{\large\bfseries The Advance Directive Ontology (ADO): A Computable Representation of\\
+End-of-Life Care Preferences in Advanced Heart Failure}\\[1em]
+{\bfseries Patrick Walsh, B.S.$^{1}$ \quad Darren Chan, B.S.$^{1}$}\\[0.4em]
+{$^{1}$Stanford University, Stanford, CA, USA}
+\end{center}
+% NOTE: confirm/adjust post-nominal degrees for each author before submission.
+
+\vspace{0.6em}
+
+%=============================================================================
+% ABSTRACT (italic, justified, 125-150 words for Paper - Regular)
+%=============================================================================
+\section{Abstract}
+\begin{itshape}
+End-of-life care preferences are recorded in instruments (advance health care directives, POLST forms, and code-status orders) that are low-resolution or disease-blind and support no automated reasoning over conditional, graded, negatable preferences. We present the Advance Directive Ontology (ADO), an OWL\,2 ontology (67 classes, 22 properties) scoped to five advanced heart failure decision points (CPR, ventilation, ICD/device management, vasopressor/inotrope escalation, dialysis) with 21 intervention subclasses. A reasoner matches a patient's encoded preferences against a clinical scenario and returns one of four outputs (clear, partial, no coverage, vague) while preserving original language. The reasoner scored 16/16 on a single-patient vignette suite and 35/36 (97\%) on code-status/POLST mapping; a condition-blind ablation dropped to 12/16 (75\%) and a pure-LLM baseline to 10--12/16, isolating the contribution of the structured layer. A closed-world LLM pipeline extracted preferences at F1\,0.97 with zero hallucinations on out-of-scope text. A multi-patient cohort stress test (50 profiles across seven encoding-quality levels, 25 scenarios, 3{,}550 decision cells) showed 41.4\% oracle agreement overall versus 17.4\% for flat checkboxes; the primary failure mode was false activation (34\%) rather than direction error (1.3\%). Because 83\% of reference answers were inherently uncertain, a system that declines to guess is calibrated to the problem rather than failing it. Expert review reframed ADO as a decision-support aid for advance-care-planning documentation, not a legal directive.
+\end{itshape}
+
+%=============================================================================
+\section{Introduction}
+%=============================================================================
+Patients record end-of-life (EOL) care preferences through several instruments at different layers of the care pathway: advance health care directives (AHCDs) capture durable values and wishes; Physician Orders for Life-Sustaining Treatment (POLST) translate them into portable medical orders; and clinician-entered code-status orders (full-code, do-not-resuscitate, do-not-intubate, do-not-escalate) are what is acted on at the bedside during an acute crisis. An estimated 67\% of intensive-care patients lack decision-making capacity at EOL,\cite{silveira2010} yet fewer than 37\% of US adults have any directive on file,\cite{yadav2017} and existing documents are rarely interoperable with electronic health record (EHR) systems.\cite{hl7adi2024}
+
+A common framing holds that the core problem is that directives are unstructured free text. This is only partly true: the better AHCDs, such as the California statutory form and the University of California directive, are largely structured checkbox instruments. The more fundamental problem is that these instruments are \textbf{low-resolution and disease-blind}. Checkbox forms collapse conditional, graded preferences (``I would accept a ventilator temporarily if there is a reversible cause, but never indefinitely'') into a few coarse options, and they omit almost entirely the device- and disease-specific decisions that dominate advanced heart failure (HF): implantable cardioverter-defibrillator (ICD) deactivation, left-ventricular-assist-device (LVAD) management, and inotrope escalation. Approximately 200,000 HF patients in the US have ICDs,\cite{kremers2023} yet most generic AD templates do not mention them.
+
+Heart failure is a revealing scope for this problem. Its trajectory is unpredictable, oscillating between stable and acute states so that ``terminal'' is hard to define; it is device-dependent in ways generic templates never anticipated; and patients cycle repeatedly through the emergency department and ICU, generating frequent, time-pressured preference-interpretation events.\cite{allen2012} To our knowledge, no published OWL ontology supports description-logic reasoning over conditional, negatable, graded EOL preferences. Adjacent work occupies neighboring layers: the HL7 PACIO Advance Directive Interoperability guide\cite{hl7adi2024} transports directive \emph{documents} as FHIR resources but does not reason over their content; POLST encodes \emph{orders} as binary checkboxes that lose conditionality; and the Stanford Letter Project\cite{periyakoil} preserves narrative voice but is not computable. ADO targets the missing \emph{inference} layer above these.
+
+%=============================================================================
+\section{Objectives}
+%=============================================================================
+We set out to (1) build a formal, computable ontology of EOL care preferences for advanced HF; (2) provide a pipeline that encodes patient preferences as ontology individuals; (3) implement a reasoner that matches encoded preferences to a clinical scenario and returns a clinically honest output that flags uncertainty rather than forcing an answer; (4) demonstrate that the same pipeline can ingest free-text directives via a large language model (LLM) constrained to closed-world extraction; and (5) subject the design to expert clinical-ethics review. We emphasize at the outset, a point reinforced by that review below, that ADO is a \textbf{decision-support and documentation aid} intended to help pre-populate an advance-care-planning (ACP) progress note. It is explicitly \emph{not} a legal advance directive: its output carries no statutory force and does not replace an AHCD, POLST, or code-status order.
+
+%=============================================================================
+\section{Methods}
+%=============================================================================
+
+\subsection{Advance directive concept inventory}
+To ground the ontology in real-world document diversity, we compiled and cataloged 50 advance directive templates across 8 categories (Table~\ref{tab:inventory}), drawing on state statutory forms, national repositories (CaringInfo,\cite{caringinfo} National POLST\cite{polst}), and specialized populations. Preliminary analysis confirmed our central hypothesis: the HF-specific decisions we target (ICD deactivation, inotrope/vasopressor escalation) are almost entirely absent from standard AD templates.
+
+\begin{table}[ht]
+\centering
+\caption{Advance directive concept inventory by category.}
+\label{tab:inventory}
+\small
+\begin{tabularx}{0.95\textwidth}{Xc>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Category} & \textbf{Count} & \textbf{Examples} \\
+\midrule
+State-specific ADs (US) & 10 & California AHCD, Texas Directive, NY Health Care Proxy \\
+POLST/MOLST forms & 6 & National POLST, CA POLST, NY MOLST \\
+Specialized populations & 4 & Five Wishes, Voicing My Choices, Dementia-specific \\
+Psychiatric/mental health & 7 & Bazelon Center PAD, SAMHSA guide \\
+Religious/faith-based & 9 & Catholic (NCBC), Halachic, Islamic (IMANA) \\
+Organizational & 4 & VA Form 10-0137, AAFP, Mayo Clinic \\
+DNR/DNAR forms & 5 & Texas OOH-DNR, CA Prehospital DNR \\
+International & 5 & UK ADRT (NHS), BC ``My Voice'' \\
+\midrule
+\textbf{Total} & \textbf{50} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Ontology design}
+The ADO contains 67 classes, 13 object properties, and 9 data properties, authored in Prot\'eg\'e\cite{protege} using OWL\,2\cite{owl2primer} for its formal description-logic semantics and reasoner compatibility. It is scoped to the five HF decision points where directives are most often consulted (CPR/resuscitation, mechanical ventilation, ICD/device management, vasopressor/inotrope escalation, and dialysis), with 21 specific intervention subclasses (Figure~\ref{fig:ontology}). Each preference is a \onto{PreferenceStatement} linking an \onto{Intervention} to an \onto{ActivationCondition} (NYHA functional class,\cite{nyha} clinical condition, reversible-cause flag, care context, and time bound), a \onto{PreferenceStrength} (Absolute / Strong / Conditional / Weak), an \onto{isNegated} boolean, and the patient's verbatim language via \onto{originalText}. Clinical concepts are grounded in SNOMED CT\cite{snomedct} for interoperability. Two design choices are central:
+
+\begin{itemize}[nosep,leftmargin=1.4em]
+\item \textbf{Vagueness as a first-class category.} A \onto{VaguePreference} subclass preserves irreducibly imprecise patient language (``no heroic measures'') via \onto{originalText} while assigning it to the nearest formal class, so the system acknowledges what it cannot fully represent rather than forcing false precision.
+\item \textbf{Negation under the open-world assumption.} Exclusionary preferences are encoded with the \onto{isNegated} flag and, where needed, \onto{complementOf} class expressions, a deliberate accommodation of OWL's open-world semantics.\cite{owl2primer}
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.76\linewidth]{figures/fig_ontology.png}
+\caption{The \onto{Intervention} class hierarchy, parsed directly from the OWL ontology: five HF decision points (blue) and their intervention subclasses, including the clinically meaningful temporary-vs-indefinite ventilation distinction.}
+\label{fig:ontology}
+\end{figure}
+
+\subsection{Preference-input and reasoning pipeline}
+A Python pipeline (\texttt{preference\_input.py}, built on owlready2\cite{owlready2}) instantiates OWL individuals from structured JSON, validating inputs against controlled vocabularies for all 21 interventions, clinical conditions, NYHA classes, care contexts, and document types. It supports interactive CLI entry, JSON-file batch input, and example generation. A scenario-based query engine (\texttt{query\_evaluation.py}) then takes a populated patient ontology plus a clinical scenario, matches each preference's activation conditions against the scenario state, and classifies the result into one of four outputs (Table~\ref{tab:outputs}). The 4-category output is the central design choice: it is meant to be clinically honest, flagging uncertainty rather than forcing an answer. Temporal conditions are handled by storing \onto{hasTimeBoundHours} as a numeric property so that, e.g., ``withdraw vasopressors if no improvement after 72\,h'' resolves by direct comparison once the elapsed time is known; care-context conditions are handled by a \onto{requiresCareContext} property so that a hospice-conditional preference does not fire in the ICU.
+
+\begin{table}[ht]
+\centering
+\caption{The reasoner's four-category output.}
+\label{tab:outputs}
+\small
+\begin{tabularx}{0.95\textwidth}{lX}
+\toprule
+\textbf{Output} & \textbf{Meaning} \\
+\midrule
+Clear match & Activation conditions met; preference unambiguous \\
+Partial match & Some conditions met, others unspecified or explicitly unmet; defer to surrogate \\
+No coverage & The directive does not address this scenario \\
+Vague match & Preference uses irreducibly imprecise terms; original language surfaced with nearest formal class \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Closed-world LLM extraction}
+To show that ADO can ingest real free-text directives, a pipeline (\texttt{llm\_extraction.py}) uses a large language model (Claude, \texttt{claude-opus-4-7}) with a Pydantic-typed schema to convert a verbatim directive paragraph into the same JSON the structured pipeline already accepts. The system prompt enforces \textbf{closed-world extraction}: the model encodes \emph{only} what the patient explicitly stated and never extrapolates, because the reasoner's ``no coverage'' behavior depends on that discipline. The ontology, not the LLM, remains the auditable source of truth; the LLM is glue at the boundary, not the reasoning core.
+
+\subsection{Code-status and POLST derivation}
+Motivated by expert review (below), which noted that the bedside is governed by code-status orders and POLST rather than the directive, we built a layer (\texttt{code\_status.py}) that aggregates intervention-level preferences into a \textbf{hospital code status} (Full code / DNR / DNI / DNR+DNI, with an optional ``Do Not Escalate'' qualifier), a \textbf{POLST Section A} order (Attempt CPR / DNAR), and a \textbf{POLST Section B} treatment level (Full / Selective / Comfort-Focused). Code status and Section A are scenario-grounded, so a conditional refusal yields DNR only when its conditions are met, and the system flags that conditionality, which a flat checkbox cannot express. Section B reflects standing willingness read from the preference set.
+
+\subsection{Evaluation design}
+We evaluated the system across six complementary tracks. \textbf{Track 1 (vignettes):} 16 clinical vignettes spanning all five decision points and all four preference types (clear, conditional, negated, vague), with 10 additional held-out vignettes evaluated blind, scored against hand-authored gold labels. \textbf{Track 2 (extraction):} LLM extraction over 12 real directive template statements, including two deliberately out-of-scope statements (artificial nutrition/hydration; antibiotics) to test closed-world discipline. \textbf{Track 3 (code-status/POLST mapping):} 12 preference profiles derived from real inventory templates, scored against a gold standard adjudicated from POLST's published definitional semantics and deliberately independent of ADO's own logic. \textbf{Track 4 (structuring):} six messy narrative passages mixing vague wishes, hedged conditions, internal contradictions, surrogate delegation, and out-of-scope content, testing whether the pipeline produces auditable structure without fabricating missing information. \textbf{Track 5 (multi-patient cohort):} 50 patient profiles spanning seven encoding-quality levels (clean, typical, minimal, incomplete encoding, contradictory, outdated, and culturally complex), evaluated against 25 clinical scenarios covering canonical cases, boundary conditions, multi-condition overlaps, and scenarios intentionally outside directive scope, yielding 3{,}550 scored decision cells. Reference decisions came from a simplified oracle that applies preference-matching rules without ontology access, keeping the gold standard independent of the system under test; flat-checkbox and condition-blind baselines were scored in parallel. \textbf{Track 6 (architecture ablation):} two ablations isolate the value added by each layer. A \emph{condition-blind} variant fires any matching preference while ignoring all activation conditions but retains the ontology structure. A \emph{pure-LLM} variant removes the ontology and reasoner entirely, passing the raw directive text and clinical question directly to an LLM (Gemini); we test it under a minimal prompt (directive text plus question only) and a full-context prompt aligned to the reasoner's four-category semantics. We additionally subjected the design to expert review by Dr.\ David Magnus, Director of the Stanford Center for Biomedical Ethics, via a written packet and a structured meeting.
+
+%=============================================================================
+\section{Results}
+%=============================================================================
+
+\subsection{Scenario-based reasoning}
+An example patient with 9 preference statements across all five decision points instantiated end-to-end without errors, producing a populated ontology of 50 individuals.
+
+The reasoner achieved \textbf{16/16 (100\%) decision accuracy and 16/16 (100\%) match-type accuracy} across the vignette suite (Table~\ref{tab:vignettes}), correctly handling all four output categories, temporal thresholds in both the ``fires'' and ``does-not-fire-yet'' directions (V10/V13), care-context gating (V5/V6), etiology-specific conditions (V14), and intervention granularity that prevents over-inference (V16). Two earlier failure modes documented in our progress report, a missing care-context property and a string-typed time bound, were resolved by the \onto{requiresCareContext} and numeric \onto{hasTimeBoundHours} additions.
+
+\textbf{Ablation 1: condition-blind reasoning.} To isolate what the conditional layer contributes, we re-ran the suite with a condition-blind reasoner that fires any matching preference while ignoring activation conditions but keeps the ontology structure intact. Its decision accuracy fell to \textbf{12/16 (75\%)}, failing the four conditional cases (V2, V6, V13, V14) (Figure~\ref{fig:ablation}). These failures are \emph{false-confident}: the reasoner returns a definitive ``yes/no'' where the directive only conditionally applies, for example recommending ICD deactivation for an ICU patient whose preference was hospice-only. The activation-condition logic is what converts that dangerous over-reading into an honest ``partial / defer to surrogate.'' The 10 held-out vignettes, not used during system development, also achieved 10/10 (100\%) decision accuracy, confirming that the full vignette performance is not an artifact of development-set overfitting.
+
+\textbf{Ablation 2: removing the ontology entirely.} We additionally tested whether the ontology and reasoner add value beyond asking an LLM to read a directive and answer clinical questions directly, bypassing extraction and reasoning altogether. We investigated two settings: (1) a \emph{minimal} setting giving the model only the verbatim directive text and the clinical question, approximating a clinician pasting the directive into a chatbot; and (2) a \emph{full-context} setting whose prompt is explicitly aligned to the reasoner's four-category semantics and decision rules. Decision accuracy was \textbf{10/16 (62\%)} in the minimal setting and \textbf{12/16 (75\%)} in the full-context setting (Figure~\ref{fig:ablation}). The failure pattern is the diagnostic result: the minimal setting failed on every vignette with a ground-truth ``partial'' label, since it cannot represent conditional, non-binary outcomes; the full-context prompt recovered most of those but regressed on ``vague'' cases, forcing structure where the patient's language was irreducibly imprecise. Neither LLM-only arm reached the full system's 16/16. The ontology and reasoner therefore add value precisely on the complex, non-binary cases (conditional and vague preferences) that a free-text LLM either collapses into a confident yes/no or cannot honestly flag.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.62\linewidth]{figures/fig_ablation_all.png}
+\caption{Architecture ablation on the 16-vignette suite. The full ADO pipeline (ontology + conditional reasoner) scores 16/16. Removing condition-checking but keeping the ontology drops to 12/16, with false-confident answers on conditionals. Removing the ontology entirely (a pure-LLM flow) scores 12/16 with an explicit reasoner-aligned prompt and only 10/16 with a minimal prompt, failing on the non-binary (partial, vague) cases the structured layer is designed to handle.}
+\label{fig:ablation}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Clinical vignette evaluation. Match types: clear (9), partial (4), no coverage (2), vague (1).}
+\label{tab:vignettes}
+\scriptsize
+\renewcommand{\arraystretch}{0.88}
+\begin{tabularx}{\textwidth}{c L{4.6cm} L{2.4cm} L{1.8cm} L{1.8cm} c}
+\toprule
+\textbf{ID} & \textbf{Clinical scenario} & \textbf{Intervention} & \textbf{Expected} & \textbf{System} & \textbf{Result} \\
+\midrule
+V1 & Cardiac arrest, NYHA IV, no reversible cause & CPR & No (clear) & No (clear) & PASS \\
+V2 & Cardiac arrest, NYHA III, reversible cause & CPR & Partial & Partial & PASS \\
+V3 & Resp.\ failure, reversible cause & Temp.\ ventilation & Yes (clear) & Yes (clear) & PASS \\
+V4 & Ventilator 10d, no improvement & Indef.\ ventilation & No (clear) & No (clear) & PASS \\
+V5 & Enrolled in hospice & ICD deactivation & Yes (clear) & Yes (clear) & PASS \\
+V6 & In ICU, not hospice & ICD deactivation & Partial & Partial & PASS \\
+V7 & Cardiorenal syndrome, recovery expected & Acute dialysis & Yes (clear) & Yes (clear) & PASS \\
+V8 & Kidney failure, no recovery & Chronic dialysis & No (clear) & No (clear) & PASS \\
+V9 & Cardiogenic shock & Inotrope escalation & Yes (clear) & Yes (clear) & PASS \\
+V10 & Cardiogenic shock, vasopressors 96\,h & Vasopressor w/d & Yes (clear) & Yes (clear) & PASS \\
+V11 & Respiratory failure & NIV (BiPAP) & Vague & Vague & PASS \\
+V12 & Stable, NYHA II & Pacemaker deactivation & No coverage & No coverage & PASS \\
+V13 & Cardiogenic shock, vasopressors 48\,h & Vasopressor w/d & Partial & Partial & PASS \\
+V14 & Sepsis-AKI (not cardiorenal), recovery expected & Acute dialysis & Partial & Partial & PASS \\
+V15 & Stable, outpatient dialysis consult & Chronic dialysis & No (clear) & No (clear) & PASS \\
+V16 & VT, ICD about to shock & ICD shock therapy & No coverage & No coverage & PASS \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Free-text to decision via the LLM pipeline}
+We gave the LLM a verbatim directive paragraph; it extracted 8 structured preferences with original language preserved, which we piped into a fresh ontology and queried for CPR in a NYHA-IV cardiac arrest. The reasoner returned \emph{no / clear} with all four activation conditions matching. The first run instead returned \emph{vague}, because the model had faithfully captured a second, vague CPR-relevant preference (``no heroic measures if I am dying'') whose ``if I am dying'' qualifier became an explicit, unmet \onto{TerminalCondition}, and we had not yet written a precedence rule for a clear specific preference versus a vague preference with explicit but unmet conditions. We named and codified that rule (a vague preference whose own activation conditions are explicitly unmet does not fire) and re-ran. This is the auditability argument made concrete: the structured layer forced an implicit assumption to become an explicit, documented rule, something a pure-LLM system would have hidden behind confident prose.
+
+\subsection{Extraction accuracy and closed-world discipline}
+Over the 12 real-template statements (15 in-scope gold preferences), the extractor achieved \textbf{precision 0.94, recall 1.00, F1 0.97}, with negation, preference type (clear/conditional/vague), and conditionality each correct on \textbf{15/15} matched preferences. Most important for the architecture's premise, it committed \textbf{zero over-extractions on the two out-of-scope statements}: given text about artificial nutrition/hydration and antibiotics, both interventions outside our vocabulary, it extracted nothing rather than inventing a mapping into the nearest covered class. This is precisely the discipline the reasoner's ``no coverage'' output depends on. The single false positive (the only departure from perfect precision) was a defensible over-split: the vague ``no heroic measures or to be kept alive by machines if I am dying'' was mapped to two vague interventions (CPR and mechanical ventilation) where the gold expected one.
+
+\subsection{Structuring messy, real-world directives}
+The cleanest test of whether the layer adds value is on input that looks like a real directive rather than a tidy test case. We ran six narrative passages through the extraction pipeline: verbose prose mixing life story, vague wishes (``let me go peacefully''), hedged conditions, internal contradictions (``I'm a fighter\,\dots\ but I don't want to be kept going just to exist''), surrogate delegation, and substantial out-of-scope content. From these, the layer produced \textbf{17 structured preferences} (5 clear, 8 conditional, 4 vague), recovering \textbf{14/16 (88\%)} of the in-scope interventions while capturing the embedded conditions (reversible cause, hospice context, time bounds). Critically, the \textbf{11 out-of-scope topics} present in the prose (faith, feeding tubes, organ donation, pet care, agent designation) produced \textbf{zero spurious orders} (Figure~\ref{fig:messy}). The model's own notes surfaced the surrogate delegation in all three passages that contained it and flagged the genuinely ambivalent passage as irreducibly vague rather than forcing structure onto it. The two missed interventions are honest: the model encoded ``shock my heart'' as defibrillation rather than inferring CPR, and read ``don't keep me on the ventilator'' as a withdrawal rather than a refusal of indefinite ventilation. The structured layer turns messy narrative into auditable structure and marks, rather than fabricates, what it cannot represent.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.76\linewidth]{figures/fig_messy_funnel.png}
+\caption{From messy narrative prose to auditable structure: six realistic passages yield 17 typed preferences, with out-of-scope content cleanly excluded and surrogate delegation surfaced.}
+\label{fig:messy}
+\end{figure}
+
+\subsection{Code-status / POLST mapping (the bedside test)}
+Across the 12 directive profiles, ADO's derived code status and POLST orders agreed with the POLST-semantics gold standard on \textbf{35/36 fields (97\%)}, with \textbf{11/12} profiles matching on all three fields (Table~\ref{tab:track3}). The hospital code-status confusion matrix was fully diagonal across all six observed categories (Full code, DNR, DNI, DNR/DNI, Do Not Escalate, DNR/DNI+Do Not Escalate) (Figure~\ref{fig:track3conf}); chance-corrected agreement with the gold standard was Cohen's $\kappa=1.00$ for code status and POLST Section~A, and $\kappa=0.88$ for Section~B. Two results matter beyond the pass rate. First, four profiles produced a code status ADO marks as \emph{conditional}: profiles P9 and P10 encode the same directive (``no CPR if NYHA IV with no reversible cause'') and correctly flip between DNR and Full code as the scenario meets or fails that condition, exactly the conditionality a flat POLST checkbox discards. Second, the single divergence (P5) is principled rather than erroneous: when a directive's activation condition (permanent unconsciousness) is not met, ADO returns POLST Section~B = \emph{Not specified} instead of presuming \emph{Full Treatment} as the POLST default does, an honest refusal to presume a treatment level the directive never addressed.
+
+\begin{table}[ht]
+\centering
+\caption{Code-status / POLST mapping fidelity across 12 directive profiles (gold standard from POLST semantics).}
+\label{tab:track3}
+\small
+\begin{tabularx}{0.95\textwidth}{Xc}
+\toprule
+\textbf{Metric} & \textbf{Agreement} \\
+\midrule
+Hospital code status & 12/12 (100\%) \\
+POLST Section A (resuscitation) & 12/12 (100\%) \\
+POLST Section B (treatment level) & 11/12 (92\%) \\
+Exact-profile match (all three fields) & 11/12 (92\%) \\
+\textbf{Overall field agreement} & \textbf{35/36 (97\%)} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\linewidth]{figures/fig_track3_confusion.png}
+\caption{Hospital code-status confusion matrix (gold = POLST semantics): fully diagonal across all six observed categories.}
+\label{fig:track3conf}
+\end{figure}
+
+\subsection{Multi-patient cohort stress test}
+The single-patient vignette suite establishes specification correctness but tests one carefully encoded patient. To probe generalization, we ran a multi-patient cohort simulation: 50 independently constructed patient profiles, each with a distinct directive encoding, evaluated against 25 clinical scenarios spanning canonical cases, boundary conditions (NYHA class thresholds, exact time-bound values), multi-condition overlaps, and scenarios explicitly outside the directive's scope (pacemaker deactivation, LVAD malfunction, comfort-floor admission). This produced 3{,}550 scored decision cells.
+
+\textbf{Overall accuracy.} ADO agreed with the reference oracle on \textbf{1{,}471/3{,}550 cells (41.4\%)}, versus 38.3\% for a condition-blind variant and 17.4\% for a flat-checkbox baseline that treats any directive presence as a firm yes/no. The raw gap understates the practical difference: checkboxes asserted a definitive decision on 2{,}929 cells where the oracle's answer was inherently uncertain (partial, no coverage, or vague), the cells where the correct clinical response is \emph{not} to commit. ADO's honest non-answers on those cells are not failures; they are the intended output.
+
+\textbf{Oracle uncertainty.} Of the 3{,}550 reference answers, \textbf{2{,}929 (83\%)} were inherently uncertain (partial, no coverage, or vague); only 11\% were clear ``yes'' and 6.5\% clear ``no.'' This reframes the accuracy denominator: a system that aggressively commits to yes/no is wrong by construction on 83\% of cells. ADO's behavior of returning partial or no-coverage when conditions are incompletely met is not a limitation but a calibration to the actual distribution of directive uncertainty.
+
+\textbf{Encoding-quality stratification.} Performance stratified across all seven encoding levels as expected (Figure~\ref{fig:cohort}): clean profiles scored 48.3\%, dropping to 36.2\% for minimal, 38.7\% for contradictory, and 29.9\% for culturally complex patients. Two patterns are clinically informative. First, outdated directives (44.4\%) outperformed contradictory ones (38.7\%): temporal information, even when stale, gives the reasoner a tractable basis for inference, while internally conflicting preferences neutralize its conditional logic. Second, culturally complex patients showed zero ADO advantage over the condition-blind baseline (both 29.9\%), because cultural and family-deference preferences require representational dimensions not yet in the ontology, a gap flagged by Dr.\ Magnus's dimensionality critique. The flat checkbox collapsed most severely on incomplete-encoding and culturally complex patients (6.7\% and 8.8\%), confirming that structured encoding adds value even when imperfect.
+
+\textbf{Scenario-type difficulty.} Mean accuracy varied by scenario category: canonical cases 61\%, multi-condition overlaps 53\%, boundary conditions 43\%, stress tests 38\%, and out-of-scope scenarios 24\%. The low out-of-scope figure is both expected, since the ontology was never designed to handle pacemaker deactivation or LVAD malfunction in isolation, and correct: returning no-coverage outside the directive's scope is preferable to fabricating an answer.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.80\linewidth]{figures/fig_cohort_messiness.png}
+\caption{Cohort stress-test performance stratified by encoding quality (50 patients, 25 scenarios, 3{,}550 cells). Left: ADO, condition-blind, and flat-checkbox accuracy by encoding level; $n$ per level shown below. Right: scatter of ADO vs.\ condition-blind per level; points above the diagonal show encoding-quality levels where the conditional logic adds value.}
+\label{fig:cohort}
+\end{figure}
+
+\subsection{Failure mode analysis}
+To understand \emph{how} ADO fails, we classified each of the 2{,}079 failure cells into five categories: (1) \textbf{false activation}, where ADO returns a definitive decision (yes/no/partial) but the oracle says the directive does not address the scenario (no coverage); (2) \textbf{coverage gap}, where ADO returns no coverage but the oracle expects a decision; (3) \textbf{boundary confusion}, where direction is correct but the confidence level (clear vs.\ partial) disagrees; (4) \textbf{direction error}, where ADO says yes when the oracle says no, or vice versa; and (5) \textbf{correct}.
+
+Results (Figure~\ref{fig:failure}): 1{,}471 cells correct (41.4\%), 1{,}194 false activations (33.6\%), 452 coverage gaps (12.7\%), 387 boundary confusions (10.9\%), and 46 direction errors (1.3\%). The dominant failure mode is \textbf{false activation}: ADO over-asserts coverage 2.6 times more often than it stays silent when coverage exists. These failures concentrate on the late scenarios (S20--S25, the out-of-scope and stress cases) across all encoding levels, indicating a structural rather than encoding-specific cause: preferences with broadly stated activation conditions fire on clinical scenarios the directive never contemplated. Direction errors, the most clinically dangerous failure, account for only 1.3\% of all cells.
+
+ADO's safety profile is therefore asymmetrically favorable: it rarely inverts the patient's stated intention, but it can over-confidently assert coverage where the directive is genuinely silent. The design fix is tighter preference scoping: more specific activation conditions and explicit no-inference guards for scenarios outside the five in-scope decision points.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.80\linewidth]{figures/fig_failure_taxonomy.png}
+\caption{Failure mode taxonomy across all 3{,}550 cells. Left: absolute counts and percentages by failure category. Right: failure mode composition stratified by encoding-quality level; false activations (red) dominate across all levels, while direction errors (orange) remain rare throughout.}
+\label{fig:failure}
+\end{figure}
+
+\subsection{Decision-point coverage}
+For the five in-scope decision points the ontology provides 21 intervention classes, more granular than any single template in the inventory (standard ADs offer a binary on ``mechanical ventilation,'' whereas ADO distinguishes six ventilation-related interventions). Table~\ref{tab:coverage} summarizes coverage and the gaps surfaced by expert review.
+
+\begin{table}[ht]
+\centering
+\caption{Ontology coverage of common decision points.}
+\label{tab:coverage}
+\small
+\begin{tabularx}{0.95\textwidth}{L{3.4cm} L{2.6cm} X}
+\toprule
+\textbf{Decision point} & \textbf{Coverage} & \textbf{Notes} \\
+\midrule
+CPR / resuscitation & Full (3 subclasses) & CPR, defibrillation, transcutaneous pacing \\
+Mechanical ventilation & Full (6 subclasses) & Temporary vs.\ indefinite, invasive vs.\ non-invasive, withdrawal \\
+ICD / device mgmt & Full (5 subclasses) & ICD deactivation, shock therapy, LVAD, pacemaker \\
+Vasopressor / inotrope & Full (4 subclasses) & Escalation and withdrawal for both \\
+Dialysis & Full (3 subclasses) & Acute, chronic, withdrawal \\
+\midrule
+Artificial hydration/nutrition & Not yet covered & Flagged by expert review as a priority gap; addressed by POLST \\
+Antibiotics, comfort care & Not covered & Future work \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Expert review}
+Dr.\ Magnus materially reframed the project. His central point was that the system's output ``can't [be thought of] as AHCDs from a legal perspective. The patient has not signed anything and it likely does not meet the regulatory requirements. This is more like a progress note.'' He challenged the free-text framing directly, noting that ``many (most?) AHCD directives\,\dots\ have more or less designed them as check boxes\,\dots\ it isn't largely a problem of free text,'' which sharpened our motivation toward the resolution-and-coverage argument above. His deepest critique was dimensional: ``one problem with this system is that it is one dimensional. But patient preferences are often two or more dimensional. E.g., I don't want to be intubated, but I want my family to be comfortable\,\dots\ so do what they say.'' Under the law a capacitous patient's preferences govern, but he noted that studies show most patients prefer that families be allowed to override. He flagged two concrete omissions, artificial hydration/nutrition and the POLST concept of a \emph{time-limited trial}, and was reassuring on liability (``liability exists no matter what you do\,\dots\ suits are rare anyway''). He did not dispute the value of the reasoning engine; he relocated where it sits in the workflow.
+
+Given the perspective that the ADO cannot legally be considered an advance directive, Dr.\ Magnus gave valuable insight into how it might instead support an advance-care-planning (ACP) note. An ACP note in Epic documents a patient's preferences regarding future medical care, living wills, and health care proxies; it is typically completed following a provider conversation with a patient about their understanding of their condition, their values, their surrogates, and their specific wishes. In this framing, structured information from an ADO is valuable as \emph{pre-populated fields} in the ACP note, which can streamline completion and help ensure patient wishes are recorded even if a given topic is not explicitly discussed during the encounter. This naturally respects the prioritization of documented wishes: although preferences recorded in an advance directive may later be clarified or superseded through an ACP conversation, the ADO can preserve the advance directive as the best available representation of the patient's wishes for any decision not revisited during the encounter.
+
+%=============================================================================
+\section{Discussion}
+%=============================================================================
+The evaluation supports our central claim: a description-logic ontology can represent conditional, graded, negatable EOL preferences and reason over them to produce a clinically honest output, including the honest non-answers (\emph{no coverage}, \emph{vague}) that a binary checkbox or a confident LLM cannot. The architecture we advocate is not ontology \emph{versus} LLM but ontology \emph{with} LLMs at the boundaries: the LLM extracts, the ontology is the auditable closed-world source of truth, and the reasoner produces the defensible four-category output. A pure LLM is non-deterministic and prone to false confidence, whereas an auditable reasoner can honestly report when a directive is silent.
+
+The cohort stress test sharpens this argument. The 41.4\% oracle agreement appears low only until the oracle's distribution is considered: 83\% of reference answers are inherently uncertain, so any system committing to a binary yes/no is wrong by construction on most cells, as the checkbox's 17.4\% confirms. ADO instead preserves uncertainty, calibrating it to the real distribution of directive coverage; its stratification across encoding levels (48\% clean, 30\% culturally complex) shows a sensitivity to documentation quality that a checkbox cannot express.
+
+The failure analysis surfaces a concrete safety priority. The dominant failure is false activation (34\% of cells), where ADO asserts coverage the directive never provided, not direction inversion (1.3\%): when the system fails, it does so by being inappropriately certain rather than by reversing the patient's intention. The fix (tighter preference scoping and explicit no-inference guards for out-of-scope scenarios) is architecturally tractable, and because these failures concentrate in out-of-scope scenarios, accuracy on in-scope canonical scenarios (61\%) better represents the intended operating domain.
+
+Expert review reframed, rather than refuted, the contribution. Three implications follow. First, \textbf{positioning}: ADO is a decision-support aid that helps pre-populate an ACP progress note and complements POLST and the code-status system; it is not a legal instrument. The code-status mapping result (97\% field agreement) is direct evidence that ADO can populate exactly those bedside instruments and, via its conditionality flag, can carry information they cannot. Second, \textbf{dimensionality}: the current model represents only the \emph{what-intervention} axis, but real preferences carry a second \emph{who-decides} axis. The cohort's culturally complex patients, which show zero ADO advantage over baseline, make this gap empirically visible: family-deference and cultural framing cannot be represented in activation conditions alone. Third, \textbf{coverage}: artificial hydration/nutrition should be added as a sixth decision point, the POLST \emph{time-limited trial} should be modeled, and outputs should align with the real code-status taxonomy via an explicit \emph{no-escalation} status.
+
+\textbf{Limitations.} ADO output has no legal force. The cohort oracle is a simplified rule-based simulation, not hand-adjudicated clinical gold, so the 41.4\% figure is a stress-test signal about system behavior under realistic encoding variability rather than a deployment performance estimate. OWL lacks native temporal reasoning, addressed here with numeric time bounds. Negation under the open-world assumption has edge cases we continue to document. Encoding fidelity (how completely the pipeline captures intent) is distinct from reasoning fidelity (how correctly the reasoner evaluates what was encoded), and the cohort shows that encoding gaps, not reasoning errors, drive most performance loss. Finally, the gold standards for extraction and mapping evaluations were team-authored; inter-rater agreement and validation against real-EHR code-status documentation (e.g., MIMIC-IV) remain future work.
+
+%=============================================================================
+\section{Conclusion}
+%=============================================================================
+We built a computable ontology of EOL care preferences for advanced heart failure that reasons over conditional, graded, negatable preferences and returns a clinically honest four-category output. A single-patient vignette suite showed 16/16 (100\%) accuracy; a condition-blind ablation dropped to 12/16 (75\%) and a pure-LLM baseline to 10--12/16, isolating what the structured layer contributes; and a multi-patient cohort stress test (50 profiles, 25 scenarios, 3{,}550 cells) showed 41.4\% oracle agreement against a baseline of 83\% inherent oracle uncertainty and 17.4\% for flat checkboxes. A failure analysis showed that the primary failure is false activation (34\%), the over-assertion of coverage, not direction inversion (1.3\%), an asymmetry that is architecturally correctable and clinically preferable to confident errors. Expert clinical-ethics review reframed ADO as a decision-support aid for advance-care-planning documentation and charted a path forward centered on multidimensional (who-decides) preference modeling, artificial nutrition/hydration coverage, and alignment with the bedside code-status system.
+
+%=============================================================================
+\section{References}
+%=============================================================================
+\begingroup
+\renewcommand{\section}[2]{} % suppress duplicate header from thebibliography
+\makeatletter\renewcommand{\@biblabel}[1]{#1.}\makeatother % AMIA "1." labels
+\begin{thebibliography}{99}
+\footnotesize
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\labelsep}{0.4em}
+
+\bibitem{silveira2010} Silveira MJ, Kim SYH, Langa KM. Advance directives and outcomes of surrogate decision making before death. N Engl J Med. 2010;362(13):1211--8.
+\bibitem{yadav2017} Yadav KN, Gabler NB, Cooney E, et al. Approximately one in three US adults completes any type of advance directive for end-of-life care. Health Aff. 2017;36(7):1244--51.
+\bibitem{hl7adi2024} HL7 International. FHIR advance directive interoperability implementation guide. Release 1.1; 2024. Available from: https://hl7.org/fhir/us/pacio-adi/
+\bibitem{kremers2023} Kremers FW, et al. Trends in the prevalence of implantable cardioverter-defibrillators in the United States. Heart Rhythm. 2023;20(5):698--706.
+\bibitem{allen2012} Allen LA, Stevenson LW, Grady KL, et al. Decision making in advanced heart failure: a scientific statement from the American Heart Association. Circulation. 2012;125(15):1928--52.
+\bibitem{periyakoil} Periyakoil VS. Stanford letter project. Stanford School of Medicine; 2024. Available from: https://med.stanford.edu/letter.html
+\bibitem{owl2primer} W3C OWL Working Group. OWL 2 web ontology language primer. 2nd ed. W3C Recommendation; 2012. Available from: https://www.w3.org/TR/owl2-primer/
+\bibitem{protege} Musen MA. The Prot\'eg\'e project: a look back and a look forward. AI Matters. 2015;1(4):4--12.
+\bibitem{owlready2} Lamy JB. Owlready: ontology-oriented programming in Python with automatic classification and high level constructs for biomedical ontologies. Artif Intell Med. 2017;80:11--28.
+\bibitem{nyha} Criteria Committee of the New York Heart Association. Nomenclature and criteria for diagnosis of diseases of the heart and great vessels. 9th ed. Boston: Little, Brown; 1994.
+\bibitem{snomedct} SNOMED International. SNOMED CT; 2024. Available from: https://www.snomed.org/
+\bibitem{caringinfo} National Hospice and Palliative Care Organization. CaringInfo: advance directives by state; 2024. Available from: https://www.caringinfo.org/
+\bibitem{polst} National POLST. POLST: portable medical orders; 2024. Available from: https://polst.org/
+
+\end{thebibliography}
+\endgroup
+
+%=============================================================================
+% END MATTER
+%=============================================================================
+\section{Code and data availability}
+All code, the OWL ontology, populated example ontologies, the 50-patient cohort and 25-scenario battery, and step-by-step instructions to reproduce every result and figure in this paper are in the project repository and its README: \url{https://github.com/patrickwalsh26/bmds210-AD_Ontology}.
+
+\section{Team member contributions}
+\begin{table}[ht]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Member} & \textbf{Project contributions} & \textbf{Report contributions} \\
+\midrule
+Patrick Walsh & Ontology design and implementation in Prot\'eg\'e; concept inventory; structured preference-input pipeline; SNOMED CT grounding; LLM extraction pipeline; expert-review coordination & Primary author; wrote all sections; compiled references \\[4pt]
+Darren Chan & Repository setup and maintenance; scenario-based query engine; clinical vignette design; architecture ablation; testing and gap analysis & Reviewed and edited; contributed evaluation results and analysis \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{AI use statement}
+LLMs were used in two capacities. \textbf{As a system component}, a closed-world extraction pipeline (Claude) converts free-text directives into structured JSON, and a pure-LLM baseline (Gemini) serves only as an ablation; in all uses the ontology, not the LLM, is the auditable source of truth, with outputs constrained by typed schemas and a closed-world prompt. \textbf{As an authoring aid}, the authors used an AI assistant (Claude) to help implement evaluation scripts, generate figures from computed results, and copy-edit prose. All reported numbers and figures were produced by running the project's own code; the authors verified and take full responsibility for all content, and no results were fabricated.
+
+\section{Statement on sharing}
+We consent to the teaching team sharing this project as an example in future offerings of the course, with identifying information removed.
+
+\end{document}
