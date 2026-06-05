@@ -30,7 +30,7 @@ env/
 *.blg
 
 # Overleaf upload bundles (regenerable from the .tex)
-docs/*_overleaf.zip
+docs/*overleaf*.zip
 
 # Local experiment outputs
 ado-local-backup/

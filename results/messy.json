@@ -1,0 +1,79 @@
+{
+  "passages": 6,
+  "extracted": 17,
+  "clear": 5,
+  "conditional": 8,
+  "vague": 4,
+  "recall_hit": 14,
+  "recall_n": 16,
+  "oos_topics": 11,
+  "deleg_flagged": 3,
+  "rows": [
+    {
+      "id": "M1",
+      "extracted": 3,
+      "clear": 0,
+      "cond": 2,
+      "vague": 1,
+      "recall_hit": 3,
+      "recall_n": 3,
+      "oos_topics": 3,
+      "deleg_flagged": true
+    },
+    {
+      "id": "M2",
+      "extracted": 6,
+      "clear": 3,
+      "cond": 3,
+      "vague": 0,
+      "recall_hit": 4,
+      "recall_n": 5,
+      "oos_topics": 0,
+      "deleg_flagged": false
+    },
+    {
+      "id": "M3",
+      "extracted": 1,
+      "clear": 0,
+      "cond": 0,
+      "vague": 1,
+      "recall_hit": 1,
+      "recall_n": 1,
+      "oos_topics": 3,
+      "deleg_flagged": false
+    },
+    {
+      "id": "M4",
+      "extracted": 4,
+      "clear": 1,
+      "cond": 3,
+      "vague": 0,
+      "recall_hit": 3,
+      "recall_n": 4,
+      "oos_topics": 1,
+      "deleg_flagged": false
+    },
+    {
+      "id": "M5",
+      "extracted": 1,
+      "clear": 1,
+      "cond": 0,
+      "vague": 0,
+      "recall_hit": 1,
+      "recall_n": 1,
+      "oos_topics": 4,
+      "deleg_flagged": true
+    },
+    {
+      "id": "M6",
+      "extracted": 2,
+      "clear": 0,
+      "cond": 0,
+      "vague": 2,
+      "recall_hit": 2,
+      "recall_n": 2,
+      "oos_topics": 0,
+      "deleg_flagged": true
+    }
+  ]
+}
